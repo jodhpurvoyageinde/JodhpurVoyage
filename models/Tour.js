@@ -21,6 +21,12 @@ const tourSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+  customUrl: {
+    type: String,
+    lowercase: true,
+    trim: true,
+    default: ''
+  },
   subtitle: {
     type: String,
     trim: true
@@ -98,7 +104,22 @@ const tourSchema = new mongoose.Schema({
   faq: [{
     question: String,
     answer: String
-  }]
+  }],
+  seoTitle: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  seoKeywords: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  seoDescription: {
+    type: String,
+    trim: true,
+    default: ''
+  }
 }, {
   timestamps: true,
   collection: 'tours',

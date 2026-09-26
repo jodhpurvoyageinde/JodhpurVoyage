@@ -13,6 +13,12 @@ const blogPostSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+  customUrl: {
+    type: String,
+    lowercase: true,
+    trim: true,
+    default: ''
+  },
   excerpt: {
     type: String,
     required: true
@@ -44,6 +50,18 @@ const blogPostSchema = new mongoose.Schema({
   published: {
     type: Boolean,
     default: true
+  },
+  seoTitle: {
+    type: String,
+    default: ''
+  },
+  seoKeywords: {
+    type: String,
+    default: ''
+  },
+  seoDescription: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true,

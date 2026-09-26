@@ -66,6 +66,7 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
 router.get('/:identifier', async (req, res) => {
   try {
     const { identifier } = req.params;
+    const cleanId = identifier.toLowerCase();
 
     if (isMongoConnected()) {
       let destination;
@@ -73,7 +74,13 @@ router.get('/:identifier', async (req, res) => {
         destination = await Destination.findById(identifier);
       }
       if (!destination) {
-        destination = await Destination.findOne({ slug: identifier });
+        destination = await Destination.findOne({
+          $or: [
+            { slug: cleanId },
+            { customUrl: cleanId },
+            { customUrl: `/${cleanId}` }
+          ]
+        });
       }
       if (!destination) {
         return res.status(404).json({ message: 'Destination non trouvée' });
@@ -81,7 +88,7 @@ router.get('/:identifier', async (req, res) => {
       return res.json(normalizeDestination(destination));
     }
 
-    const destination = memoryStore.destinations.find((d) => d.slug === identifier || d._id === identifier);
+    const destination = memoryStore.destinations.find((d) => d.slug === cleanId || d.customUrl === cleanId || d._id === identifier);
     if (!destination) {
       return res.status(404).json({ message: 'Destination non trouvée' });
     }

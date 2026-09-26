@@ -170,19 +170,36 @@ router.post('/admin', protect, adminOnly, async (req, res) => {
 // PUT /api/reviews/:id
 router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
+    const { id } = req.params;
+    const updateData = req.body;
+
     if (isMongoConnected()) {
-      const review = await Review.findById(req.params.id);
-      if (!review) return res.status(404).json({ message: 'Avis introuvable' });
-      Object.assign(review, req.body);
-      const updated = await review.save();
-      return res.json(updated);
+      let updated;
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        updated = await Review.findByIdAndUpdate(id, { $set: updateData }, { new: true, runValidators: false });
+      }
+      if (!updated) {
+        updated = await Review.findOneAndUpdate({ _id: id }, { $set: updateData }, { new: true, runValidators: false });
+      }
+
+      if (!updated) {
+        const idx = memoryStore.reviews.findIndex((r) => String(r._id) === String(id));
+        if (idx !== -1) {
+          memoryStore.reviews[idx] = { ...memoryStore.reviews[idx], ...updateData };
+          return res.json(normalizeReview(memoryStore.reviews[idx]));
+        }
+        return res.status(404).json({ message: 'Avis introuvable' });
+      }
+
+      return res.json(normalizeReview(updated));
     }
 
-    const idx = memoryStore.reviews.findIndex((r) => r._id === req.params.id);
+    const idx = memoryStore.reviews.findIndex((r) => String(r._id) === String(id));
     if (idx === -1) return res.status(404).json({ message: 'Avis introuvable' });
-    memoryStore.reviews[idx] = { ...memoryStore.reviews[idx], ...req.body };
-    res.json(memoryStore.reviews[idx]);
+    memoryStore.reviews[idx] = { ...memoryStore.reviews[idx], ...updateData };
+    res.json(normalizeReview(memoryStore.reviews[idx]));
   } catch (error) {
+    console.error('Erreur update review:', error);
     res.status(400).json({ message: error.message || 'Erreur mise à jour' });
   }
 });
@@ -190,14 +207,21 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
 // DELETE /api/reviews/:id
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {
+    const { id } = req.params;
     if (isMongoConnected()) {
-      await Review.findByIdAndDelete(req.params.id);
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        await Review.findByIdAndDelete(id);
+      } else {
+        await Review.deleteOne({ _id: id });
+      }
+      memoryStore.reviews = memoryStore.reviews.filter((r) => String(r._id) !== String(id));
       return res.json({ message: 'Avis supprimé avec succès' });
     }
 
-    memoryStore.reviews = memoryStore.reviews.filter((r) => r._id !== req.params.id);
+    memoryStore.reviews = memoryStore.reviews.filter((r) => String(r._id) !== String(id));
     res.json({ message: 'Avis supprimé avec succès' });
   } catch (error) {
+    console.error('Erreur delete review:', error);
     res.status(500).json({ message: 'Erreur suppression' });
   }
 });

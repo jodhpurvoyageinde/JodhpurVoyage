@@ -10,6 +10,8 @@ import {
   sampleMessages
 } from './seed/seedData.js';
 
+import { defaultSeoData } from './seed/seoData.js';
+
 // In-Memory store initialized with prototype seed data
 export const memoryStore = {
   users: [
@@ -50,6 +52,12 @@ export const memoryStore = {
     _id: `contact_${idx + 1}`,
     ...m,
     createdAt: new Date().toISOString()
+  })),
+  seo: defaultSeoData.map((s, idx) => ({
+    _id: `seo_${idx + 1}`,
+    ...s,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }))
 };
 

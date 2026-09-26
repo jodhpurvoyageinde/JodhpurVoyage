@@ -1,5 +1,5 @@
 import express from 'express';
-import Tour from '../models/Tour.js';
+import BlogPost from '../models/BlogPost.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
@@ -12,135 +12,145 @@ const createSlug = (text) => {
     .replace(/ +/g, '-');
 };
 
-const getRegionFilterList = (region) => {
-  if (!region || region === 'all') return null;
-  if (region === 'inde-du-nord') {
-    return ['inde-du-nord', 'rajasthan', 'ladakh'];
-  }
-  if (region === 'inde-du-sud') {
-    return ['inde-du-sud', 'gujarat', 'tamil-nadu', 'kerala', 'karnataka'];
-  }
-  if (region === 'rajasthan') {
-    return ['rajasthan'];
-  }
-  if (region === 'ladakh') {
-    return ['ladakh'];
-  }
-  if (region === 'gujarat') {
-    return ['gujarat'];
-  }
-  if (region === 'nepal') {
-    return ['nepal'];
-  }
-  if (region === 'bhoutan') {
-    return ['bhoutan'];
-  }
-  return [region];
+const cleanHtml = (rawStr) => {
+  if (!rawStr || typeof rawStr !== 'string') return '';
+  return rawStr
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/\[\/?vc_[^\]]*\]/gi, '')
+    .trim();
 };
 
-const normalizeTour = (t) => {
-  const doc = t && t.toObject ? t.toObject() : (t || {});
-  const { price, priceUnit, pricing, ...safeDoc } = doc;
+const stripHtmlTags = (rawStr) => {
+  if (!rawStr || typeof rawStr !== 'string') return '';
+  return cleanHtml(rawStr)
+    .replace(/<[^>]*>?/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const normalizeBlogToTour = (blog) => {
+  const doc = blog && blog.toObject ? blog.toObject() : (blog || {});
+  const cleanTitle = stripHtmlTags(doc.title) || 'Circuit Blog';
+  const cleanExcerpt = stripHtmlTags(doc.excerpt || doc.summary || doc.content || '').slice(0, 160);
+  const cleanOverview = cleanHtml(doc.content || doc.excerpt || '');
+
   return {
-    ...safeDoc,
-    title: doc.title || doc.name || 'Circuit Inde',
-    slug: doc.slug || (doc.title ? doc.title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : doc._id),
-    subtitle: doc.subtitle || doc.tagline || (doc.overview ? doc.overview.slice(0, 110) : ''),
-    duration: doc.duration || (doc.daysCount ? `${doc.daysCount} Jours / ${doc.daysCount - 1} Nuits` : '10 Jours / 9 Nuits'),
-    location: doc.location || doc.cityName || doc.category || 'Inde du Nord',
-    image: doc.image || doc.coverImage || doc.bannerImage || '/images/dest-rajasthan.jpg',
-    region: (doc.region || doc.category || 'inde-du-nord').toLowerCase().replace(/\s+/g, '-'),
-    itinerary: Array.isArray(doc.itinerary) && doc.itinerary.length > 0 ? doc.itinerary : [],
-    highlights: Array.isArray(doc.highlights) && doc.highlights.length > 0 ? doc.highlights : []
+    _id: doc._id,
+    title: cleanTitle,
+    slug: doc.slug || (cleanTitle ? cleanTitle.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : doc._id),
+    subtitle: cleanExcerpt,
+    duration: doc.readTime || '5 Jours / 4 Nuits',
+    daysCount: 5,
+    location: doc.category || 'Inde du Nord',
+    region: (doc.category || 'rajasthan').toLowerCase().replace(/\s+/g, '-'),
+    theme: doc.category || 'Culture & Patrimoine',
+    badge: doc.category || 'Article Blog',
+    price: doc.price || 950,
+    priceUnit: '€ / pers',
+    rating: 4.9,
+    reviewCount: 35,
+    featured: true,
+    published: doc.published !== false,
+    image: doc.coverImage || doc.image || '/images/dest-rajasthan.jpg',
+    gallery: doc.gallery || [doc.coverImage || '/images/dest-rajasthan.jpg'],
+    overview: cleanOverview,
+    highlights: Array.isArray(doc.tags) && doc.tags.length > 0 ? doc.tags : ['Points d’intérêt culturels', 'Conseils d’experts', 'Circuit authentique'],
+    itinerary: Array.isArray(doc.itinerary) && doc.itinerary.length > 0 ? doc.itinerary : [
+      {
+        day: 1,
+        title: `Découverte: ${cleanTitle}`,
+        description: cleanExcerpt || 'Accueil et présentation du séjour.',
+        meals: 'Petit-déjeuner inclus',
+        accommodation: 'Hôtel de charme'
+      },
+      {
+        day: 2,
+        title: 'Exploration & Récit de Voyage',
+        description: stripHtmlTags(cleanOverview).slice(0, 300) || 'Visites guidées et découvertes locales.',
+        meals: 'Petit-déjeuner & Dîner',
+        accommodation: 'Haveli de patrimoine'
+      }
+    ],
+    inclusions: doc.inclusions || ['Chauffeur privé & véhicule climatisé', 'Guides locaux francophones', 'Hébergements de charme'],
+    exclusions: doc.exclusions || ['Vols internationaux', 'Frais de visa', 'Dépenses personnelles'],
+    createdAt: doc.createdAt
   };
 };
 
-// GET /api/tours
+// GET /api/tours (fetches from Blog Database)
 router.get('/', async (req, res) => {
   try {
-    const { region, theme, search, featured, limit } = req.query;
-    const regionList = getRegionFilterList(region);
+    const { region, search, limit } = req.query;
 
     if (isMongoConnected()) {
       let query = { published: { $ne: false } };
-      if (regionList) {
-        query.region = { $in: regionList };
+      if (region && region !== 'all') {
+        const regRegex = new RegExp(region.replace(/-/g, ' '), 'i');
+        query.$or = [
+          { category: regRegex },
+          { tags: regRegex },
+          { title: regRegex }
+        ];
       }
-      if (theme && theme !== 'all') query.theme = new RegExp(theme, 'i');
-      if (featured === 'true') query.featured = true;
       if (search) {
         const sRegex = new RegExp(search.trim(), 'i');
         query.$or = [
           { title: sRegex },
-          { location: sRegex },
-          { cityName: sRegex },
-          { overview: sRegex },
-          { subtitle: sRegex },
-          { region: sRegex },
+          { excerpt: sRegex },
+          { content: sRegex },
           { category: sRegex },
-          { highlights: sRegex },
-          { 'itinerary.title': sRegex },
-          { 'itinerary.description': sRegex },
-          { 'itinerary.desc': sRegex }
+          { tags: sRegex }
         ];
       }
 
-      let q = Tour.find(query).sort({ featured: -1, createdAt: -1 });
-      if (limit) q = q.limit(Number(limit));
-      let rawTours = await q.exec();
+      let bq = BlogPost.find(query).sort({ createdAt: -1 });
+      if (limit) bq = bq.limit(Number(limit));
+      let rawBlogs = await bq.exec();
 
-      // If specific search or region yielded 0 in MongoDB, check memoryStore fallback
-      if (rawTours.length === 0) {
-        let memList = memoryStore.tours.filter((t) => t.published !== false);
-        if (regionList) {
-          memList = memList.filter((t) => regionList.includes(t.region));
-        }
+      if (rawBlogs.length === 0) {
+        let memList = memoryStore.blogs.filter((b) => b.published !== false);
         if (search) {
           const s = search.toLowerCase();
-          memList = memList.filter((t) =>
-            t.title?.toLowerCase().includes(s) ||
-            t.location?.toLowerCase().includes(s) ||
-            t.cityName?.toLowerCase().includes(s) ||
-            t.overview?.toLowerCase().includes(s) ||
-            t.subtitle?.toLowerCase().includes(s) ||
-            t.region?.toLowerCase().includes(s) ||
-            t.highlights?.some((h) => h.toLowerCase().includes(s)) ||
-            t.itinerary?.some((i) => i.title?.toLowerCase().includes(s) || i.description?.toLowerCase().includes(s))
+          memList = memList.filter((b) =>
+            b.title?.toLowerCase().includes(s) ||
+            b.excerpt?.toLowerCase().includes(s) ||
+            b.content?.toLowerCase().includes(s) ||
+            b.category?.toLowerCase().includes(s)
           );
         }
         if (memList.length > 0) {
-          rawTours = memList;
+          rawBlogs = memList;
         }
       }
 
-      return res.json(rawTours.map(normalizeTour));
+      return res.json(rawBlogs.map(normalizeBlogToTour));
     }
 
     // Memory Store Fallback
-    let list = memoryStore.tours.filter((t) => t.published !== false);
-    if (regionList) {
-      list = list.filter((t) => regionList.includes(t.region));
+    let list = memoryStore.blogs.filter((b) => b.published !== false);
+    if (region && region !== 'all') {
+      const reg = region.toLowerCase().replace(/-/g, ' ');
+      list = list.filter((b) =>
+        b.category?.toLowerCase().includes(reg) ||
+        b.title?.toLowerCase().includes(reg) ||
+        b.tags?.some((t) => t.toLowerCase().includes(reg))
+      );
     }
-    if (theme && theme !== 'all') list = list.filter((t) => t.theme?.toLowerCase().includes(theme.toLowerCase()));
-    if (featured === 'true') list = list.filter((t) => t.featured);
     if (search) {
       const s = search.toLowerCase();
-      list = list.filter((t) =>
-        t.title?.toLowerCase().includes(s) ||
-        t.location?.toLowerCase().includes(s) ||
-        t.cityName?.toLowerCase().includes(s) ||
-        t.overview?.toLowerCase().includes(s) ||
-        t.subtitle?.toLowerCase().includes(s) ||
-        t.region?.toLowerCase().includes(s) ||
-        t.highlights?.some((h) => h.toLowerCase().includes(s)) ||
-        t.itinerary?.some((i) => i.title?.toLowerCase().includes(s) || i.description?.toLowerCase().includes(s))
+      list = list.filter((b) =>
+        b.title?.toLowerCase().includes(s) ||
+        b.excerpt?.toLowerCase().includes(s) ||
+        b.content?.toLowerCase().includes(s) ||
+        b.category?.toLowerCase().includes(s)
       );
     }
     if (limit) list = list.slice(0, Number(limit));
-    res.json(list.map(normalizeTour));
+    res.json(list.map(normalizeBlogToTour));
   } catch (error) {
     console.error('Erreur get tours:', error);
-    res.status(500).json({ message: 'Erreur lors de la récupération des circuits' });
+    res.status(500).json({ message: 'Erreur lors de la récupération des circuits depuis le blog' });
   }
 });
 
@@ -148,10 +158,10 @@ router.get('/', async (req, res) => {
 router.get('/admin/all', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const tours = await Tour.find().sort({ createdAt: -1 });
-      return res.json(tours.map(normalizeTour));
+      const blogs = await BlogPost.find().sort({ createdAt: -1 });
+      return res.json(blogs.map(normalizeBlogToTour));
     }
-    res.json(memoryStore.tours.map(normalizeTour));
+    res.json(memoryStore.blogs.map(normalizeBlogToTour));
   } catch (error) {
     res.status(500).json({ message: 'Erreur récupération circuits' });
   }
@@ -161,29 +171,36 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
 router.get('/:identifier', async (req, res) => {
   try {
     const { identifier } = req.params;
+    const cleanId = identifier.toLowerCase();
 
     if (isMongoConnected()) {
-      let tour;
+      let blog;
       if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
-        tour = await Tour.findById(identifier);
+        blog = await BlogPost.findById(identifier);
       }
-      if (!tour) {
-        tour = await Tour.findOne({ slug: identifier });
+      if (!blog) {
+        blog = await BlogPost.findOne({
+          $or: [
+            { slug: cleanId },
+            { customUrl: cleanId },
+            { customUrl: `/${cleanId}` }
+          ]
+        });
       }
-      if (!tour) {
-        tour = memoryStore.tours.find((t) => t.slug === identifier || t._id === identifier);
+      if (!blog) {
+        blog = memoryStore.blogs.find((b) => b.slug === cleanId || b.customUrl === cleanId || b._id === identifier);
       }
-      if (!tour) {
-        return res.status(404).json({ message: 'Circuit non trouvé' });
+      if (!blog) {
+        return res.status(404).json({ message: 'Circuit (Blog) non trouvé' });
       }
-      return res.json(normalizeTour(tour));
+      return res.json(normalizeBlogToTour(blog));
     }
 
-    const tour = memoryStore.tours.find((t) => t.slug === identifier || t._id === identifier);
-    if (!tour) {
-      return res.status(404).json({ message: 'Circuit non trouvé' });
+    const blog = memoryStore.blogs.find((b) => b.slug === cleanId || b.customUrl === cleanId || b._id === identifier);
+    if (!blog) {
+      return res.status(404).json({ message: 'Circuit (Blog) non trouvé' });
     }
-    res.json(normalizeTour(tour));
+    res.json(normalizeBlogToTour(blog));
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération du circuit' });
   }
@@ -198,18 +215,34 @@ router.post('/', protect, adminOnly, async (req, res) => {
     }
 
     if (isMongoConnected()) {
-      const tour = new Tour(tourData);
-      const created = await tour.save();
-      return res.status(201).json(created);
+      const blog = new BlogPost({
+        title: tourData.title,
+        slug: tourData.slug,
+        excerpt: tourData.subtitle || tourData.overview || '',
+        content: tourData.overview || tourData.subtitle || '',
+        coverImage: tourData.image || '/images/dest-rajasthan.jpg',
+        category: tourData.location || tourData.region || 'Tour Package',
+        readTime: tourData.duration || '5 min de lecture',
+        tags: tourData.highlights || []
+      });
+      const created = await blog.save();
+      return res.status(201).json(normalizeBlogToTour(created));
     }
 
-    const newTour = {
-      _id: `tour_${Date.now()}`,
-      ...tourData,
+    const newBlog = {
+      _id: `blog_${Date.now()}`,
+      title: tourData.title,
+      slug: tourData.slug,
+      excerpt: tourData.subtitle || tourData.overview || '',
+      content: tourData.overview || tourData.subtitle || '',
+      coverImage: tourData.image || '/images/dest-rajasthan.jpg',
+      category: tourData.location || tourData.region || 'Tour Package',
+      readTime: tourData.duration || '5 min de lecture',
+      tags: tourData.highlights || [],
       createdAt: new Date().toISOString()
     };
-    memoryStore.tours.unshift(newTour);
-    res.status(201).json(newTour);
+    memoryStore.blogs.unshift(newBlog);
+    res.status(201).json(normalizeBlogToTour(newBlog));
   } catch (error) {
     res.status(400).json({ message: error.message || 'Erreur création circuit' });
   }
@@ -219,17 +252,17 @@ router.post('/', protect, adminOnly, async (req, res) => {
 router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const tour = await Tour.findById(req.params.id);
-      if (!tour) return res.status(404).json({ message: 'Circuit introuvable' });
-      Object.assign(tour, req.body);
-      const updated = await tour.save();
-      return res.json(updated);
+      const blog = await BlogPost.findById(req.params.id);
+      if (!blog) return res.status(404).json({ message: 'Circuit introuvable' });
+      Object.assign(blog, req.body);
+      const updated = await blog.save();
+      return res.json(normalizeBlogToTour(updated));
     }
 
-    const idx = memoryStore.tours.findIndex((t) => t._id === req.params.id);
+    const idx = memoryStore.blogs.findIndex((b) => b._id === req.params.id);
     if (idx === -1) return res.status(404).json({ message: 'Circuit introuvable' });
-    memoryStore.tours[idx] = { ...memoryStore.tours[idx], ...req.body };
-    res.json(memoryStore.tours[idx]);
+    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...req.body };
+    res.json(normalizeBlogToTour(memoryStore.blogs[idx]));
   } catch (error) {
     res.status(400).json({ message: error.message || 'Erreur mise à jour' });
   }
@@ -239,11 +272,11 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      await Tour.findByIdAndDelete(req.params.id);
+      await BlogPost.findByIdAndDelete(req.params.id);
       return res.json({ message: 'Circuit supprimé avec succès' });
     }
 
-    memoryStore.tours = memoryStore.tours.filter((t) => t._id !== req.params.id);
+    memoryStore.blogs = memoryStore.blogs.filter((b) => b._id !== req.params.id);
     res.json({ message: 'Circuit supprimé avec succès' });
   } catch (error) {
     res.status(500).json({ message: 'Erreur suppression circuit' });
@@ -251,3 +284,4 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
 });
 
 export default router;
+

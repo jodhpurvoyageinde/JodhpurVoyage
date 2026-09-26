@@ -19,6 +19,12 @@ const destinationSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+  customUrl: {
+    type: String,
+    lowercase: true,
+    trim: true,
+    default: ''
+  },
   region: {
     type: String,
     required: true,

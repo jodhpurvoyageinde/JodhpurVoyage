@@ -15,6 +15,8 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import seoRoutes from './routes/seoRoutes.js';
+import customUrlRoutes from './routes/customUrlRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +25,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const API_PREFIX = (process.env.API_PREFIX || '/api').replace(/\/+$/, '');
 
 // Middleware
 app.use(cors({
@@ -44,33 +47,60 @@ app.use('/images', express.static(rootImagesPath));
 const uploadsPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/tours', tourRoutes);
-app.use('/api/destinations', destinationRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/stats', statsRoutes);
-app.use('/api/upload', uploadRoutes);
+// API Routes setup with configurable API_PREFIX
+const registerRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/tours`, tourRoutes);
+  app.use(`${prefix}/destinations`, destinationRoutes);
+  app.use(`${prefix}/bookings`, bookingRoutes);
+  app.use(`${prefix}/contacts`, contactRoutes);
+  app.use(`${prefix}/reviews`, reviewRoutes);
+  app.use(`${prefix}/blogs`, blogRoutes);
+  app.use(`${prefix}/stats`, statsRoutes);
+  app.use(`${prefix}/upload`, uploadRoutes);
+  app.use(`${prefix}/seo`, seoRoutes);
+  app.use(`${prefix}/custom-urls`, customUrlRoutes);
+};
+
+// Mount configured API prefix
+registerRoutes(API_PREFIX);
+
+// If custom API_PREFIX is set, also maintain /api alias for backward compatibility
+if (API_PREFIX !== '/api') {
+  registerRoutes('/api');
+}
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(`${API_PREFIX}/health`, (req, res) => {
   res.json({
     status: 'OK',
     app: 'Jodhpur Voyage API',
+    apiPrefix: API_PREFIX,
     mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString()
   });
 });
+
+if (API_PREFIX !== '/api') {
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'OK',
+      app: 'Jodhpur Voyage API',
+      apiPrefix: API_PREFIX,
+      mongoStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      timestamp: new Date().toISOString()
+    });
+  });
+}
 
 // Root API info
 app.get('/', (req, res) => {
   res.json({
     message: 'Bienvenue sur l’API Jodhpur Voyage',
     version: '1.0.0',
-    documentation: '/api/health'
+    apiPrefix: API_PREFIX,
+    documentation: `${API_PREFIX}/health`,
+    customUrlsEndpoint: `${API_PREFIX}/custom-urls`
   });
 });
 
@@ -108,11 +138,10 @@ const connectMongoDB = async () => {
   }
 };
 
-connectMongoDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Serveur Backend Jodhpur Voyage démarré sur http://localhost:${PORT}`);
-    console.log(`📡 API Health Check disponible sur http://localhost:${PORT}/api/health`);
-  });
+app.listen(PORT, () => {
+  console.log(`🚀 Serveur Backend Jodhpur Voyage démarré sur http://localhost:${PORT}`);
+  console.log(`📡 API Health Check disponible sur http://localhost:${PORT}/api/health`);
+  connectMongoDB();
 });
 
 export default app;
