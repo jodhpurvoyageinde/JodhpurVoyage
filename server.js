@@ -17,6 +17,7 @@ import statsRoutes from './routes/statsRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import seoRoutes from './routes/seoRoutes.js';
 import customUrlRoutes from './routes/customUrlRoutes.js';
+import megaMenuRoutes from './routes/megaMenuRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,6 +61,7 @@ const registerRoutes = (prefix) => {
   app.use(`${prefix}/upload`, uploadRoutes);
   app.use(`${prefix}/seo`, seoRoutes);
   app.use(`${prefix}/custom-urls`, customUrlRoutes);
+  app.use(`${prefix}/mega-menu`, megaMenuRoutes);
 };
 
 // Mount configured API prefix
