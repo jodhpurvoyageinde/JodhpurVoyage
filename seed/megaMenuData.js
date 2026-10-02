@@ -85,26 +85,26 @@ export const defaultMegaMenuData = {
         title: 'Formalités & Climat',
         icon: 'fas fa-passport',
         links: [
-          { label: "Visa pour l'Inde & Népal", path: '/infos-pratiques#visa', icon: 'fas fa-id-card' },
-          { label: 'Quand partir', path: '/infos-pratiques#quand-partir', icon: 'fas fa-calendar-alt' },
-          { label: 'Climat & Météo', path: '/infos-pratiques#climat', icon: 'fas fa-sun' }
+          { label: "Visa pour l'Inde & Népal", path: '/visa-inde-nepal', icon: 'fas fa-id-card' },
+          { label: 'Quand partir', path: '/quand-partir', icon: 'fas fa-calendar-alt' },
+          { label: 'Climat & Météo', path: '/climat-meteo', icon: 'fas fa-sun' }
         ]
       },
       {
         title: 'Santé & Budget',
         icon: 'fas fa-heartbeat',
         links: [
-          { label: 'Santé & Vaccins', path: '/infos-pratiques#sante', icon: 'fas fa-first-aid' },
-          { label: 'Monnaie & Change (Rupee)', path: '/infos-pratiques#monnaie', icon: 'fas fa-coins' },
-          { label: 'Transports & Chauffeur', path: '/infos-pratiques#transport', icon: 'fas fa-car-side' }
+          { label: 'Santé & Vaccins', path: '/sante-vaccins', icon: 'fas fa-first-aid' },
+          { label: 'Monnaie & Change (Rupee)', path: '/monnaie-change', icon: 'fas fa-coins' },
+          { label: 'Transports & Chauffeur', path: '/transports-chauffeur', icon: 'fas fa-car-side' }
         ]
       },
       {
         title: 'FAQ & Conseils',
         icon: 'fas fa-question-circle',
         links: [
-          { label: 'Conseils pratiques', path: '/infos-pratiques#conseils', icon: 'fas fa-lightbulb' },
-          { label: 'Questions Fréquentes', path: '/infos-pratiques#faq', icon: 'fas fa-comments' }
+          { label: 'Conseils pratiques', path: '/conseils-pratiques', icon: 'fas fa-lightbulb' },
+          { label: 'Questions Fréquentes', path: '/faq', icon: 'fas fa-comments' }
         ]
       }
     ],
