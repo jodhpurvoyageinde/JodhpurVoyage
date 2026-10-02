@@ -24,13 +24,13 @@ export const defaultMegaMenuData = {
       },
       {
         title: 'Notre valeur ajoutée',
-        link: '/qui-sommes-nous#valeurs',
+        link: '/notre-valeur-ajoutee',
         image: '/images/image-9.jpg',
         order: 2
       },
       {
         title: 'Notre engagement responsable',
-        link: '/qui-sommes-nous#engagement',
+        link: '/notre-engagement-responsable',
         image: '/images/image-6.jpg',
         order: 3
       },
@@ -127,25 +127,25 @@ export const defaultMegaMenuData = {
       },
       {
         title: 'Circuit accompagné',
-        link: '/tours',
+        link: '/circuit-accompagne',
         image: '/images/image-9.jpg',
         order: 2
       },
       {
         title: 'Culture & Safari',
-        link: '/destinations/rajasthan',
+        link: '/culture-et-safari',
         image: '/images/image-6.jpg',
         order: 3
       },
       {
         title: '+ de 10 personnes',
-        link: '/contact',
+        link: '/plus-de-10-personnes',
         image: '/images/slide4-300x176.jpg',
         order: 4
       },
       {
         title: 'Toutes les inspirations',
-        link: '/destinations',
+        link: '/inspirations',
         image: '/images/slide8-300x176.jpg',
         order: 5
       }
