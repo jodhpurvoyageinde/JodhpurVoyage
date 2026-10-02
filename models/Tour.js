@@ -41,11 +41,23 @@ const tourSchema = new mongoose.Schema({
   },
   location: {
     type: String,
-    required: true
+    default: ''
   },
+  category: {
+    type: String,
+    default: 'Rajasthan'
+  },
+  categoryId: {
+    type: String,
+    default: ''
+  },
+  cities: [{
+    cityId: { type: String, default: '' },
+    name: { type: String, required: true },
+    slug: { type: String, required: true }
+  }],
   region: {
     type: String,
-    enum: ['rajasthan', 'inde-du-nord', 'inde-du-sud', 'ladakh', 'gujarat', 'nepal', 'bhoutan'],
     default: 'rajasthan'
   },
   theme: {

@@ -101,7 +101,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/custom-urls - Create new custom URL mapping
+// POST /api/custom-urls - Create or update custom URL mapping
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const { customPath, targetUrl, targetType, targetId, redirectType, active, description } = req.body;
@@ -115,7 +115,21 @@ router.post('/', protect, adminOnly, async (req, res) => {
     if (isMongoConnected()) {
       const existing = await CustomUrl.findOne({ customPath: normalizedCustomPath });
       if (existing) {
-        return res.status(400).json({ message: 'Cette URL personnalisée existe déjà' });
+        // Upsert / Update existing mapping seamlessly
+        const updated = await CustomUrl.findByIdAndUpdate(
+          existing._id,
+          {
+            customPath: normalizedCustomPath,
+            targetUrl,
+            targetType: targetType || 'custom',
+            targetId: targetId || '',
+            redirectType: redirectType || 301,
+            active: active !== false,
+            description: description || ''
+          },
+          { new: true }
+        );
+        return res.status(200).json(updated);
       }
 
       const newUrl = await CustomUrl.create({
@@ -129,6 +143,23 @@ router.post('/', protect, adminOnly, async (req, res) => {
       });
 
       return res.status(201).json(newUrl);
+    }
+
+    const existingIndex = memoryStore.customUrls.findIndex(
+      (item) => normalizePath(item.customPath) === normalizedCustomPath
+    );
+    if (existingIndex !== -1) {
+      memoryStore.customUrls[existingIndex] = {
+        ...memoryStore.customUrls[existingIndex],
+        targetUrl,
+        targetType: targetType || 'custom',
+        targetId: targetId || '',
+        redirectType: redirectType || 301,
+        active: active !== false,
+        description: description || '',
+        updatedAt: new Date().toISOString()
+      };
+      return res.status(200).json(memoryStore.customUrls[existingIndex]);
     }
 
     const newMemUrl = {

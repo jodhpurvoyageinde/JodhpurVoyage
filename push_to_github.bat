@@ -1,5 +1,5 @@
 @echo off
-cd /d "d:\dump\jodhpur voyage\backend"
+cd /d "d:\jodhpur_voyage01022026updated\jodhpur_voyage\backend"
 echo ========================================================
 echo   Uploading Jodhpur Voyage Backend to GitHub...
 echo ========================================================

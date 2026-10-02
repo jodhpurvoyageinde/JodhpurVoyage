@@ -2,6 +2,7 @@ import express from 'express';
 import Booking from '../models/Booking.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { sendBookingNotificationEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -54,6 +55,11 @@ router.post('/', async (req, res) => {
       preferredContact: body.preferredContact || 'email',
       status: 'nouveau'
     };
+
+    // Trigger email notification to Info@jodhpurvoyage.com from jodhpurvoyageinde@gmail.com
+    sendBookingNotificationEmail(bookingData).catch((err) => {
+      console.error('Erreur envoi notification mail booking:', err);
+    });
 
     if (isMongoConnected()) {
       const booking = new Booking(bookingData);

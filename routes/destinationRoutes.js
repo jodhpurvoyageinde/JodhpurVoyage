@@ -1,5 +1,6 @@
 import express from 'express';
 import Destination from '../models/Destination.js';
+import DestinationCategory from '../models/DestinationCategory.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 
@@ -12,16 +13,56 @@ const createSlug = (text) => {
     .replace(/ +/g, '-');
 };
 
+const DEST_IMAGE_FALLBACKS = {
+  'rajasthan': '/images/dest-rajasthan.jpg',
+  'jodhpur': '/images/dest-jodhpur.jpg',
+  'delhi': '/images/dest-tajmahal.jpg',
+  'delhi-agra': '/images/dest-tajmahal.jpg',
+  'agra': '/images/dest-tajmahal.jpg',
+  'varanasi': '/images/dest-varanasi.jpg',
+  'amritsar': '/images/dest-jodhpur.jpg',
+  'amritsar-punjab': '/images/dest-jodhpur.jpg',
+  'dharamsala': '/images/dest-himachal.jpg',
+  'dharamsala-himachal': '/images/dest-himachal.jpg',
+  'himachal-pradesh': '/images/dest-himachal.jpg',
+  'rishikesh': '/images/image-12.jpg',
+  'rishikesh-uttarakhand': '/images/image-12.jpg',
+  'ladakh': '/images/dest-ladakh.jpg',
+  'kerala': '/images/dest-kerala.jpg',
+  'tamil-nadu': '/images/dest-karnataka.jpg',
+  'karnataka': '/images/dest-karnataka.jpg',
+  'gujarat': '/images/dest-gujarat.jpg',
+  'goa': '/images/dest-goa.jpg',
+  'orissa': '/images/dest-orissa.jpg',
+  'madhya-pradesh': '/images/image-8.jpg',
+  'darjeeling-sikkim': '/images/slide8-300x176.jpg',
+  'nepal': '/images/dest-nepal.jpg',
+  'kathmandu': '/images/dest-nepal.jpg',
+  'chitwan': '/images/slide8-300x176.jpg',
+  'pokhara': '/images/dest-nepal.jpg',
+  'bhoutan': '/images/jaipur-travel.jpg',
+  'punakha': '/images/Voyage-Jaisalmer.jpg',
+  'paro': '/images/image-9.jpg',
+  'thimphu': '/images/jaipur-travel.jpg'
+};
+
 const normalizeDestination = (d) => {
   const doc = d && d.toObject ? d.toObject() : (d || {});
+  const slug = doc.slug || (doc.name ? doc.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : doc._id);
+
+  let validImage = doc.image || doc.bannerImage || doc.coverImage;
+  if (!validImage || validImage.includes('undefined') || validImage === '/images/dest-punakha.jpg') {
+    validImage = DEST_IMAGE_FALLBACKS[slug] || DEST_IMAGE_FALLBACKS[doc.name?.toLowerCase()] || '/images/dest-rajasthan.jpg';
+  }
+
   return {
     ...doc,
     name: doc.name || 'Destination',
-    slug: doc.slug || (doc.name ? doc.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : doc._id),
+    slug: slug,
     tagline: doc.tagline || doc.heroTitle || 'Explorez cette destination féérique',
     shortDescription: doc.shortDescription || doc.metaDescription || doc.description || `${doc.name} - découvrez nos offres et circuits sur mesure.`,
-    image: doc.image || doc.bannerImage || doc.coverImage || '/images/dest-rajasthan.jpg',
-    gallery: Array.isArray(doc.gallery) && doc.gallery.length > 0 ? doc.gallery : [doc.image || doc.bannerImage || '/images/dest-rajasthan.jpg'],
+    image: validImage,
+    gallery: Array.isArray(doc.gallery) && doc.gallery.length > 0 ? doc.gallery : [validImage],
     highlights: Array.isArray(doc.highlights) && doc.highlights.length > 0 ? doc.highlights : ['Monuments historiques', 'Culture et traditions', 'Circuits avec chauffeur privé'],
     region: (doc.region || doc.categoryName || 'inde-du-nord').toLowerCase().replace(/\s+/g, '-')
   };
@@ -59,6 +100,29 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     res.json(memoryStore.destinations.map(normalizeDestination));
   } catch (error) {
     res.status(500).json({ message: 'Erreur admin destinations' });
+  }
+});
+
+// GET /api/destinations/categories
+router.get('/categories', async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const categories = await DestinationCategory.find({ status: { $ne: 'Inactive' } }).sort({ order: 1, name: 1 });
+      return res.json(categories);
+    }
+    const fallbackCategories = [
+      { name: 'Rajasthan', slug: 'rajasthan' },
+      { name: 'North India', slug: 'north-india' },
+      { name: 'South India', slug: 'south-india' },
+      { name: 'Himalaya & Ladakh', slug: 'ladakh' },
+      { name: 'Gujarat', slug: 'gujarat' },
+      { name: 'Nepal', slug: 'nepal' },
+      { name: 'Bhoutan', slug: 'bhoutan' }
+    ];
+    res.json(fallbackCategories);
+  } catch (error) {
+    console.error('Erreur récupération catégories:', error);
+    res.status(500).json({ message: 'Erreur récupération catégories destinations' });
   }
 });
 

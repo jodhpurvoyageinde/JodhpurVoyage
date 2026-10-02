@@ -26,6 +26,7 @@ export const memoryStore = {
   tours: toursData.map((t, idx) => ({
     _id: `tour_${idx + 1}`,
     ...t,
+    featured: false,
     createdAt: new Date().toISOString()
   })),
   destinations: destinationsData.map((d, idx) => ({
@@ -41,6 +42,7 @@ export const memoryStore = {
   blogs: blogPostsData.map((b, idx) => ({
     _id: `blog_${idx + 1}`,
     ...b,
+    featured: false,
     createdAt: new Date().toISOString()
   })),
   bookings: sampleBookings.map((b, idx) => ({

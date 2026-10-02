@@ -21,11 +21,11 @@ const blogPostSchema = new mongoose.Schema({
   },
   excerpt: {
     type: String,
-    required: true
+    default: ''
   },
   content: {
     type: String,
-    required: true
+    default: ''
   },
   coverImage: {
     type: String,
@@ -40,6 +40,15 @@ const blogPostSchema = new mongoose.Schema({
     type: String,
     default: 'Conseils Voyage'
   },
+  categoryId: {
+    type: String,
+    default: ''
+  },
+  cities: [{
+    cityId: { type: String, default: '' },
+    name: { type: String, required: true },
+    slug: { type: String, required: true }
+  }],
   readTime: {
     type: String,
     default: '5 min de lecture'
@@ -50,6 +59,10 @@ const blogPostSchema = new mongoose.Schema({
   published: {
     type: Boolean,
     default: true
+  },
+  featured: {
+    type: Boolean,
+    default: false
   },
   seoTitle: {
     type: String,

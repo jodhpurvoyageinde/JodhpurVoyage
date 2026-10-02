@@ -2,6 +2,7 @@ import express from 'express';
 import ContactMessage from '../models/ContactMessage.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { sendContactNotificationEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -22,6 +23,11 @@ router.post('/', async (req, res) => {
       message,
       status: 'unread'
     };
+
+    // Trigger email notification to Info@jodhpurvoyage.com from jodhpurvoyageinde@gmail.com
+    sendContactNotificationEmail(data).catch((err) => {
+      console.error('Erreur envoi notification mail contact:', err);
+    });
 
     if (isMongoConnected()) {
       const contact = new ContactMessage(data);
