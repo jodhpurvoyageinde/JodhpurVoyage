@@ -2,12 +2,12 @@
   "name": "jodhpur-voyage-root",
   "version": "1.0.0",
   "description": "Jodhpur Voyage Web Service",
-  "main": "backend/server.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "postinstall": "npm install --prefix backend",
     "build": "npm install --prefix backend",
-    "start": "node backend/server.js"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18.0.0"
