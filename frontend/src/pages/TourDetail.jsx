@@ -31,7 +31,6 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
   const slug = overrideSlug || paramSlug;
   const [tour, setTour] = useState(initialTour || null);
   const [loading, setLoading] = useState(!initialTour);
-  const [openDay, setOpenDay] = useState(1);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   useEffect(() => {
@@ -256,71 +255,6 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
                 </div>
               )}
             </div>
-
-            {/* Day by Day Itinerary */}
-            {tour.itinerary && tour.itinerary.length > 0 && (
-              <div style={{ background: '#fff', borderRadius: '12px', padding: '30px', marginBottom: '30px', boxShadow: 'var(--shadow-sm)' }}>
-                <h2 style={{ fontSize: '1.6rem', marginBottom: '20px', color: 'var(--secondary-color)' }}>
-                  <i className="fas fa-map-marked-alt" style={{ color: 'var(--primary-color)' }}></i> Itinéraire Détaillé Jour par Jour
-                </h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {tour.itinerary.map((item) => (
-                    <div
-                      key={item.day}
-                      style={{
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        transition: 'var(--transition)'
-                      }}
-                    >
-                      <div
-                        onClick={() => setOpenDay(openDay === item.day ? null : item.day)}
-                        style={{
-                          background: openDay === item.day ? 'var(--secondary-color)' : '#f8fafc',
-                          color: openDay === item.day ? '#fff' : 'var(--secondary-color)',
-                          padding: '14px 20px',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          fontWeight: '700',
-                          fontSize: '1rem'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span
-                            style={{
-                              background: openDay === item.day ? 'var(--gold-color)' : 'var(--primary-color)',
-                              color: openDay === item.day ? '#0b2545' : '#fff',
-                              padding: '2px 8px',
-                              borderRadius: '4px',
-                              fontSize: '0.8rem'
-                            }}
-                          >
-                            Jour {item.day}
-                          </span>
-                          <span>{item.title}</span>
-                        </div>
-                        <i className={`fas fa-chevron-${openDay === item.day ? 'up' : 'down'}`}></i>
-                      </div>
-
-                      {openDay === item.day && (
-                        <div style={{ padding: '20px', background: '#ffffff' }}>
-                          <p style={{ lineHeight: '1.7', color: 'var(--text-main)', marginBottom: '14px' }}>
-                            {item.description}
-                          </p>
-                          <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', color: 'var(--text-muted)', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
-                            {item.meals && <span><i className="fas fa-utensils" style={{ color: 'var(--primary-color)' }}></i> {item.meals}</span>}
-                            {item.accommodation && <span><i className="fas fa-hotel" style={{ color: 'var(--primary-color)' }}></i> {item.accommodation}</span>}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Inclusions & Exclusions */}
             <div style={{ background: '#fff', borderRadius: '12px', padding: '30px', boxShadow: 'var(--shadow-sm)' }}>

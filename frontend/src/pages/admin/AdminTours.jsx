@@ -669,41 +669,7 @@ const AdminTours = () => {
                   <textarea rows="4" required className="form-control" placeholder="Compelling description of the tour..." value={formData.overview} onChange={(e) => setFormData({ ...formData, overview: e.target.value })}></textarea>
                 </div>
 
-                {/* Day by Day Itinerary Builder */}
-                <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', marginBottom: '20px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <strong style={{ color: 'var(--admin-text-main)' }}>Day by Day Program ({formData.itinerary?.length || 0} days)</strong>
-                    <button type="button" className="btn btn-sm btn-outline" onClick={handleAddItineraryDay}>
-                      <i className="fas fa-plus"></i> Add Day
-                    </button>
-                  </div>
 
-                  {formData.itinerary?.map((it, idx) => (
-                    <div key={idx} style={{ background: '#FFFFFF', padding: '14px', borderRadius: '8px', marginBottom: '12px', border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span style={{ fontWeight: '700', color: 'var(--admin-primary)', fontSize: '0.9rem' }}>Day {it.day || idx + 1}</span>
-                        <button type="button" style={{ background: 'transparent', border: 'none', color: '#DC2626', cursor: 'pointer', padding: '4px' }} onClick={() => handleRemoveItineraryDay(idx)} title="Delete day">
-                          <i className="fas fa-trash-alt"></i>
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Day title (e.g. Delhi - Jaipur)"
-                        className="form-control"
-                        style={{ marginBottom: '8px' }}
-                        value={it.title}
-                        onChange={(e) => handleItineraryChange(idx, 'title', e.target.value)}
-                      />
-                      <textarea
-                        rows="2"
-                        placeholder="Sightseeing, monuments, travel details..."
-                        className="form-control"
-                        value={it.description}
-                        onChange={(e) => handleItineraryChange(idx, 'description', e.target.value)}
-                      ></textarea>
-                    </div>
-                  ))}
-                </div>
 
                 {/* SEO Meta Tag Settings */}
                 <div style={{ background: '#F0F9FF', padding: '16px', borderRadius: '10px', marginBottom: '20px', border: '1px solid #BAE6FD' }}>
