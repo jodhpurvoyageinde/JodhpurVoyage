@@ -9,7 +9,10 @@ const router = express.Router();
 const createSlug = (text) => {
   return (text || '')
     .toLowerCase()
-    .replace(/[^\w ]+/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w -]+/g, '')
+    .trim()
     .replace(/ +/g, '-');
 };
 
@@ -70,7 +73,10 @@ const formatBlogPost = (post) => {
     featured: doc.featured === true,
     publishedAt: doc.publishedAt || doc.createdAt || new Date().toISOString(),
     createdAt: doc.createdAt || new Date().toISOString(),
-    cities: doc.cities || []
+    cities: doc.cities || [],
+    seoTitle: doc.seoTitle || '',
+    seoKeywords: doc.seoKeywords || '',
+    seoDescription: doc.seoDescription || ''
   };
 };
 
@@ -261,22 +267,29 @@ router.get('/:identifier', async (req, res) => {
 // POST /api/blogs
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
-    const blogData = req.body;
+    const blogData = { ...req.body };
     if (!blogData.slug && blogData.title) {
       blogData.slug = createSlug(blogData.title);
+    } else if (blogData.slug) {
+      blogData.slug = createSlug(blogData.slug);
     }
 
     if (isMongoConnected()) {
       const blog = new BlogPost({
         title: blogData.title,
         slug: blogData.slug,
+        customUrl: blogData.customUrl || '',
         excerpt: blogData.excerpt || '',
         content: blogData.content || '',
         coverImage: blogData.coverImage || '/images/dest-rajasthan.jpg',
-        category: blogData.category || 'Travel Guide',
+        category: blogData.category || 'Conseils Voyage',
         readTime: blogData.readTime || '5 min de lecture',
         tags: blogData.tags || ['Inde'],
-        published: blogData.published !== false
+        published: blogData.published !== false,
+        featured: blogData.featured === true,
+        seoTitle: blogData.seoTitle || '',
+        seoKeywords: blogData.seoKeywords || '',
+        seoDescription: blogData.seoDescription || ''
       });
       const saved = await blog.save();
       return res.status(201).json(formatBlogPost(saved));
@@ -291,6 +304,7 @@ router.post('/', protect, adminOnly, async (req, res) => {
     memoryStore.blogs.unshift(saved);
     res.status(201).json(formatBlogPost(saved));
   } catch (error) {
+    console.error('Erreur creation article:', error);
     res.status(400).json({ message: error.message || 'Erreur création article' });
   }
 });
@@ -298,38 +312,77 @@ router.post('/', protect, adminOnly, async (req, res) => {
 // PUT /api/blogs/:id
 router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+
     if (isMongoConnected()) {
-      const blog = await BlogPost.findById(req.params.id);
-      if (!blog) return res.status(404).json({ message: 'Article introuvable' });
-      Object.assign(blog, req.body);
+      let blog;
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        blog = await BlogPost.findById(id);
+      }
+      if (!blog) {
+        blog = await BlogPost.findOne({
+          $or: [
+            { _id: id },
+            { slug: id.toLowerCase() },
+            { customUrl: id.toLowerCase() }
+          ]
+        });
+      }
+
+      if (!blog) {
+        return res.status(404).json({ message: 'Article introuvable en base de données' });
+      }
+
+      if (updateData.slug && updateData.slug.trim()) {
+        updateData.slug = createSlug(updateData.slug);
+      } else if (updateData.title && !blog.slug) {
+        updateData.slug = createSlug(updateData.title);
+      }
+
+      Object.assign(blog, updateData);
       const updated = await blog.save();
       return res.json(formatBlogPost(updated));
     }
 
     if (!memoryStore.blogs) memoryStore.blogs = [];
-    const idx = memoryStore.blogs.findIndex((b) => b._id === req.params.id);
-    if (idx === -1) return res.status(404).json({ message: 'Article introuvable' });
-    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...req.body };
+    const idx = memoryStore.blogs.findIndex((b) => b._id === id || b.slug === id);
+    if (idx === -1) {
+      return res.status(404).json({ message: 'Article introuvable dans la mémoire' });
+    }
+
+    if (updateData.slug && updateData.slug.trim()) {
+      updateData.slug = createSlug(updateData.slug);
+    }
+
+    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...updateData };
     res.json(formatBlogPost(memoryStore.blogs[idx]));
   } catch (error) {
-    res.status(400).json({ message: error.message || 'Erreur mise à jour' });
+    console.error('Erreur update blog:', error);
+    res.status(400).json({ message: error.message || 'Erreur mise à jour article' });
   }
 });
 
 // DELETE /api/blogs/:id
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {
+    const { id } = req.params;
     if (isMongoConnected()) {
-      await BlogPost.findByIdAndDelete(req.params.id);
+      if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        await BlogPost.findByIdAndDelete(id);
+      } else {
+        await BlogPost.deleteOne({ $or: [{ _id: id }, { slug: id }] });
+      }
       return res.json({ message: 'Article supprimé avec succès' });
     }
 
     if (memoryStore.blogs) {
-      memoryStore.blogs = memoryStore.blogs.filter((b) => b._id !== req.params.id);
+      memoryStore.blogs = memoryStore.blogs.filter((b) => b._id !== id && b.slug !== id);
     }
     res.json({ message: 'Article supprimé avec succès' });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur suppression' });
+    console.error('Erreur delete blog:', error);
+    res.status(400).json({ message: error.message || 'Erreur suppression' });
   }
 });
 
