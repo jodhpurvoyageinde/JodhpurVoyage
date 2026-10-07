@@ -9,15 +9,14 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Nord',
     icon: 'fas fa-gopuram',
     subcategories: [
-      { name: 'Rajasthan', path: '/destinations/rajasthan', searchKey: 'rajasthan' },
-      { name: 'Ladakh', path: '/destinations/ladakh', searchKey: 'ladakh' },
-      { name: 'Himalaya', path: '/tours?search=Himalaya', searchKey: 'himalaya' },
-      { name: 'Himachal', path: '/destinations/dharamsala-himachal', searchKey: 'himachal' },
+      { name: 'Rajasthan', path: '/tours?region=rajasthan', searchKey: 'rajasthan' },
+      { name: 'Delhi', path: '/tours?search=Delhi', searchKey: 'delhi' },
+      { name: 'Agra (Taj Mahal)', path: '/tours?search=Agra', searchKey: 'agra' },
+      { name: 'Varanasi', path: '/tours?search=Varanasi', searchKey: 'varanasi' },
       { name: 'Amritsar', path: '/tours?search=Amritsar', searchKey: 'amritsar' },
-      { name: 'Banaras', path: '/tours?search=Varanasi', searchKey: 'banaras' },
-      { name: 'Agra', path: '/tours?search=Agra', searchKey: 'agra' },
-      { name: 'Gujarat', path: '/destinations/gujarat', searchKey: 'gujarat' },
-      { name: 'Rishikesh', path: '/tours?search=Rishikesh', searchKey: 'rishikesh' }
+      { name: 'Dharamsala', path: '/tours?search=Dharamsala', searchKey: 'dharamsala' },
+      { name: 'Rishikesh', path: '/tours?search=Rishikesh', searchKey: 'rishikesh' },
+      { name: 'Ladakh', path: '/tours?region=ladakh', searchKey: 'ladakh' }
     ]
   },
   {
@@ -256,39 +255,6 @@ const Navbar = () => {
             groupMap[colKey].subcategories.push({ name, path });
           }
         });
-
-        // Enforce exact sequence for Inde du Nord column: Rajasthan, Ladakh, Himalaya, Himachal, Amritsar, Banaras, Agra, Gujarat, Rishikesh
-        const defaultNordSequence = [
-          { name: 'Rajasthan', path: '/destinations/rajasthan' },
-          { name: 'Ladakh', path: '/destinations/ladakh' },
-          { name: 'Himalaya', path: '/tours?search=Himalaya' },
-          { name: 'Himachal', path: '/destinations/dharamsala-himachal' },
-          { name: 'Amritsar', path: '/tours?search=Amritsar' },
-          { name: 'Banaras', path: '/tours?search=Varanasi' },
-          { name: 'Agra', path: '/tours?search=Agra' },
-          { name: 'Gujarat', path: '/destinations/gujarat' },
-          { name: 'Rishikesh', path: '/tours?search=Rishikesh' }
-        ];
-
-        const dbNordItems = groupMap.nord.subcategories;
-        const orderedNord = defaultNordSequence.map((defItem) => {
-          const match = dbNordItems.find((d) => {
-            const low = d.name.toLowerCase();
-            if (defItem.name === 'Banaras') return low.includes('banaras') || low.includes('varanasi') || low.includes('benares');
-            if (defItem.name === 'Himachal') return low.includes('himachal') || low.includes('dharamsala');
-            return low.includes(defItem.name.toLowerCase());
-          });
-          return match ? { name: defItem.name, path: match.path } : defItem;
-        });
-
-        // Add any remaining unique DB items for nord
-        dbNordItems.forEach((d) => {
-          const low = d.name.toLowerCase();
-          if (!orderedNord.some((o) => o.name.toLowerCase() === low || (o.name === 'Banaras' && (low.includes('varanasi') || low.includes('benares'))))) {
-            orderedNord.push(d);
-          }
-        });
-        groupMap.nord.subcategories = orderedNord;
 
         // Ensure "ouest" section has default items if none are assigned yet
         if (groupMap.ouest.subcategories.length === 0) {

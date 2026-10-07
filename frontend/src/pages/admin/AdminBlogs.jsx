@@ -57,7 +57,6 @@ const AdminBlogs = () => {
     setFormData({
       ...initialForm,
       ...blog,
-      slug: blog.slug || '',
       seoTitle: blog.seoTitle || '',
       seoKeywords: blog.seoKeywords || '',
       seoDescription: blog.seoDescription || ''
@@ -65,8 +64,7 @@ const AdminBlogs = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (blog) => {
-    const id = typeof blog === 'object' ? (blog._id || blog.id || blog.slug) : blog;
+  const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to permanently delete this blog article?')) return;
     try {
       await deleteBlog(id);
@@ -85,16 +83,14 @@ const AdminBlogs = () => {
     setSaving(true);
     try {
       if (editingBlog) {
-        const targetId = editingBlog._id || editingBlog.id || editingBlog.slug;
-        await updateBlog(targetId, formData);
+        await updateBlog(editingBlog._id, formData);
       } else {
         await createBlog(formData);
       }
       setIsModalOpen(false);
       loadBlogs();
     } catch (err) {
-      console.error('Save blog error:', err);
-      alert(err.response?.data?.message || err.message || 'Error saving article.');
+      alert(err.response?.data?.message || 'Error saving article.');
     } finally {
       setSaving(false);
     }
@@ -196,7 +192,7 @@ const AdminBlogs = () => {
                         <button className="btn btn-sm btn-outline" onClick={() => handleOpenEdit(b)} title="Edit article">
                           <i className="fas fa-edit"></i> Edit
                         </button>
-                        <button className="btn btn-sm" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }} onClick={() => handleDelete(b)} title="Delete article">
+                        <button className="btn btn-sm" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }} onClick={() => handleDelete(b._id)} title="Delete article">
                           <i className="fas fa-trash-alt"></i>
                         </button>
                       </div>
@@ -225,43 +221,24 @@ const AdminBlogs = () => {
               </div>
 
               <div className="modal-body">
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
-                  <div className="form-group">
-                    <label className="form-label" style={{ fontWeight: '600' }}>Article Title *</label>
-                    <input type="text" required className="form-control" placeholder="e.g. 10 Essential Tips for Your First Trip to Rajasthan" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" style={{ fontWeight: '600' }}>URL Permalink / Slug</label>
-                    <input type="text" className="form-control" placeholder="e.g. 10-essential-tips-rajasthan (auto-generated if empty)" value={formData.slug || ''} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} />
-                  </div>
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <label className="form-label" style={{ fontWeight: '600' }}>Article Title *</label>
+                  <input type="text" required className="form-control" placeholder="e.g. 10 Essential Tips for Your First Trip to Rajasthan" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                   <div className="form-group">
                     <label className="form-label" style={{ fontWeight: '600' }}>Editorial Category</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      list="category-suggestions"
-                      placeholder="e.g. Conseils Voyage, Infos Pratiques..."
-                      value={formData.category || ''}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    />
-                    <datalist id="category-suggestions">
-                      <option value="Conseils Voyage" />
-                      <option value="Culture & Patrimoine" />
-                      <option value="Infos Pratiques" />
-                      <option value="Inde" />
-                      <option value="Népal" />
-                      <option value="Travel Advice" />
-                      <option value="Practical Info" />
-                      <option value="Heritage & History" />
-                      <option value="Culture & Festivals" />
-                    </datalist>
+                    <select className="form-control" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
+                      <option value="Travel Advice">Travel Advice</option>
+                      <option value="Practical Info">Practical Info</option>
+                      <option value="Heritage & History">Heritage & History</option>
+                      <option value="Culture & Festivals">Culture & Festivals</option>
+                    </select>
                   </div>
                   <div className="form-group">
                     <label className="form-label" style={{ fontWeight: '600' }}>Estimated Reading Time</label>
-                    <input type="text" className="form-control" placeholder="e.g. 6 min read" value={formData.readTime || ''} onChange={(e) => setFormData({ ...formData, readTime: e.target.value })} />
+                    <input type="text" className="form-control" placeholder="e.g. 6 min read" value={formData.readTime} onChange={(e) => setFormData({ ...formData, readTime: e.target.value })} />
                   </div>
                 </div>
 

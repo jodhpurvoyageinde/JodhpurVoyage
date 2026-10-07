@@ -1,5 +1,4 @@
 import express from 'express';
-import BlogPost from '../models/BlogPost.js';
 import Tour from '../models/Tour.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
@@ -7,7 +6,7 @@ import { protect, adminOnly } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 const createSlug = (text) => {
-  return text
+  return (text || '')
     .toLowerCase()
     .replace(/[^\w ]+/g, '')
     .replace(/ +/g, '-');
@@ -30,21 +29,17 @@ const stripHtmlTags = (rawStr) => {
     .trim();
 };
 
-const normalizeBlogToTour = (blog) => {
-  const doc = blog && blog.toObject ? blog.toObject() : (blog || {});
-  const cleanTitle = stripHtmlTags(doc.title) || 'Circuit Blog';
-  const cleanExcerpt = stripHtmlTags(doc.excerpt || doc.summary || doc.subtitle || '').trim();
-  
-  let rawContent = doc.overview || doc.content || doc.excerpt || doc.summary || doc.subtitle || '';
+const normalizeTour = (tour) => {
+  if (!tour) return null;
+  const doc = tour && tour.toObject ? tour.toObject() : tour;
+
+  const cleanTitle = stripHtmlTags(doc.title) || 'Circuit Touristique';
+  const cleanExcerpt = stripHtmlTags(doc.subtitle || doc.excerpt || doc.overview || '').trim();
+
+  let rawContent = doc.overview || doc.content || doc.subtitle || '';
   let cleanOverview = cleanHtml(rawContent);
 
-  if (stripHtmlTags(cleanOverview).length < 25) {
-    const loc = doc.category || doc.location || 'l\'Inde';
-    const dur = doc.readTime || doc.duration || 'plusieurs jours';
-    cleanOverview = `<p>Embarquez pour une expérience de voyage exceptionnelle avec notre itinéraire <strong>${cleanTitle}</strong>. Ce circuit privatif de <strong>${dur}</strong> à travers <strong>${loc}</strong> a été conçu sur mesure pour vous offrir une immersion totale entre monuments mythiques, traditions séculaires et paysages grandioses.</p><p>Voyagez en toute sérénité grâce à un véhicule privé climatisé avec chauffeur dédié, des hébergements de charme rigoureusement sélectionnés et une assistance francophone disponible 24h/24 tout au long de votre séjour.</p>`;
-  }
-
-  // Format connected cities array (Many-to-Many Tags)
+  // Format connected cities array
   let cities = [];
   if (Array.isArray(doc.cities) && doc.cities.length > 0) {
     cities = doc.cities.map(c => {
@@ -75,75 +70,71 @@ const normalizeBlogToTour = (blog) => {
     }
   }
 
-  const validHighlights = Array.isArray(doc.tags) && doc.tags.length > 0 && doc.tags.some(t => typeof t === 'string' && t.trim().length > 3)
-    ? doc.tags
-    : [
-        `Circuit 100% privatif et personnalisable à ${doc.category || 'destination'}`,
-        'Chauffeur privé expérimenté & véhicule climatisé',
-        'Hébergements de charme avec petits-déjeuners inclus',
-        'Assistance locale francophone 24h/24 et 7j/7'
-      ];
-
-  const defaultSeoTitle = doc.seoTitle || `${cleanTitle} | Circuit ${doc.readTime || doc.duration || ''} | Jodhpur Voyage`;
-  const defaultSeoKeywords = doc.seoKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`;
-  const defaultSeoDescription = doc.seoDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`;
+  const validHighlights = Array.isArray(doc.highlights) && doc.highlights.length > 0
+    ? doc.highlights
+    : (Array.isArray(doc.tags) && doc.tags.length > 0 ? doc.tags : [
+      `Circuit 100% privatif et personnalisable à ${doc.category || 'destination'}`,
+      'Chauffeur privé expérimenté & véhicule climatisé',
+      'Hébergements de charme avec petits-déjeuners inclus',
+      'Assistance locale francophone 24h/24 et 7j/7'
+    ]);
 
   return {
     _id: doc._id,
     title: cleanTitle,
-    slug: doc.slug || (cleanTitle ? cleanTitle.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : doc._id),
-    subtitle: doc.subtitle || cleanExcerpt || `Circuit privatif sur mesure à ${doc.category || 'l\'Inde'} avec chauffeur dédié.`,
-    duration: doc.readTime || doc.duration || '5 Jours / 4 Nuits',
-    daysCount: 5,
-    location: (cities.length > 0 ? cities.map(c => c.name).join(', ') : (doc.location || doc.category || 'Inde')),
+    slug: doc.slug || (cleanTitle ? createSlug(cleanTitle) : String(doc._id)),
+    customUrl: doc.customUrl || '',
+    subtitle: doc.subtitle || cleanExcerpt,
+    duration: doc.duration || '10 Jours / 9 Nuits',
+    daysCount: doc.daysCount || 10,
+    location: doc.location || (cities.length > 0 ? cities.map(c => c.name).join(', ') : 'Inde'),
     category: doc.category || doc.region || 'Rajasthan',
     categoryId: doc.categoryId || '',
     cities: cities,
     region: (doc.region || doc.category || 'rajasthan').toLowerCase().replace(/\s+/g, '-'),
-    theme: doc.theme || doc.category || 'Culture & Patrimoine',
-    badge: doc.badge || doc.category || 'Circuit Privé',
+    theme: doc.theme || 'Culture & Patrimoine',
+    badge: doc.badge || 'Circuit Privé',
     price: doc.price || 950,
-    priceUnit: '€ / pers',
-    rating: 4.9,
-    reviewCount: 35,
+    priceUnit: doc.priceUnit || '€ / pers',
+    rating: doc.rating || 4.9,
+    reviewCount: doc.reviewCount || 35,
     featured: Boolean(doc.featured === true),
     published: doc.published !== false,
-    image: doc.coverImage || doc.image || '/images/dest-rajasthan.jpg',
-    gallery: doc.gallery || [doc.coverImage || '/images/dest-rajasthan.jpg'],
+    image: doc.image || doc.coverImage || '/images/dest-rajasthan.jpg',
+    gallery: Array.isArray(doc.gallery) && doc.gallery.length > 0 ? doc.gallery : [doc.image || '/images/dest-rajasthan.jpg'],
     overview: cleanOverview,
     highlights: validHighlights,
-    itinerary: Array.isArray(doc.itinerary) && doc.itinerary.length > 0 ? doc.itinerary : [
-      {
-        day: 1,
-        title: `Découverte: ${cleanTitle}`,
-        description: cleanExcerpt || 'Accueil par votre chauffeur privé et transfert vers votre hôtel de charme.',
-        meals: 'Petit-déjeuner inclus',
-        accommodation: 'Hôtel de charme / Haveli de patrimoine'
-      },
-      {
-        day: 2,
-        title: 'Visites Guidées & Exploration Locale',
-        description: stripHtmlTags(cleanOverview) || 'Visites guidées des édifices historiques, bazars authentiques et panoramas majeurs.',
-        meals: 'Petit-déjeuner & Dîner',
-        accommodation: 'Haveli de patrimoine'
-      }
+    itinerary: Array.isArray(doc.itinerary) ? doc.itinerary : [],
+    inclusions: Array.isArray(doc.inclusions) ? doc.inclusions : [
+      'Chauffeur privé & véhicule climatisé',
+      'Guides locaux francophones',
+      'Hébergements de charme'
     ],
-    inclusions: doc.inclusions || ['Chauffeur privé & véhicule climatisé', 'Guides locaux francophones', 'Hébergements de charme'],
-    exclusions: doc.exclusions || ['Vols internationaux', 'Frais de visa', 'Dépenses personnelles'],
-    seoTitle: defaultSeoTitle,
-    seoKeywords: defaultSeoKeywords,
-    seoDescription: defaultSeoDescription,
-    createdAt: doc.createdAt
+    exclusions: Array.isArray(doc.exclusions) ? doc.exclusions : [
+      'Vols internationaux',
+      'Frais de visa',
+      'Dépenses personnelles'
+    ],
+    faq: Array.isArray(doc.faq) ? doc.faq : [],
+    seoTitle: doc.seoTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
+    seoKeywords: doc.seoKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
+    seoDescription: doc.seoDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt
   };
 };
 
-// GET /api/tours (fetches from Blog Database)
+// GET /api/tours (fetches from Tour database / Tour model)
 router.get('/', async (req, res) => {
   try {
-    const { region, city, search, limit } = req.query;
+    const { region, city, search, limit, featured } = req.query;
 
     if (isMongoConnected()) {
       const conditions = [{ published: { $ne: false } }];
+
+      if (featured !== undefined) {
+        conditions.push({ featured: featured === 'true' || featured === true });
+      }
 
       if (region && region !== 'all') {
         const regNorm = region.toLowerCase().replace(/_/g, '-');
@@ -173,7 +164,7 @@ router.get('/', async (req, res) => {
             { category: regRegex },
             { region: regRegex },
             { location: regRegex },
-            { tags: regRegex },
+            { highlights: regRegex },
             { title: regRegex }
           ]
         });
@@ -194,10 +185,7 @@ router.get('/', async (req, res) => {
             { title: cityRegex },
             { category: cityRegex },
             { region: cityRegex },
-            { tags: cityRegex },
             { highlights: cityRegex },
-            { excerpt: cityRegex },
-            { content: cityRegex },
             { overview: cityRegex },
             { 'itinerary.title': cityRegex },
             { 'itinerary.description': cityRegex }
@@ -211,16 +199,12 @@ router.get('/', async (req, res) => {
           $or: [
             { title: sRegex },
             { subtitle: sRegex },
-            { excerpt: sRegex },
-            { summary: sRegex },
-            { content: sRegex },
             { overview: sRegex },
             { category: sRegex },
             { location: sRegex },
             { region: sRegex },
             { theme: sRegex },
             { badge: sRegex },
-            { tags: sRegex },
             { highlights: sRegex },
             { 'cities.name': sRegex },
             { 'itinerary.title': sRegex },
@@ -234,119 +218,64 @@ router.get('/', async (req, res) => {
 
       const query = conditions.length > 1 ? { $and: conditions } : conditions[0];
 
-      let bq = BlogPost.find(query).sort({ createdAt: -1 });
-      if (limit) bq = bq.limit(Number(limit));
-      let rawBlogs = await bq.exec();
+      let tq = Tour.find(query).sort({ createdAt: -1 });
+      if (limit) tq = tq.limit(Number(limit));
+      let rawTours = await tq.exec();
 
-      if (rawBlogs.length === 0) {
-        let memList = memoryStore.blogs.filter((b) => b.published !== false);
-        if (region && region !== 'all') {
-          const reg = region.toLowerCase().replace(/-/g, ' ');
-          memList = memList.filter((b) =>
-            b.category?.toLowerCase().includes(reg) ||
-            b.region?.toLowerCase().includes(reg) ||
-            b.title?.toLowerCase().includes(reg) ||
-            b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(reg))
-          );
-        }
-        if (city && city !== 'all') {
-          const c = city.toLowerCase().replace(/-/g, ' ');
-          memList = memList.filter((b) =>
-            b.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(c) || ct.slug?.toLowerCase().includes(c)) ||
-            b.cityName?.toLowerCase().includes(c) ||
-            b.location?.toLowerCase().includes(c) ||
-            b.title?.toLowerCase().includes(c) ||
-            b.category?.toLowerCase().includes(c) ||
-            b.overview?.toLowerCase().includes(c) ||
-            b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(c)) ||
-            b.highlights?.some((h) => typeof h === 'string' && h.toLowerCase().includes(c)) ||
-            b.itinerary?.some((d) => d.title?.toLowerCase().includes(c) || d.description?.toLowerCase().includes(c))
-          );
-        }
-        if (search && search.trim()) {
-          const s = search.trim().toLowerCase();
-          memList = memList.filter((b) =>
-            b.title?.toLowerCase().includes(s) ||
-            b.subtitle?.toLowerCase().includes(s) ||
-            b.excerpt?.toLowerCase().includes(s) ||
-            b.summary?.toLowerCase().includes(s) ||
-            b.content?.toLowerCase().includes(s) ||
-            b.overview?.toLowerCase().includes(s) ||
-            b.category?.toLowerCase().includes(s) ||
-            b.location?.toLowerCase().includes(s) ||
-            b.theme?.toLowerCase().includes(s) ||
-            b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(s)) ||
-            b.highlights?.some((h) => typeof h === 'string' && h.toLowerCase().includes(s)) ||
-            b.itinerary?.some((d) => d.title?.toLowerCase().includes(s) || d.description?.toLowerCase().includes(s))
-          );
-        }
-        if (memList.length > 0) {
-          rawBlogs = memList;
-        }
-      }
-
-      return res.json(rawBlogs.map(normalizeBlogToTour));
+      return res.json(rawTours.map(normalizeTour));
     }
 
     // Memory Store Fallback
-    let list = memoryStore.blogs.filter((b) => b.published !== false);
+    let list = (memoryStore.tours || []).filter((t) => t.published !== false);
+    if (featured !== undefined) {
+      list = list.filter((t) => t.featured === (featured === 'true' || featured === true));
+    }
     if (region && region !== 'all') {
       const reg = region.toLowerCase().replace(/-/g, ' ');
-      list = list.filter((b) =>
-        b.category?.toLowerCase().includes(reg) ||
-        b.title?.toLowerCase().includes(reg) ||
-        b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(reg))
+      list = list.filter((t) =>
+        t.category?.toLowerCase().includes(reg) ||
+        t.region?.toLowerCase().includes(reg) ||
+        t.location?.toLowerCase().includes(reg) ||
+        t.title?.toLowerCase().includes(reg)
       );
     }
     if (city && city !== 'all') {
       const c = city.toLowerCase().replace(/-/g, ' ');
-      list = list.filter((b) =>
-        b.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(c) || ct.slug?.toLowerCase().includes(c)) ||
-        b.cityName?.toLowerCase().includes(c) ||
-        b.location?.toLowerCase().includes(c) ||
-        b.title?.toLowerCase().includes(c) ||
-        b.category?.toLowerCase().includes(c) ||
-        b.overview?.toLowerCase().includes(c) ||
-        b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(c)) ||
-        b.highlights?.some((h) => typeof h === 'string' && h.toLowerCase().includes(c)) ||
-        b.itinerary?.some((d) => d.title?.toLowerCase().includes(c) || d.description?.toLowerCase().includes(c))
+      list = list.filter((t) =>
+        t.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(c) || ct.slug?.toLowerCase().includes(c)) ||
+        t.location?.toLowerCase().includes(c) ||
+        t.title?.toLowerCase().includes(c) ||
+        t.category?.toLowerCase().includes(c)
       );
     }
     if (search && search.trim()) {
       const s = search.trim().toLowerCase();
-      list = list.filter((b) =>
-        b.title?.toLowerCase().includes(s) ||
-        b.subtitle?.toLowerCase().includes(s) ||
-        b.excerpt?.toLowerCase().includes(s) ||
-        b.summary?.toLowerCase().includes(s) ||
-        b.content?.toLowerCase().includes(s) ||
-        b.overview?.toLowerCase().includes(s) ||
-        b.category?.toLowerCase().includes(s) ||
-        b.location?.toLowerCase().includes(s) ||
-        b.theme?.toLowerCase().includes(s) ||
-        b.tags?.some((t) => typeof t === 'string' && t.toLowerCase().includes(s)) ||
-        b.highlights?.some((h) => typeof h === 'string' && h.toLowerCase().includes(s)) ||
-        b.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(s) || ct.slug?.toLowerCase().includes(s)) ||
-        b.itinerary?.some((d) => d.title?.toLowerCase().includes(s) || d.description?.toLowerCase().includes(s))
+      list = list.filter((t) =>
+        t.title?.toLowerCase().includes(s) ||
+        t.subtitle?.toLowerCase().includes(s) ||
+        t.overview?.toLowerCase().includes(s) ||
+        t.category?.toLowerCase().includes(s) ||
+        t.location?.toLowerCase().includes(s)
       );
     }
     if (limit) list = list.slice(0, Number(limit));
-    res.json(list.map(normalizeBlogToTour));
+    res.json(list.map(normalizeTour));
   } catch (error) {
     console.error('Erreur get tours:', error);
-    res.status(500).json({ message: 'Erreur lors de la récupération des circuits depuis le blog' });
+    res.status(500).json({ message: 'Erreur lors de la récupération des circuits' });
   }
 });
 
-// GET /api/tours/admin/all
+// GET /api/tours/admin/all (All tours for Admin Panel)
 router.get('/admin/all', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const blogs = await BlogPost.find().sort({ createdAt: -1 });
-      return res.json(blogs.map(normalizeBlogToTour));
+      const tours = await Tour.find().sort({ createdAt: -1 });
+      return res.json(tours.map(normalizeTour));
     }
-    res.json(memoryStore.blogs.map(normalizeBlogToTour));
+    res.json((memoryStore.tours || []).map(normalizeTour));
   } catch (error) {
+    console.error('Erreur admin tours:', error);
     res.status(500).json({ message: 'Erreur récupération circuits' });
   }
 });
@@ -358,12 +287,12 @@ router.get('/:identifier', async (req, res) => {
     const cleanId = identifier.toLowerCase();
 
     if (isMongoConnected()) {
-      let blog;
+      let tour;
       if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
-        blog = await BlogPost.findById(identifier);
+        tour = await Tour.findById(identifier);
       }
-      if (!blog) {
-        blog = await BlogPost.findOne({
+      if (!tour) {
+        tour = await Tour.findOne({
           $or: [
             { slug: cleanId },
             { customUrl: cleanId },
@@ -371,21 +300,22 @@ router.get('/:identifier', async (req, res) => {
           ]
         });
       }
-      if (!blog) {
-        blog = memoryStore.blogs.find((b) => b.slug === cleanId || b.customUrl === cleanId || b._id === identifier);
+      if (!tour) {
+        tour = (memoryStore.tours || []).find((t) => t.slug === cleanId || t.customUrl === cleanId || String(t._id) === identifier);
       }
-      if (!blog) {
-        return res.status(404).json({ message: 'Circuit (Blog) non trouvé' });
+      if (!tour) {
+        return res.status(404).json({ message: 'Circuit non trouvé' });
       }
-      return res.json(normalizeBlogToTour(blog));
+      return res.json(normalizeTour(tour));
     }
 
-    const blog = memoryStore.blogs.find((b) => b.slug === cleanId || b.customUrl === cleanId || b._id === identifier);
-    if (!blog) {
-      return res.status(404).json({ message: 'Circuit (Blog) non trouvé' });
+    const tour = (memoryStore.tours || []).find((t) => t.slug === cleanId || t.customUrl === cleanId || String(t._id) === identifier);
+    if (!tour) {
+      return res.status(404).json({ message: 'Circuit non trouvé' });
     }
-    res.json(normalizeBlogToTour(blog));
+    res.json(normalizeTour(tour));
   } catch (error) {
+    console.error('Erreur get tour detail:', error);
     res.status(500).json({ message: 'Erreur lors de la récupération du circuit' });
   }
 });
@@ -393,7 +323,7 @@ router.get('/:identifier', async (req, res) => {
 // POST /api/tours
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
-    const tourData = req.body;
+    const tourData = { ...req.body };
     if (!tourData.slug && tourData.title) {
       tourData.slug = createSlug(tourData.title);
     }
@@ -413,54 +343,37 @@ router.post('/', protect, adminOnly, async (req, res) => {
         };
       }).filter(c => c.name);
     }
+    tourData.cities = formattedCities;
 
-    const categoryName = tourData.category || tourData.region || 'Rajasthan';
-
-    if (isMongoConnected()) {
-      const blog = new BlogPost({
-        title: tourData.title,
-        slug: tourData.slug,
-        subtitle: tourData.subtitle || '',
-        excerpt: tourData.subtitle || tourData.overview || '',
-        content: tourData.overview || tourData.subtitle || '',
-        coverImage: tourData.image || '/images/dest-rajasthan.jpg',
-        category: categoryName,
-        categoryId: tourData.categoryId || '',
-        cities: formattedCities,
-        readTime: tourData.duration || '5 min de lecture',
-        tags: tourData.highlights || [],
-        featured: Boolean(tourData.featured === true),
-        published: tourData.published !== false,
-        seoTitle: tourData.seoTitle || '',
-        seoKeywords: tourData.seoKeywords || '',
-        seoDescription: tourData.seoDescription || ''
-      });
-      const created = await blog.save();
-      return res.status(201).json(normalizeBlogToTour(created));
+    if (!tourData.image && tourData.coverImage) {
+      tourData.image = tourData.coverImage;
+    }
+    if (!tourData.overview && tourData.content) {
+      tourData.overview = tourData.content;
+    }
+    if (!tourData.overview && tourData.subtitle) {
+      tourData.overview = tourData.subtitle;
+    }
+    if (!tourData.category && tourData.region) {
+      tourData.category = tourData.region;
     }
 
-    const newBlog = {
-      _id: `blog_${Date.now()}`,
-      title: tourData.title,
-      slug: tourData.slug,
-      excerpt: tourData.subtitle || tourData.overview || '',
-      content: tourData.overview || tourData.subtitle || '',
-      coverImage: tourData.image || '/images/dest-rajasthan.jpg',
-      category: categoryName,
-      categoryId: tourData.categoryId || '',
-      cities: formattedCities,
-      readTime: tourData.duration || '5 min de lecture',
-      tags: tourData.highlights || [],
-      featured: Boolean(tourData.featured === true),
-      published: tourData.published !== false,
-      seoTitle: tourData.seoTitle || '',
-      seoKeywords: tourData.seoKeywords || '',
-      seoDescription: tourData.seoDescription || '',
+    if (isMongoConnected()) {
+      const tour = new Tour(tourData);
+      const created = await tour.save();
+      return res.status(201).json(normalizeTour(created));
+    }
+
+    const newTour = {
+      _id: `tour_${Date.now()}`,
+      ...tourData,
       createdAt: new Date().toISOString()
     };
-    memoryStore.blogs.unshift(newBlog);
-    res.status(201).json(normalizeBlogToTour(newBlog));
+    if (!memoryStore.tours) memoryStore.tours = [];
+    memoryStore.tours.unshift(newTour);
+    res.status(201).json(normalizeTour(newTour));
   } catch (error) {
+    console.error('Erreur create tour:', error);
     res.status(400).json({ message: error.message || 'Erreur création circuit' });
   }
 });
@@ -470,15 +383,6 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
-    if (updateData.subtitle !== undefined) {
-      updateData.excerpt = updateData.subtitle;
-    }
-    if (updateData.overview && !updateData.content) updateData.content = updateData.overview;
-    if (!updateData.content) updateData.content = updateData.overview || updateData.excerpt || updateData.subtitle || updateData.title || '';
-    if (!updateData.excerpt) updateData.excerpt = updateData.subtitle || updateData.content || updateData.title || '';
-    if (updateData.image && !updateData.coverImage) updateData.coverImage = updateData.image;
-    if (updateData.duration && !updateData.readTime) updateData.readTime = updateData.duration;
-    if (updateData.location && !updateData.category) updateData.category = updateData.location;
 
     if (updateData.cities && Array.isArray(updateData.cities)) {
       updateData.cities = updateData.cities.map(c => {
@@ -493,8 +397,12 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
         };
       }).filter(c => c.name);
     }
-    if (updateData.category) {
-      updateData.region = (updateData.category || '').toLowerCase().replace(/\s+/g, '-');
+
+    if (updateData.coverImage && !updateData.image) {
+      updateData.image = updateData.coverImage;
+    }
+    if (updateData.content && !updateData.overview) {
+      updateData.overview = updateData.content;
     }
 
     if (isMongoConnected()) {
@@ -512,19 +420,19 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
         };
       }
 
-      const updated = await BlogPost.findOneAndUpdate(
+      const updated = await Tour.findOneAndUpdate(
         query,
         { $set: updateData },
         { new: true, runValidators: false }
       );
       if (!updated) return res.status(404).json({ message: 'Circuit introuvable' });
-      return res.json(normalizeBlogToTour(updated));
+      return res.json(normalizeTour(updated));
     }
 
-    const idx = memoryStore.blogs.findIndex((b) => b._id === id || b.slug === id.toLowerCase());
+    const idx = (memoryStore.tours || []).findIndex((t) => String(t._id) === id || t.slug === id.toLowerCase());
     if (idx === -1) return res.status(404).json({ message: 'Circuit introuvable' });
-    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...updateData };
-    res.json(normalizeBlogToTour(memoryStore.blogs[idx]));
+    memoryStore.tours[idx] = { ...memoryStore.tours[idx], ...updateData };
+    res.json(normalizeTour(memoryStore.tours[idx]));
   } catch (error) {
     console.error('Erreur update tour:', error);
     res.status(400).json({ message: error.message || 'Erreur mise à jour' });
@@ -550,14 +458,14 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
         };
       }
 
-      const deleted = await BlogPost.findOneAndDelete(query);
+      const deleted = await Tour.findOneAndDelete(query);
       if (!deleted) return res.status(404).json({ message: 'Circuit supprimé ou non trouvé' });
       return res.json({ message: 'Circuit supprimé avec succès' });
     }
 
-    const idx = memoryStore.blogs.findIndex((b) => b._id === id || b.slug === id.toLowerCase());
+    const idx = (memoryStore.tours || []).findIndex((t) => String(t._id) === id || t.slug === id.toLowerCase());
     if (idx !== -1) {
-      memoryStore.blogs.splice(idx, 1);
+      memoryStore.tours.splice(idx, 1);
     }
     res.json({ message: 'Circuit supprimé avec succès' });
   } catch (error) {
@@ -569,10 +477,10 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
 router.post('/unfeature-all', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      await BlogPost.updateMany({}, { $set: { featured: false } });
+      await Tour.updateMany({}, { $set: { featured: false } });
     }
-    if (Array.isArray(memoryStore.blogs)) {
-      memoryStore.blogs.forEach((b) => { b.featured = false; });
+    if (Array.isArray(memoryStore.tours)) {
+      memoryStore.tours.forEach((t) => { t.featured = false; });
     }
     res.json({ message: 'Tous les circuits ont été retirés de la page d’accueil avec succès' });
   } catch (error) {
@@ -581,19 +489,4 @@ router.post('/unfeature-all', protect, adminOnly, async (req, res) => {
   }
 });
 
-// Auto-unfeature all existing tours so default state is zero featured packages on homepage
-setTimeout(async () => {
-  try {
-    if (isMongoConnected()) {
-      await BlogPost.updateMany({}, { $set: { featured: false } });
-    }
-    if (Array.isArray(memoryStore.blogs)) {
-      memoryStore.blogs.forEach((b) => { b.featured = false; });
-    }
-  } catch (err) {
-    console.error('Initial unfeature error:', err);
-  }
-}, 2000);
-
 export default router;
-
