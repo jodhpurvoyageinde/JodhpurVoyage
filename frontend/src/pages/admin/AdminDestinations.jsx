@@ -79,6 +79,9 @@ const AdminDestinations = () => {
     bestTimeToVisit: "From October to April",
     image: '/images/dest-rajasthan.jpg',
     highlights: ['Must-see highlight', 'Local culture & heritage', 'Dedicated private guide'],
+    seoTitle: '',
+    seoKeywords: '',
+    seoDescription: '',
     featured: false,
     published: true
   };
@@ -113,6 +116,9 @@ const AdminDestinations = () => {
     setFormData({
       ...initialForm,
       ...dest,
+      seoTitle: dest.seoTitle || `${dest.name} — Voyage & Circuit Sur Mesure | Jodhpur Voyage`,
+      seoKeywords: dest.seoKeywords || `${(dest.name || '').toLowerCase()}, voyage ${(dest.name || '').toLowerCase()}, circuit inde`,
+      seoDescription: dest.seoDescription || dest.shortDescription || `${dest.name} - découvrez nos offres et circuits sur mesure avec chauffeur privé.`,
       highlights: dest.highlights && dest.highlights.length > 0 ? dest.highlights : initialForm.highlights
     });
     setIsModalOpen(true);
@@ -489,6 +495,47 @@ const AdminDestinations = () => {
                     value={formData.fullDescription} 
                     onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
                   ></textarea>
+                </div>
+
+                {/* SEO Meta Tag Settings */}
+                <div style={{ background: '#F0F9FF', padding: '16px', borderRadius: '10px', marginBottom: '20px', border: '1px solid #BAE6FD' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <i className="fas fa-search" style={{ color: '#0284C7', fontSize: '1.1rem' }}></i>
+                    <strong style={{ color: '#0369A1', fontSize: '0.95rem' }}>SEO Settings (Meta Title, Keywords & Description)</strong>
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>SEO Meta Title (Title Tag)</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="e.g. Voyage Rajasthan sur mesure | Circuits & Hôtels | Jodhpur Voyage" 
+                      value={formData.seoTitle || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })} 
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>SEO Meta Keywords (Comma separated)</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      placeholder="e.g. rajasthan voyage, circuit rajasthan, jodhpur voyage" 
+                      value={formData.seoKeywords || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoKeywords: e.target.value })} 
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: '0' }}>
+                    <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>SEO Meta Description</label>
+                    <textarea 
+                      rows="2" 
+                      className="form-control" 
+                      placeholder="e.g. Partez à la découverte du Rajasthan avec chauffeur privé et hébergements de charme." 
+                      value={formData.seoDescription || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })} 
+                    ></textarea>
+                  </div>
                 </div>
 
                 {/* Options Checkboxes */}

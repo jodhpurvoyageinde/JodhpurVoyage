@@ -67,6 +67,18 @@ const destinationSchema = new mongoose.Schema({
   published: {
     type: Boolean,
     default: true
+  },
+  seoTitle: {
+    type: String,
+    default: ''
+  },
+  seoKeywords: {
+    type: String,
+    default: ''
+  },
+  seoDescription: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true,

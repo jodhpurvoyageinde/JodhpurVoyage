@@ -37,6 +37,38 @@ const reviewSchema = new mongoose.Schema({
   avatar: {
     type: String
   },
+  image: {
+    type: String,
+    default: '/images/image-8.jpg'
+  },
+  img: {
+    type: String,
+    default: '/images/image-8.jpg'
+  },
+  fallbackImg: {
+    type: String,
+    default: '/images/image-8.jpg'
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  slug: {
+    type: String,
+    sparse: true
+  },
+  tag: {
+    type: String,
+    default: ''
+  },
+  tagIcon: {
+    type: String,
+    default: 'fas fa-map-marker-alt'
+  },
+  link: {
+    type: String,
+    default: '/tour-rajasthan'
+  },
   status: {
     type: String,
     enum: ['approved', 'pending', 'rejected'],

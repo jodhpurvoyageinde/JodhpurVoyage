@@ -131,6 +131,21 @@ const tourSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: ''
+  },
+  metaTitle: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  metaKeywords: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  metaDescription: {
+    type: String,
+    trim: true,
+    default: ''
   }
 }, {
   timestamps: true,

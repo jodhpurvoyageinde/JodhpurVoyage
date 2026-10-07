@@ -73,6 +73,9 @@ const AdminTours = () => {
     seoTitle: '',
     seoKeywords: '',
     seoDescription: '',
+    metaTitle: '',
+    metaKeywords: '',
+    metaDescription: '',
     featured: false,
     published: true
   };
@@ -118,7 +121,7 @@ const AdminTours = () => {
     loadCategories();
   }, []);
 
-  // Build combined list of all destinations added in system
+  // Build combined list of all destinations added in system for tagging
   const allDestinationsMap = [...DEFAULT_DESTINATIONS_PRESETS];
   destinationsList.forEach((d) => {
     if (d.name && !allDestinationsMap.some(item => item.name.toLowerCase() === d.name.toLowerCase())) {
@@ -130,6 +133,57 @@ const AdminTours = () => {
       });
     }
   });
+
+  // Build unified, de-duplicated list of all destination categories & created destinations for dropdown
+  const combinedCategories = [];
+  const seenCatNames = new Set();
+
+  // 1. Add all destinations created by admin in Destinations & Regions
+  (destinationsList || []).forEach((d) => {
+    const rawName = (d.name || '').trim();
+    const key = rawName.toLowerCase();
+    if (key && !seenCatNames.has(key)) {
+      seenCatNames.add(key);
+      combinedCategories.push({
+        _id: d._id,
+        name: rawName,
+        slug: d.slug || key.replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+        region: d.region
+      });
+    }
+  });
+
+  // 2. Add categories from categoriesList
+  (categoriesList || []).forEach((cat) => {
+    const rawName = (cat.name || '').trim();
+    const key = rawName.toLowerCase();
+    if (key && !seenCatNames.has(key)) {
+      seenCatNames.add(key);
+      combinedCategories.push({
+        _id: cat._id,
+        name: rawName,
+        slug: cat.slug || key.replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+        region: cat.region
+      });
+    }
+  });
+
+  // 3. Add default presets
+  DEFAULT_DESTINATIONS_PRESETS.forEach((preset) => {
+    const key = preset.name.toLowerCase();
+    if (!seenCatNames.has(key)) {
+      seenCatNames.add(key);
+      combinedCategories.push({
+        _id: preset.slug,
+        name: preset.name,
+        slug: preset.slug,
+        region: preset.region
+      });
+    }
+  });
+
+  // Sort alphabetically so admin can easily find any destination
+  combinedCategories.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
 
   const handleOpenCreate = () => {
     setEditingTour(null);
@@ -167,9 +221,12 @@ const AdminTours = () => {
       cities: initialCities,
       featured: Boolean(tour.featured === true),
       published: tour.published !== false,
-      seoTitle: tour.seoTitle || `${title} | Circuit ${dur} | Jodhpur Voyage`,
-      seoKeywords: tour.seoKeywords || `${title.toLowerCase()}, circuit ${loc.toLowerCase()}, voyage sur mesure, chauffeur prive`,
-      seoDescription: tour.seoDescription || tour.subtitle || `Réservez le circuit ${title} à ${loc} avec chauffeur privé, hôtels de charme et assistance 24h/24.`,
+      seoTitle: tour.seoTitle || tour.metaTitle || '',
+      metaTitle: tour.seoTitle || tour.metaTitle || '',
+      seoKeywords: tour.seoKeywords || tour.metaKeywords || '',
+      metaKeywords: tour.seoKeywords || tour.metaKeywords || '',
+      seoDescription: tour.seoDescription || tour.metaDescription || '',
+      metaDescription: tour.seoDescription || tour.metaDescription || '',
       highlights: tour.highlights || [],
       itinerary: tour.itinerary || [],
       inclusions: tour.inclusions || [],
@@ -245,8 +302,18 @@ const AdminTours = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const sTitle = (formData.seoTitle || formData.metaTitle || '').trim();
+      const sKeywords = (formData.seoKeywords || formData.metaKeywords || '').trim();
+      const sDesc = (formData.seoDescription || formData.metaDescription || '').trim();
+
       const payload = {
         ...formData,
+        seoTitle: sTitle,
+        metaTitle: sTitle,
+        seoKeywords: sKeywords,
+        metaKeywords: sKeywords,
+        seoDescription: sDesc,
+        metaDescription: sDesc,
         subtitle: formData.subtitle || '',
         content: formData.overview || formData.content || formData.subtitle || formData.title || 'Tour Details',
         excerpt: formData.subtitle || formData.excerpt || formData.overview || formData.title || 'Tour Excerpt'
@@ -462,32 +529,28 @@ const AdminTours = () => {
                       value={formData.category || formData.region} 
                       onChange={(e) => {
                         const selectedVal = e.target.value;
-                        const matched = categoriesList.find(c => c.name.toLowerCase() === selectedVal.toLowerCase() || c.slug?.toLowerCase() === selectedVal.toLowerCase());
+                        const matched = combinedCategories.find(c => 
+                          c.name.toLowerCase() === selectedVal.toLowerCase() || 
+                          c.slug?.toLowerCase() === selectedVal.toLowerCase()
+                        );
                         setFormData({
                           ...formData,
                           category: selectedVal,
                           categoryId: matched ? matched._id : formData.categoryId,
-                          region: matched?.slug || selectedVal.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-')
+                          region: matched?.region || matched?.slug || selectedVal.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-')
                         });
                       }}
                     >
-                      {categoriesList.length > 0 ? (
-                        categoriesList.map((cat, i) => (
-                          <option key={cat._id || i} value={cat.name}>
-                            📁 {cat.name}
-                          </option>
-                        ))
-                      ) : (
-                        <>
-                          <option value="Rajasthan">📁 Rajasthan</option>
-                          <option value="North India">📁 North India (Inde du Nord)</option>
-                          <option value="South India">📁 South India (Inde du Sud & Kerala)</option>
-                          <option value="Ladakh">📁 Ladakh & Himalaya</option>
-                          <option value="Gujarat">📁 Gujarat</option>
-                          <option value="Nepal">📁 Nepal</option>
-                          <option value="Bhoutan">📁 Bhutan</option>
-                        </>
+                      {formData.category && !combinedCategories.some(c => c.name.toLowerCase() === formData.category.toLowerCase()) && (
+                        <option value={formData.category}>
+                          📁 {formData.category} (Actuel)
+                        </option>
                       )}
+                      {combinedCategories.map((cat, i) => (
+                        <option key={cat._id || i} value={cat.name}>
+                          📁 {cat.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -718,8 +781,8 @@ const AdminTours = () => {
                       type="text" 
                       className="form-control" 
                       placeholder="e.g. Best Jodhpur Tour Package | 5 Days Rajasthan Itinerary" 
-                      value={formData.seoTitle || ''} 
-                      onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })} 
+                      value={formData.seoTitle || formData.metaTitle || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value, metaTitle: e.target.value })} 
                     />
                   </div>
 
@@ -729,8 +792,8 @@ const AdminTours = () => {
                       type="text" 
                       className="form-control" 
                       placeholder="e.g. jodhpur tour, rajasthan itinerary, jodhpur travel package" 
-                      value={formData.seoKeywords || ''} 
-                      onChange={(e) => setFormData({ ...formData, seoKeywords: e.target.value })} 
+                      value={formData.seoKeywords || formData.metaKeywords || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoKeywords: e.target.value, metaKeywords: e.target.value })} 
                     />
                   </div>
 
@@ -740,8 +803,8 @@ const AdminTours = () => {
                       rows="2" 
                       className="form-control" 
                       placeholder="e.g. Book our top-rated Jodhpur tour package with private driver, luxury hotel stays, and authentic heritage sightseeing." 
-                      value={formData.seoDescription || ''} 
-                      onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })} 
+                      value={formData.seoDescription || formData.metaDescription || ''} 
+                      onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value, metaDescription: e.target.value })} 
                     ></textarea>
                   </div>
                 </div>

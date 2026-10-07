@@ -113,6 +113,46 @@
   .mega-menu {
     width: calc(100vw - 2rem);
     padding: 1.8rem;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+  }
+
+  .mega-menu-destinations {
+    width: auto !important;
+    min-width: 720px !important;
+    max-width: 900px !important;
+    padding: 0.85rem 1.1rem !important;
+    max-height: 440px !important;
+    overflow-y: auto !important;
+  }
+
+  .mega-grid-destinations {
+    display: grid !important;
+    grid-template-columns: 1.25fr 1.15fr 1fr 0.8fr 1.15fr !important;
+    gap: 0.6rem !important;
+    align-items: start !important;
+  }
+
+  .mega-grid-destinations .mega-column-title {
+    font-size: 0.88rem !important;
+    margin-bottom: 0.3rem !important;
+    padding-bottom: 0.22rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .mega-grid-destinations .mega-link-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.08rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .mega-grid-destinations .mega-link-item {
+    font-size: 0.78rem !important;
+    line-height: 1.2 !important;
+    padding: 0.12rem 0.3rem !important;
+    gap: 0.35rem !important;
   }
 
   .mega-grid-3col {

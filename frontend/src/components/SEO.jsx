@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import { fetchSeoPageConfig, fetchSeoConfigByPath } from '../services/api';
 
 const updateMetaTag = (selector, attributeName, attributeValue, content) => {
-  if (!content) return;
-  let element = document.querySelector(selector);
-  if (!element) {
-    element = document.createElement('meta');
+  if (content === undefined || content === null) return;
+  const elements = document.querySelectorAll(selector);
+  if (elements.length > 0) {
+    elements.forEach(el => el.setAttribute('content', content));
+  } else {
+    const element = document.createElement('meta');
     element.setAttribute(attributeName, attributeValue);
+    element.setAttribute('content', content);
     document.head.appendChild(element);
   }
-  element.setAttribute('content', content);
 };
 
 const updateLinkTag = (rel, href) => {
@@ -101,7 +103,7 @@ const SEO = ({
     return () => {
       isMounted = false;
     };
-  }, [pageKey]);
+  }, [pageKey, window.location.pathname]);
 
   useEffect(() => {
     // 1. Title (Priority: Specific item prop > Page SEO config > Default site title)
@@ -110,6 +112,12 @@ const SEO = ({
       seoData?.title ||
       'Jodhpur Voyage - Tour Opérateur en Inde et Népal | Agence de Voyage Spécialisée';
     document.title = finalTitle;
+    let titleElement = document.querySelector('title');
+    if (!titleElement) {
+      titleElement = document.createElement('title');
+      document.head.appendChild(titleElement);
+    }
+    titleElement.textContent = finalTitle;
 
     // 2. Meta Description
     const finalDescription =

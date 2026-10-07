@@ -101,15 +101,15 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
       ];
 
   return (
-    <div>
+    <div style={{ width: '100%', overflowX: 'hidden' }}>
       <SEO
-        pageKey="tour-detail"
-        title={tour.seoTitle || `${tour.title} — Circuit ${tour.duration || ''} | Jodhpur Voyage`}
-        description={tour.seoDescription || tour.subtitle || `Circuit ${tour.title} avec chauffeur privé.`}
-        keywords={tour.seoKeywords || `${tour.title.toLowerCase()}, circuit ${tour.location?.toLowerCase() || 'inde'}, voyage sur mesure`}
-        ogTitle={tour.seoTitle || tour.title}
-        ogDescription={tour.seoDescription || tour.subtitle}
-        ogImage={tour.image}
+        title={tour.seoTitle || tour.metaTitle || `${tour.title} — Circuit Privé ${tour.duration || ''} | Jodhpur Voyage`}
+        description={tour.seoDescription || tour.metaDescription || tour.subtitle || `Découvrez le circuit privatif ${tour.title} à ${tour.location || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance francophone 24h/24.`}
+        keywords={tour.seoKeywords || tour.metaKeywords || `${tour.title.toLowerCase()}, circuit ${tour.location?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`}
+        ogTitle={tour.seoTitle || tour.metaTitle || tour.title}
+        ogDescription={tour.seoDescription || tour.metaDescription || tour.subtitle || `Circuit privatif ${tour.title}`}
+        ogImage={tour.image || '/images/dest-rajasthan.jpg'}
+        canonicalUrl={`https://jodhpurvoyage.com/tours/${tour.slug || slug}`}
         structuredData={JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'TouristTrip',
@@ -123,19 +123,19 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
           }
         })}
       />
-      {/* Tour Hero */}
-      <section style={{ position: 'relative', background: 'transparent', padding: '70px 0', color: '#fff', overflow: 'hidden' }}>
+      {/* Tour Hero - Full Width */}
+      <section style={{ position: 'relative', background: 'transparent', padding: '75px 0', color: '#fff', overflow: 'hidden', width: '100%' }}>
         <img
           src={tour.image || '/images/dest-rajasthan.jpg'}
           alt={tour.title}
           onError={(e) => { e.currentTarget.src = "/images/dest-rajasthan.jpg"; }}
           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 1 }}
         />
-        <div className="container" style={{ position: 'relative', zIndex: 2, maxWidth: '900px', textShadow: '0 2px 10px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.95)' }}>
-          <h1 style={{ fontSize: 'clamp(1.4rem, 2.6vw, 2.1rem)', color: '#fff', marginBottom: '12px', lineHeight: '1.25', fontWeight: '800' }}>{tour.title}</h1>
+        <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: '100%', padding: '0 clamp(1.2rem, 3.5vw, 4rem)', textShadow: '0 2px 10px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.95)' }}>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 2.8vw, 2.4rem)', color: '#fff', marginBottom: '12px', lineHeight: '1.25', fontWeight: '800' }}>{tour.title}</h1>
           {tour.location && (
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '24px' }}>
-              <span style={{ color: '#ffffff', fontSize: '0.92rem', fontWeight: '600' }}>
+              <span style={{ color: '#ffffff', fontSize: '0.96rem', fontWeight: '600' }}>
                 <i className="fas fa-map-marker-alt" style={{ marginRight: '6px', color: 'var(--gold-color, #ffb800)' }}></i> {tour.location}
               </span>
             </div>
@@ -151,9 +151,9 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
         </div>
       </section>
 
-      {/* Quick Info Bar */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid var(--border-color)', padding: '16px 0' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '20px', textAlign: 'center' }}>
+      {/* Quick Info Bar - Full Width */}
+      <div style={{ background: '#ffffff', borderBottom: '1px solid var(--border-color)', padding: '18px 0', width: '100%' }}>
+        <div style={{ width: '100%', maxWidth: '100%', padding: '0 clamp(1.2rem, 3.5vw, 4rem)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', textAlign: 'center' }}>
           <div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>DURÉE</div>
             <div style={{ fontWeight: '700', color: 'var(--secondary-color)' }}><i className="far fa-clock"></i> {tour.duration}</div>
@@ -173,11 +173,11 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
         </div>
       </div>
 
-      {/* Main Content & Sidebar */}
-      <div className="section-padding bg-cream">
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(320px, 1fr)', gap: '40px', alignItems: 'start' }}>
+      {/* Main Content & Sidebar - Full Width */}
+      <div className="section-padding bg-cream" style={{ width: '100%', padding: '40px 0' }}>
+        <div className="tour-detail-container" style={{ width: '100%', maxWidth: '100%', padding: '0 clamp(1.2rem, 3.5vw, 4rem)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: '36px', alignItems: 'start' }}>
           {/* Main Column */}
-          <div>
+          <div style={{ width: '100%', minWidth: 0 }}>
             {/* Tour Image Slider */}
             <TourImageSlider tour={tour} />
 

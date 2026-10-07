@@ -116,9 +116,12 @@ const normalizeTour = (tour) => {
       'Dépenses personnelles'
     ],
     faq: Array.isArray(doc.faq) ? doc.faq : [],
-    seoTitle: doc.seoTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
-    seoKeywords: doc.seoKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
-    seoDescription: doc.seoDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
+    seoTitle: doc.seoTitle || doc.metaTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
+    seoKeywords: doc.seoKeywords || doc.metaKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
+    seoDescription: doc.seoDescription || doc.metaDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
+    metaTitle: doc.metaTitle || doc.seoTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
+    metaKeywords: doc.metaKeywords || doc.seoKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
+    metaDescription: doc.metaDescription || doc.seoDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt
   };
@@ -358,6 +361,24 @@ router.post('/', protect, adminOnly, async (req, res) => {
       tourData.category = tourData.region;
     }
 
+    // Explicitly handle SEO / Meta tags
+    const postSeoTitle = tourData.seoTitle !== undefined ? tourData.seoTitle : tourData.metaTitle;
+    const postSeoKeywords = tourData.seoKeywords !== undefined ? tourData.seoKeywords : tourData.metaKeywords;
+    const postSeoDesc = tourData.seoDescription !== undefined ? tourData.seoDescription : tourData.metaDescription;
+
+    if (postSeoTitle !== undefined) {
+      tourData.seoTitle = String(postSeoTitle).trim();
+      tourData.metaTitle = String(postSeoTitle).trim();
+    }
+    if (postSeoKeywords !== undefined) {
+      tourData.seoKeywords = String(postSeoKeywords).trim();
+      tourData.metaKeywords = String(postSeoKeywords).trim();
+    }
+    if (postSeoDesc !== undefined) {
+      tourData.seoDescription = String(postSeoDesc).trim();
+      tourData.metaDescription = String(postSeoDesc).trim();
+    }
+
     if (isMongoConnected()) {
       const tour = new Tour(tourData);
       const created = await tour.save();
@@ -383,6 +404,25 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
+    delete updateData._id; // CRITICAL: Prevent MongoServerError for immutable _id
+
+    // Explicitly handle SEO / Meta tags
+    const putSeoTitle = updateData.seoTitle !== undefined ? updateData.seoTitle : updateData.metaTitle;
+    const putSeoKeywords = updateData.seoKeywords !== undefined ? updateData.seoKeywords : updateData.metaKeywords;
+    const putSeoDesc = updateData.seoDescription !== undefined ? updateData.seoDescription : updateData.metaDescription;
+
+    if (putSeoTitle !== undefined) {
+      updateData.seoTitle = String(putSeoTitle).trim();
+      updateData.metaTitle = String(putSeoTitle).trim();
+    }
+    if (putSeoKeywords !== undefined) {
+      updateData.seoKeywords = String(putSeoKeywords).trim();
+      updateData.metaKeywords = String(putSeoKeywords).trim();
+    }
+    if (putSeoDesc !== undefined) {
+      updateData.seoDescription = String(putSeoDesc).trim();
+      updateData.metaDescription = String(putSeoDesc).trim();
+    }
 
     if (updateData.cities && Array.isArray(updateData.cities)) {
       updateData.cities = updateData.cities.map(c => {
@@ -406,19 +446,18 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     }
 
     if (isMongoConnected()) {
-      let query;
-      if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
-        query = { _id: id };
-      } else {
-        const cleanId = (id || '').toLowerCase();
-        query = {
-          $or: [
-            { slug: cleanId },
-            { customUrl: cleanId },
-            { customUrl: `/${cleanId}` }
-          ]
-        };
+      const cleanId = String(id || '').trim();
+      const queryConditions = [
+        { slug: cleanId.toLowerCase() },
+        { customUrl: cleanId.toLowerCase() },
+        { customUrl: `/${cleanId.toLowerCase()}` }
+      ];
+      if (cleanId.match(/^[0-9a-fA-F]{24}$/)) {
+        queryConditions.unshift({ _id: cleanId });
       }
+      queryConditions.push({ _id: cleanId });
+
+      const query = { $or: queryConditions };
 
       const updated = await Tour.findOneAndUpdate(
         query,

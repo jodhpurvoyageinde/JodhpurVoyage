@@ -70,7 +70,13 @@ const formatBlogPost = (post) => {
     featured: doc.featured === true,
     publishedAt: doc.publishedAt || doc.createdAt || new Date().toISOString(),
     createdAt: doc.createdAt || new Date().toISOString(),
-    cities: doc.cities || []
+    cities: doc.cities || [],
+    seoTitle: doc.seoTitle || '',
+    seoKeywords: doc.seoKeywords || '',
+    seoDescription: doc.seoDescription || '',
+    metaTitle: doc.seoTitle || '',
+    metaKeywords: doc.seoKeywords || '',
+    metaDescription: doc.seoDescription || ''
   };
 };
 
@@ -261,10 +267,14 @@ router.get('/:identifier', async (req, res) => {
 // POST /api/blogs
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
-    const blogData = req.body;
+    const blogData = { ...req.body };
     if (!blogData.slug && blogData.title) {
       blogData.slug = createSlug(blogData.title);
     }
+
+    if (blogData.metaTitle && !blogData.seoTitle) blogData.seoTitle = blogData.metaTitle;
+    if (blogData.metaKeywords && !blogData.seoKeywords) blogData.seoKeywords = blogData.metaKeywords;
+    if (blogData.metaDescription && !blogData.seoDescription) blogData.seoDescription = blogData.metaDescription;
 
     if (isMongoConnected()) {
       const blog = new BlogPost({
@@ -276,7 +286,10 @@ router.post('/', protect, adminOnly, async (req, res) => {
         category: blogData.category || 'Travel Guide',
         readTime: blogData.readTime || '5 min de lecture',
         tags: blogData.tags || ['Inde'],
-        published: blogData.published !== false
+        published: blogData.published !== false,
+        seoTitle: blogData.seoTitle || '',
+        seoKeywords: blogData.seoKeywords || '',
+        seoDescription: blogData.seoDescription || ''
       });
       const saved = await blog.save();
       return res.status(201).json(formatBlogPost(saved));
@@ -298,10 +311,17 @@ router.post('/', protect, adminOnly, async (req, res) => {
 // PUT /api/blogs/:id
 router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    delete updateData._id;
+
+    if (updateData.metaTitle && !updateData.seoTitle) updateData.seoTitle = updateData.metaTitle;
+    if (updateData.metaKeywords && !updateData.seoKeywords) updateData.seoKeywords = updateData.metaKeywords;
+    if (updateData.metaDescription && !updateData.seoDescription) updateData.seoDescription = updateData.metaDescription;
+
     if (isMongoConnected()) {
       const blog = await BlogPost.findById(req.params.id);
       if (!blog) return res.status(404).json({ message: 'Article introuvable' });
-      Object.assign(blog, req.body);
+      Object.assign(blog, updateData);
       const updated = await blog.save();
       return res.json(formatBlogPost(updated));
     }
@@ -309,7 +329,7 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     if (!memoryStore.blogs) memoryStore.blogs = [];
     const idx = memoryStore.blogs.findIndex((b) => b._id === req.params.id);
     if (idx === -1) return res.status(404).json({ message: 'Article introuvable' });
-    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...req.body };
+    memoryStore.blogs[idx] = { ...memoryStore.blogs[idx], ...updateData };
     res.json(formatBlogPost(memoryStore.blogs[idx]));
   } catch (error) {
     res.status(400).json({ message: error.message || 'Erreur mise à jour' });

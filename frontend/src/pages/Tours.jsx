@@ -309,7 +309,12 @@ const Tours = () => {
 
   return (
     <div>
-      <SEO pageKey="tours" title={`${currentMeta.title} | Jodhpur Voyage`} description={currentMeta.desc} />
+      <SEO 
+        pageKey={!hasActiveFilters ? "tours" : undefined}
+        title={hasActiveFilters ? `${currentMeta.title} | Jodhpur Voyage` : undefined}
+        description={hasActiveFilters ? currentMeta.desc : undefined}
+        keywords={hasActiveFilters ? `${currentMeta.title.toLowerCase()}, circuit inde, voyage sur mesure inde` : undefined}
+      />
       {/* Hero Banner */}
       <section className="reviews-hero-section">
         <img src={currentMeta.bg} alt={currentMeta.title} className="reviews-hero-bg" />
@@ -531,50 +536,22 @@ const Tours = () => {
               </div>
 
               <div className="tours-grid">
-                {currentTours.map((tour) => (
-                  <div key={tour._id || tour.slug} className="tour-card">
-                    <Link to={`/${tour.slug}`} className="tour-card-image-wrap">
-                      <img src={tour.image || '/images/dest-rajasthan.jpg'} alt={tour.title} />
-                      <span className="tour-card-badge">{tour.badge || 'Populaire'}</span>
-                      <div className="tour-card-duration"><i className="far fa-clock"></i> {tour.duration}</div>
-                    </Link>
-                    <div className="tour-card-body">
-                      <div className="tour-card-location"><i className="fas fa-map-marker-alt"></i> {tour.location}</div>
-                      {Array.isArray(tour.cities) && tour.cities.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '6px 0 8px' }}>
-                          {tour.cities.slice(0, 4).map((c, i) => (
-                            <span 
-                              key={i} 
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleCityChange(c.slug || c.name.toLowerCase());
-                              }}
-                              style={{ 
-                                fontSize: '0.72rem', 
-                                background: '#EEF2FF', 
-                                color: '#4338CA', 
-                                border: '1px solid #C7D2FE', 
-                                padding: '1px 6px', 
-                                borderRadius: '10px', 
-                                fontWeight: '600',
-                                cursor: 'pointer' 
-                              }}
-                              title={`Filtrer par ${c.name}`}
-                            >
-                              📍 {c.name}
-                            </span>
-                          ))}
-                          {tour.cities.length > 4 && (
-                            <span style={{ fontSize: '0.7rem', color: '#64748B', alignSelf: 'center' }}>
-                              +{tour.cities.length - 4}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      <h3 className="tour-card-title">
-                        <Link to={`/${tour.slug}`}>{tour.title}</Link>
-                      </h3>
+                {currentTours.map((tour) => {
+                  const rawLocation = tour.location || tour.category || 'Inde';
+                  const cleanLocation = rawLocation.replace(/^Inde\s*,\s*(.+)/i, '$1').trim() || rawLocation;
+
+                  return (
+                    <div key={tour._id || tour.slug} className="tour-card">
+                      <Link to={`/${tour.slug}`} className="tour-card-image-wrap">
+                        <img src={tour.image || '/images/dest-rajasthan.jpg'} alt={tour.title} />
+                        <span className="tour-card-badge">{tour.badge || 'Populaire'}</span>
+                        <div className="tour-card-duration"><i className="far fa-clock"></i> {tour.duration}</div>
+                      </Link>
+                      <div className="tour-card-body">
+                        <div className="tour-card-location"><i className="fas fa-map-marker-alt"></i> {cleanLocation}</div>
+                        <h3 className="tour-card-title">
+                          <Link to={`/${tour.slug}`}>{tour.title}</Link>
+                        </h3>
                       <p className="tour-card-excerpt">{tour.subtitle || (tour.overview ? tour.overview.slice(0, 110) + '...' : '')}</p>
                       <div className="tour-card-footer">
                         <span style={{ fontSize: '0.82rem', color: 'var(--color-primary)', fontWeight: '600' }}>
@@ -591,7 +568,8 @@ const Tours = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
 
               {/* Pagination Bar */}

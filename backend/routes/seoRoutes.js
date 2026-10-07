@@ -125,7 +125,8 @@ router.get('/:pageKey', async (req, res) => {
 router.put('/:pageKey', protect, adminOnly, async (req, res) => {
   try {
     const pageKey = req.params.pageKey.toLowerCase();
-    const seoData = req.body;
+    const seoData = { ...req.body };
+    delete seoData._id;
 
     if (seoData.customUrl) {
       seoData.customUrl = normalizeCustomPath(seoData.customUrl);

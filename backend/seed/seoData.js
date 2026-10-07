@@ -144,5 +144,18 @@ export const defaultSeoData = [
     ogImage: '/images/contact-banner.jpg',
     canonicalUrl: 'https://jodhpurvoyage.com/contact',
     structuredData: ''
+  },
+  {
+    pageKey: 'circuit-accompagne',
+    pageName: 'Circuits Accompagnés & Devis Sur Mesure',
+    customUrl: '/circuit-accompagne',
+    title: 'Circuits Accompagnés & Devis Sur Mesure en Inde | Jodhpur Voyage',
+    description: 'Créez votre voyage personnalisé ou circuit accompagné en Inde & Népal avec Jodhpur Voyage. Devis gratuit et conseils sur mesure d’experts locaux.',
+    keywords: 'circuit accompagne inde, voyage groupe inde, devis sur mesure rajasthan, agence voyage francophone',
+    ogTitle: 'Circuits Accompagnés & Devis Sur Mesure en Inde',
+    ogDescription: 'Demandez votre devis gratuit pour un circuit sur mesure ou en groupe restreint.',
+    ogImage: '/images/image-12.jpg',
+    canonicalUrl: 'https://jodhpurvoyage.com/circuit-accompagne',
+    structuredData: ''
   }
 ];

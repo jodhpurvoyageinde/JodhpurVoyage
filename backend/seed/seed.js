@@ -15,11 +15,11 @@ import {
   adminUser,
   destinationsData,
   toursData,
-  reviewsData,
   blogPostsData,
   sampleBookings,
   sampleMessages
 } from './seedData.js';
+import { reviewsData } from './reviewsSeedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
