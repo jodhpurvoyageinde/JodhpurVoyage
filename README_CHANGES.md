@@ -119,12 +119,12 @@ Establishes a **Many-to-Many Relationship** between **Packages (Tours)** and **C
   - Displays connected city tag pills (`📍 Jodhpur`, `📍 Jaipur`, etc.).
   - City filter checks `tour.cities` tags array.
 - **`frontend/src/components/TourImageSlider.jsx`**
-  - Interactive multiple image slider with autoplay (4.5s), swipe/touch support, navigation arrows, photo counter, caption overlay, clickable thumbnails strip, and full-screen lightbox modal.
+  - Interactive multiple image slider with autoplay (4.5s), swipe/touch support, navigation arrows, photo counter, clickable thumbnails strip, and full-screen lightbox modal (clean image view without city overlay).
   - Pulls images from `tour.gallery` and supplements with high-definition destination photos from the website library.
 - **`frontend/src/pages/TourDetail.jsx`**
   - Integrated `TourImageSlider` directly above "Aperçu du Circuit".
   - Configured sticky right sidebar (`position: sticky; top: 95px; alignSelf: 'start'`) so the booking inquiry box smoothly tracks the scroll alongside the itinerary and package content.
-  - Displays "Villes & Étapes de ce Circuit" with interactive city tags.
+  - Displays "Villes & Étapes de ce Circuit" with static non-clickable city badges.
   - Accepts `initialTour` prop for instant hydration.
   - Removed top hero category badge box (`.badge-gold`) and repositioned location indicator directly under the main title.
   - Removed the subtitle from the top Hero banner and placed it directly under **"Aperçu du Circuit"** without any text or character limit.

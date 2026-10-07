@@ -229,9 +229,8 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {tour.cities.map((city, idx) => (
-                      <Link
+                      <span
                         key={idx}
-                        to={`/circuits?city=${encodeURIComponent(city.slug || city.name.toLowerCase())}`}
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -243,14 +242,12 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
                           borderRadius: '20px',
                           fontSize: '0.84rem',
                           fontWeight: '600',
-                          textDecoration: 'none',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                          transition: 'all 0.2s ease'
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
                         }}
                       >
                         <i className="fas fa-map-marker-alt" style={{ fontSize: '0.78rem' }}></i>
                         {city.name}
-                      </Link>
+                      </span>
                     ))}
                   </div>
                 </div>

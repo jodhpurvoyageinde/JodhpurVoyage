@@ -163,18 +163,6 @@ const TourImageSlider = ({ tour }) => {
           }}
         />
 
-        {/* Gradient shadow for text readability */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '80px',
-            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
-            pointerEvents: 'none'
-          }}
-        />
 
         {/* Counter Badge */}
         <div
@@ -224,27 +212,6 @@ const TourImageSlider = ({ tour }) => {
           <i className="fas fa-expand-alt"></i>
         </div>
 
-        {/* Caption / Tag */}
-        {tour?.location && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '14px',
-              left: '16px',
-              color: '#ffffff',
-              fontSize: '0.92rem',
-              fontWeight: '600',
-              textShadow: '0 2px 6px rgba(0,0,0,0.8)',
-              zIndex: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <i className="fas fa-map-marker-alt" style={{ color: 'var(--gold-color, #f59e0b)' }}></i>
-            <span>{tour.location}</span>
-          </div>
-        )}
 
         {/* Navigation Arrows */}
         {images.length > 1 && (
