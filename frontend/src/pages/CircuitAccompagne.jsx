@@ -203,7 +203,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
 
       {/* STEPPER PROGRESS BAR */}
       <div className="container" style={{ marginTop: '-35px', position: 'relative', zIndex: 10 }}>
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '20px 30px', boxShadow: '0 8px 30px rgba(0,0,0,0.08)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+        <div className="circuit-stepper-wrap" style={{ background: '#fff', borderRadius: '16px', boxShadow: '0 8px 30px rgba(0,0,0,0.08)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: currentStep >= 1 ? '#0D9488' : '#94A3B8' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: currentStep >= 1 ? '#0D9488' : '#E2E8F0', color: currentStep >= 1 ? '#fff' : '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.1rem' }}>
@@ -245,7 +245,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
         {currentStep === 1 && (
           <form onSubmit={goToStep2}>
             {/* 1. SELECTION DE DESTINATION */}
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
+            <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
               <h3 style={{ fontSize: '1.4rem', color: '#1E293B', marginBottom: '8px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-map-marked-alt" style={{ color: '#0D9488' }}></i> Ma destination souhaitée *
               </h3>
@@ -285,7 +285,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
             </div>
 
             {/* 2. DATES, DUREE & VILLE DE DEPART */}
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
+            <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
               <h3 style={{ fontSize: '1.4rem', color: '#1E293B', marginBottom: '20px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-calendar-alt" style={{ color: '#0D9488' }}></i> Mes dates & durée de voyage *
               </h3>
@@ -330,7 +330,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
             </div>
 
             {/* 3. VOYAGEURS & BUDGET */}
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
+            <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
               <h3 style={{ fontSize: '1.4rem', color: '#1E293B', marginBottom: '20px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-coins" style={{ color: '#0D9488' }}></i> Nombre de voyageurs & Budget *
               </h3>
@@ -390,7 +390,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
             </div>
 
             {/* 4. PERSONNALISATION DE VOTRE VOYAGE (SELECTION MAISONS DU VOYAGE STYLE) */}
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
+            <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #E2E8F0' }}>
               <h3 style={{ fontSize: '1.4rem', color: '#1E293B', marginBottom: '6px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-sliders-h" style={{ color: '#0D9488' }}></i> Afin de personnaliser votre voyage, dites-nous ce qui est important pour vous *
               </h3>
@@ -493,7 +493,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
 
             {/* BUTTON NEXT STEP */}
             <div style={{ textAlign: 'center', marginTop: '30px' }}>
-              <button type="submit" className="btn btn-primary btn-lg" style={{ padding: '14px 40px', fontSize: '1.1rem' }}>
+              <button type="submit" className="btn btn-primary btn-lg circuit-submit-btn" style={{ padding: '14px 40px', fontSize: '1.1rem' }}>
                 Continuer vers mes coordonnées <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
               </button>
             </div>
@@ -503,7 +503,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
         {/* STEP 2: MES COORDONNEES & VALIDATION */}
         {currentStep === 2 && (
           <form onSubmit={handleSubmit}>
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '36px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #E2E8F0' }}>
+            <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', marginBottom: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #E2E8F0' }}>
               <h3 style={{ fontSize: '1.5rem', color: '#1E293B', marginBottom: '8px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-user-check" style={{ color: '#0D9488' }}></i> Mes Coordonnées de Contact *
               </h3>
@@ -612,7 +612,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
 
         {/* STEP 3: CONFIRMATION */}
         {currentStep === 3 && (
-          <div style={{ background: '#fff', borderRadius: '16px', padding: '50px 30px', textAlign: 'center', boxShadow: '0 4px 25px rgba(0,0,0,0.06)', border: '1px solid #E2E8F0', maxWidth: '800px', margin: '0 auto' }}>
+          <div className="circuit-form-card" style={{ background: '#fff', borderRadius: '16px', textAlign: 'center', boxShadow: '0 4px 25px rgba(0,0,0,0.06)', border: '1px solid #E2E8F0', maxWidth: '800px', margin: '0 auto' }}>
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#F0FDFA', color: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', fontSize: '2.5rem' }}>
               <i className="fas fa-check-circle"></i>
             </div>
