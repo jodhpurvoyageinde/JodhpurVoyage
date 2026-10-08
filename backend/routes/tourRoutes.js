@@ -130,13 +130,61 @@ const normalizeTour = (tour) => {
 // GET /api/tours (fetches from Tour database / Tour model)
 router.get('/', async (req, res) => {
   try {
-    const { region, city, search, limit, featured } = req.query;
+    const { region, city, category, destination, search, limit, featured } = req.query;
 
     if (isMongoConnected()) {
       const conditions = [{ published: { $ne: false } }];
 
       if (featured !== undefined) {
         conditions.push({ featured: featured === 'true' || featured === true });
+      }
+
+      const targetCat = category || destination;
+      if (targetCat && targetCat !== 'all') {
+        const catNorm = targetCat.trim().toLowerCase().replace(/_/g, '-');
+        let catPattern;
+        if (catNorm === 'rajasthan') {
+          catPattern = '^rajasthan|rajasthan';
+        } else if (catNorm === 'gujarat') {
+          catPattern = 'gujarat';
+        } else if (catNorm === 'ladakh') {
+          catPattern = 'ladakh';
+        } else if (catNorm === 'nepal') {
+          catPattern = 'n[ée]pal|katmandou|kathmandu';
+        } else if (catNorm === 'kerala') {
+          catPattern = 'kerala';
+        } else if (catNorm === 'karnataka') {
+          catPattern = 'karnataka';
+        } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil') {
+          catPattern = 'tamil|chennai|madras';
+        } else if (catNorm === 'delhi-agra' || catNorm === 'delhi' || catNorm === 'agra') {
+          catPattern = 'delhi|agra';
+        } else if (catNorm === 'varanasi' || catNorm === 'benares') {
+          catPattern = 'varanasi|b[ée]nar[èe]s';
+        } else if (catNorm === 'amritsar-punjab' || catNorm === 'amritsar' || catNorm === 'punjab') {
+          catPattern = 'amritsar|punjab';
+        } else if (catNorm === 'goa') {
+          catPattern = 'goa';
+        } else if (catNorm === 'orissa') {
+          catPattern = 'orissa';
+        } else if (catNorm === 'bhoutan') {
+          catPattern = 'bhoutan';
+        } else if (catNorm === 'himachal' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal') {
+          catPattern = 'himachal|dharamsala';
+        } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand') {
+          catPattern = 'rishikesh|uttarakhand|haridwar';
+        } else {
+          catPattern = targetCat.replace(/-/g, ' ');
+        }
+
+        const catRegex = new RegExp(catPattern, 'i');
+        conditions.push({
+          $or: [
+            { category: catRegex },
+            { 'cities.name': catRegex },
+            { 'cities.slug': new RegExp(catNorm, 'i') }
+          ]
+        });
       }
 
       if (region && region !== 'all') {
@@ -155,7 +203,7 @@ router.get('/', async (req, res) => {
         } else if (regNorm === 'ladakh' || regNorm === 'himalaya') {
           regPattern = 'ladakh|himalaya|spiti|zanskar|leh';
         } else if (regNorm === 'rajasthan') {
-          regPattern = 'rajasthan|jodhpur|jaipur|udaipur|jaisalmer';
+          regPattern = '^rajasthan|rajasthan|jodhpur|jaipur|udaipur|jaisalmer';
         } else if (regNorm === 'gujarat') {
           regPattern = 'gujarat|kutch|palitana';
         } else {
@@ -186,12 +234,7 @@ router.get('/', async (req, res) => {
             { cityName: cityRegex },
             { location: cityRegex },
             { title: cityRegex },
-            { category: cityRegex },
-            { region: cityRegex },
-            { highlights: cityRegex },
-            { overview: cityRegex },
-            { 'itinerary.title': cityRegex },
-            { 'itinerary.description': cityRegex }
+            { category: cityRegex }
           ]
         });
       }
@@ -232,6 +275,14 @@ router.get('/', async (req, res) => {
     let list = (memoryStore.tours || []).filter((t) => t.published !== false);
     if (featured !== undefined) {
       list = list.filter((t) => t.featured === (featured === 'true' || featured === true));
+    }
+    const targetCatMem = category || destination;
+    if (targetCatMem && targetCatMem !== 'all') {
+      const cat = targetCatMem.toLowerCase().replace(/-/g, ' ');
+      list = list.filter((t) =>
+        t.category?.toLowerCase().includes(cat) ||
+        t.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(cat) || ct.slug?.toLowerCase().includes(cat))
+      );
     }
     if (region && region !== 'all') {
       const reg = region.toLowerCase().replace(/-/g, ' ');

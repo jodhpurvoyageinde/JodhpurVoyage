@@ -708,39 +708,7 @@ const Navbar = () => {
                 </div>
               </div>
 
-              {/* BLOG DROPDOWN */}
-              <div
-                className={`nav-item has-dropdown ${openMobileMega === 'blog' ? 'mobile-open' : ''} ${isActive('/blog') || isActive('/blog_category') ? 'active' : ''} ${hoveredMega === 'blog' ? 'mega-active' : ''}`}
-                onMouseEnter={() => handleMegaMouseEnter('blog')}
-                onMouseLeave={handleMegaMouseLeave}
-              >
-                <Link to="/blog" className="nav-link" onClick={(e) => handleParentNavClick(e, 'blog')}>
-                  Blog <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'blog' ? 'rotate' : ''}`}></i>
-                </Link>
-                <div
-                  className={`nav-dropdown-menu ${forceCloseMega ? 'force-closed' : ''}`}
-                  onMouseEnter={() => handleMegaMouseEnter('blog')}
-                  onMouseLeave={handleMegaMouseLeave}
-                >
-                  <ul className="nav-dropdown-list">
-                    <li>
-                      <Link to="/blog_category/inde" className="nav-dropdown-item" onClick={closeMobileMenu}>
-                        <i className="fas fa-newspaper"></i> Inde
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/blog_category/nepal-2" className="nav-dropdown-item" onClick={closeMobileMenu}>
-                        <i className="fas fa-mountain"></i> Nepal
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/blog" className="nav-dropdown-item" onClick={closeMobileMenu}>
-                        <i className="fas fa-th-list"></i> Tous les articles
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+
 
               <div className={`nav-item ${isActive('/commentaires') ? 'active' : ''}`} onMouseEnter={handleNonMegaMouseEnter}>
                 <Link to={getCustomPath('/commentaires')} className="nav-link" onClick={closeMobileMenu}>commentaires</Link>

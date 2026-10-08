@@ -244,7 +244,7 @@
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 1.5rem;
+  gap: 0.6rem;
   margin: 0;
   padding: 0;
 }
@@ -263,8 +263,8 @@
   color: var(--color-dark);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.4rem;
+  gap: 0.45rem;
+  padding: 0.55rem 0.85rem;
   position: relative;
   white-space: nowrap;
   transition: var(--transition-fast);

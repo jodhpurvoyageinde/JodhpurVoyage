@@ -372,8 +372,8 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
             </div>
           </div>
 
-          {/* Sticky Sidebar */}
-          <aside style={{ position: 'sticky', top: '95px', alignSelf: 'start', zIndex: 10 }}>
+          {/* Sidebar */}
+          <aside style={{ alignSelf: 'start' }}>
             <div style={{ background: '#ffffff', borderRadius: '12px', padding: '28px', boxShadow: 'var(--shadow-md)', border: '2px solid var(--gold-light)' }}>
               <span className="badge-gold" style={{ marginBottom: '10px', display: 'inline-block' }}>Devis 100% Personnalisé</span>
               <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--secondary-color)', margin: '8px 0', fontFamily: 'var(--font-heading)' }}>
