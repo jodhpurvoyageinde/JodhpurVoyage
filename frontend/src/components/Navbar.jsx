@@ -9,14 +9,13 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Nord',
     icon: 'fas fa-gopuram',
     subcategories: [
-      { name: 'Rajasthan', path: '/tours?region=rajasthan', searchKey: 'rajasthan' },
-      { name: 'Delhi', path: '/tours?search=Delhi', searchKey: 'delhi' },
-      { name: 'Agra (Taj Mahal)', path: '/tours?search=Agra', searchKey: 'agra' },
-      { name: 'Varanasi', path: '/tours?search=Varanasi', searchKey: 'varanasi' },
-      { name: 'Amritsar', path: '/tours?search=Amritsar', searchKey: 'amritsar' },
-      { name: 'Dharamsala', path: '/tours?search=Dharamsala', searchKey: 'dharamsala' },
-      { name: 'Rishikesh', path: '/tours?search=Rishikesh', searchKey: 'rishikesh' },
-      { name: 'Ladakh', path: '/tours?region=ladakh', searchKey: 'ladakh' }
+      { name: 'Rajasthan', path: '/destinations/rajasthan', searchKey: 'rajasthan' },
+      { name: 'Delhi & Agra (Taj Mahal)', path: '/destinations/delhi-agra', searchKey: 'delhi-agra' },
+      { name: 'Varanasi (Bénarès)', path: '/destinations/varanasi', searchKey: 'varanasi' },
+      { name: 'Amritsar & Punjab', path: '/destinations/amritsar-punjab', searchKey: 'amritsar-punjab' },
+      { name: 'Dharamsala & Himachal', path: '/destinations/dharamsala-himachal', searchKey: 'dharamsala-himachal' },
+      { name: 'Rishikesh & Uttarakhand', path: '/destinations/rishikesh-uttarakhand', searchKey: 'rishikesh-uttarakhand' },
+      { name: 'Ladakh (Petit Tibet)', path: '/destinations/ladakh', searchKey: 'ladakh' }
     ]
   },
   {
@@ -24,11 +23,11 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Sud',
     icon: 'fas fa-tree',
     subcategories: [
-      { name: 'Goa & Côte Tropicale', path: '/tours?search=Goa', searchKey: 'goa' },
-      { name: 'Karnataka', path: '/tours?search=Karnataka', searchKey: 'karnataka' },
-      { name: 'Kerala', path: '/tours?search=Kerala', searchKey: 'kerala' },
-      { name: 'Orissa', path: '/tours?search=Orissa', searchKey: 'orissa' },
-      { name: 'Tamil Nadu', path: '/tours?search=Tamil', searchKey: 'tamil' }
+      { name: 'Kerala & Backwaters', path: '/destinations/kerala', searchKey: 'kerala' },
+      { name: 'Tamil Nadu & Temples', path: '/destinations/tamil-nadu', searchKey: 'tamil-nadu' },
+      { name: 'Karnataka & Hampi', path: '/destinations/karnataka', searchKey: 'karnataka' },
+      { name: 'Goa & Côte Tropicale', path: '/destinations/goa', searchKey: 'goa' },
+      { name: 'Orissa & Konark', path: '/destinations/orissa', searchKey: 'orissa' }
     ]
   },
   {
@@ -36,9 +35,9 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: "Inde de l'Ouest",
     icon: 'fas fa-compass',
     subcategories: [
-      { name: 'Gujarat', path: '/destinations/gujarat', searchKey: 'gujarat' },
-      { name: 'Désert du Rann de Kutch', path: '/tours?search=Kutch', searchKey: 'kutch' },
-      { name: 'Palitana', path: '/tours?search=Palitana', searchKey: 'palitana' }
+      { name: 'Gujarat & Kutch', path: '/destinations/gujarat', searchKey: 'gujarat' },
+      { name: 'Désert du Rann de Kutch', path: '/destinations/gujarat', searchKey: 'kutch' },
+      { name: 'Palitana & Shatrunjaya', path: '/destinations/gujarat', searchKey: 'palitana' }
     ]
   },
   {
@@ -46,9 +45,10 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Népal',
     icon: 'fas fa-mountain',
     subcategories: [
-      { name: 'Katmandou', path: '/tours?search=Katmandou', searchKey: 'katmandou' },
-      { name: 'Pokhara', path: '/tours?search=Pokhara', searchKey: 'pokhara' },
-      { name: 'Chitwan', path: '/tours?search=Chitwan', searchKey: 'chitwan' }
+      { name: 'Népal & Katmandou', path: '/destinations/nepal', searchKey: 'nepal' },
+      { name: 'Vallée de Katmandou', path: '/destinations/nepal', searchKey: 'katmandou' },
+      { name: 'Pokhara & Annapurnas', path: '/destinations/nepal', searchKey: 'pokhara' },
+      { name: 'Parc National de Chitwan', path: '/destinations/nepal', searchKey: 'chitwan' }
     ]
   },
   {
@@ -56,9 +56,10 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Bhoutan',
     icon: 'fas fa-place-of-worship',
     subcategories: [
-      { name: 'Punakha', path: '/tours?search=Punakha', searchKey: 'punakha' },
-      { name: 'Paro', path: '/tours?search=Paro', searchKey: 'paro' },
-      { name: 'Thimphu', path: '/tours?search=Thimphu', searchKey: 'thimphu' }
+      { name: 'Bhoutan – Royaume du Dragon', path: '/destinations/bhoutan', searchKey: 'bhoutan' },
+      { name: 'Paro & Nid du Tigre', path: '/destinations/bhoutan', searchKey: 'paro' },
+      { name: 'Punakha & Dzongs', path: '/destinations/bhoutan', searchKey: 'punakha' },
+      { name: 'Thimphu Royale', path: '/destinations/bhoutan', searchKey: 'thimphu' }
     ]
   }
 ];
@@ -208,31 +209,31 @@ const Navbar = () => {
             key: 'nord',
             title: 'Inde du Nord',
             icon: 'fas fa-gopuram',
-            subcategories: []
+            subcategories: [...DEFAULT_DESTINATION_GROUPS[0].subcategories]
           },
           sud: {
             key: 'sud',
             title: 'Inde du Sud',
             icon: 'fas fa-tree',
-            subcategories: []
+            subcategories: [...DEFAULT_DESTINATION_GROUPS[1].subcategories]
           },
           ouest: {
             key: 'ouest',
             title: "Inde de l'Ouest",
             icon: 'fas fa-compass',
-            subcategories: []
+            subcategories: [...DEFAULT_DESTINATION_GROUPS[2].subcategories]
           },
           nepal: {
             key: 'nepal',
             title: 'Népal',
             icon: 'fas fa-mountain',
-            subcategories: []
+            subcategories: [...DEFAULT_DESTINATION_GROUPS[3].subcategories]
           },
           bhoutan: {
             key: 'bhoutan',
             title: 'Bhoutan',
             icon: 'fas fa-place-of-worship',
-            subcategories: []
+            subcategories: [...DEFAULT_DESTINATION_GROUPS[4].subcategories]
           }
         };
 
@@ -243,27 +244,22 @@ const Navbar = () => {
           let colKey = 'nord';
           if (reg === 'nepal' || reg.includes('nepal')) colKey = 'nepal';
           else if (reg === 'bhoutan' || reg.includes('bhoutan')) colKey = 'bhoutan';
-          else if (reg === 'inde-de-louest' || reg === 'inde-du-ouest' || reg === 'ouest' || reg.includes('ouest')) colKey = 'ouest';
-          else if (reg === 'gujarat') colKey = 'ouest';
+          else if (reg === 'inde-de-louest' || reg === 'inde-du-ouest' || reg === 'ouest' || reg.includes('ouest') || reg === 'gujarat') colKey = 'ouest';
           else if (reg === 'inde-du-sud' || reg === 'sud' || reg === 'kerala' || reg === 'karnataka' || reg === 'goa' || reg === 'orissa') colKey = 'sud';
           else colKey = 'nord';
 
           const name = d.name || d.title;
           const path = d.customUrl || `/destinations/${d.slug}`;
 
-          if (!groupMap[colKey].subcategories.some((s) => s.name.toLowerCase() === name.toLowerCase())) {
+          const existingIdx = groupMap[colKey].subcategories.findIndex(
+            (s) => s.name.toLowerCase() === name.toLowerCase() || s.path === path
+          );
+          if (existingIdx !== -1) {
+            groupMap[colKey].subcategories[existingIdx] = { name, path };
+          } else {
             groupMap[colKey].subcategories.push({ name, path });
           }
         });
-
-        // Ensure "ouest" section has default items if none are assigned yet
-        if (groupMap.ouest.subcategories.length === 0) {
-          groupMap.ouest.subcategories = [
-            { name: 'Gujarat', path: '/destinations/gujarat' },
-            { name: 'Désert du Rann de Kutch', path: '/tours?search=Kutch' },
-            { name: 'Palitana', path: '/tours?search=Palitana' }
-          ];
-        }
 
         const dynamicGroups = Object.values(groupMap).filter((g) => g.subcategories.length > 0);
         if (dynamicGroups.length > 0) {
@@ -320,7 +316,15 @@ const Navbar = () => {
     }
     megaCloseTimeoutRef.current = setTimeout(() => {
       setHoveredMega(null);
-    }, 350);
+    }, 120);
+  };
+
+  const handleNonMegaMouseEnter = () => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+      megaCloseTimeoutRef.current = null;
+    }
+    setHoveredMega(null);
   };
 
   useEffect(() => {
@@ -344,7 +348,11 @@ const Navbar = () => {
   };
 
   const handleHeaderMouseLeave = () => {
-    handleMegaMouseLeave();
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+      megaCloseTimeoutRef.current = null;
+    }
+    setHoveredMega(null);
   };
 
   const handleNavMouseEnter = () => {
@@ -530,7 +538,7 @@ const Navbar = () => {
         <div className="main-nav-bar">
           <div className="container nav-container">
             {/* Logo */}
-            <Link to="/" className="brand-logo" onClick={closeMobileMenu}>
+            <Link to="/" className="brand-logo" onClick={closeMobileMenu} onMouseEnter={handleNonMegaMouseEnter}>
               <img src="/images/logo-transprent.png" alt="Jodhpur Voyage Logo" className="brand-logo-img" />
             </Link>
 
@@ -546,7 +554,7 @@ const Navbar = () => {
               </div>
 
               {/* Accueil */}
-              <div className={`nav-item ${isActive('/') ? 'active' : ''}`}>
+              <div className={`nav-item ${isActive('/') ? 'active' : ''}`} onMouseEnter={handleNonMegaMouseEnter}>
                 <Link to="/" className="nav-link" onClick={closeMobileMenu}>Accueil</Link>
               </div>
 
@@ -621,7 +629,7 @@ const Navbar = () => {
               </div>
 
               {/* VOYAGE SUR MESURE DIRECT LINK */}
-              <div className={`nav-item ${isActive('/voyage-sur-mesure') ? 'active' : ''}`}>
+              <div className={`nav-item ${isActive('/voyage-sur-mesure') ? 'active' : ''}`} onMouseEnter={handleNonMegaMouseEnter}>
                 <Link to={getCustomPath('/voyage-sur-mesure')} className="nav-link" onClick={closeMobileMenu}>
                   Voyage sur mesure
                 </Link>
@@ -734,11 +742,11 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <div className={`nav-item ${isActive('/commentaires') ? 'active' : ''}`}>
+              <div className={`nav-item ${isActive('/commentaires') ? 'active' : ''}`} onMouseEnter={handleNonMegaMouseEnter}>
                 <Link to={getCustomPath('/commentaires')} className="nav-link" onClick={closeMobileMenu}>commentaires</Link>
               </div>
 
-              <div className={`nav-item ${isActive('/contact') ? 'active' : ''}`}>
+              <div className={`nav-item ${isActive('/contact') ? 'active' : ''}`} onMouseEnter={handleNonMegaMouseEnter}>
                 <Link to={getCustomPath('/contact')} className="nav-link" onClick={closeMobileMenu}>Contactez Nous</Link>
               </div>
             </nav>

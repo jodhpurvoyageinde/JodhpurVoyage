@@ -127,6 +127,142 @@ const defaultDestinationsMap = {
       { icon: 'fa-tshirt', title: 'Artisanat & Broderies', desc: 'Techniques ancestrales de tissage Ikat et de broderies tribales d\'exception.' }
     ],
     region: 'gujarat'
+  },
+  'amritsar-punjab': {
+    name: 'Amritsar & Le Punjab',
+    slug: 'amritsar-punjab',
+    heroTitle: 'Voyage à Amritsar & Punjab',
+    h1Title: 'Amritsar & Le Punjab : Temple d\'Or et Hospitalité Sikh',
+    tagline: 'Temple d\'Or scintillant, ferveur spirituelle, gastronomie généreuse et cérémonie de Wagah',
+    image: '/images/dest-jodhpur.jpg',
+    satisfaction: '98% de satisfaction (78 avis)',
+    shortDescription: "Capitale spirituelle de la communauté sikh, Amritsar abrite le somptueux Harmandir Sahib (Temple d'Or), havre de paix et de dévotion inconditionnelle. Découvrez une culture chaleureuse, des cuisines réputées et la cérémonie spectaculaire de la frontière indo-pakistanaise de Wagah.",
+    highlights: [
+      { icon: 'fa-sun', title: 'Harmandir Sahib (Temple d\'Or)', desc: 'Le sanctuaire d\'or étincelant au cœur du bassin sacré d\'Amrit Sarovar.' },
+      { icon: 'fa-utensils', title: 'Langar Sacré', desc: 'La plus grande cuisine communautaire gratuite au monde servant 100 000 repas par jour.' },
+      { icon: 'fa-flag', title: 'Frontière de Wagah', desc: 'Cérémonie militaire théâtrale de descente des drapeaux entre l\'Inde et le Pakistan.' },
+      { icon: 'fa-history', title: 'Jallianwala Bagh', desc: 'Mémorial historique émouvant retraçant la lutte pour l\'indépendance indienne.' }
+    ],
+    region: 'inde-du-nord'
+  },
+  'dharamsala-himachal': {
+    name: 'Dharamsala & Himachal Pradesh',
+    slug: 'dharamsala-himachal',
+    heroTitle: 'Voyage à Dharamsala & Himachal',
+    h1Title: 'Dharamsala & Himachal : Résidence du Dalaï-Lama au Cœur de l\'Himalaya',
+    tagline: 'McLeod Ganj, monastères tibétains, forêts de cèdres et vallées de Kangra et Manali',
+    image: '/images/dest-himachal.jpg',
+    satisfaction: '97% de satisfaction (64 avis)',
+    shortDescription: "Niché sur les pentes boisées de la chaîne des Dhauladhar, Dharamsala et son faubourg McLeod Ganj constituent le refuge du Dalaï-Lama et du gouvernement tibétain en exil. Imprégnez-vous de spiritualité bouddhiste au milieu de paysages de pins majestueux.",
+    highlights: [
+      { icon: 'fa-place-of-worship', title: 'Temple du Dalaï-Lama', desc: 'Centre névralgique de la spiritualité tibétaine et lieu d\'enseignement bouddhiste.' },
+      { icon: 'fa-mountain', title: 'Vallée de Kangra', desc: 'Collines verdoyantes, plantations de thé et forteresse médiévale de Kangra.' },
+      { icon: 'fa-hiking', title: 'Trek de Triund', desc: 'Randonnée panoramique offrant des vues spectaculaires sur les crêtes enneigées de l\'Himalaya.' },
+      { icon: 'fa-hands', title: 'Institut Norbulingka', desc: 'Préservation des arts et traditions tibétains : peinture thangka et artisanat d\'art.' }
+    ],
+    region: 'inde-du-nord'
+  },
+  'rishikesh-uttarakhand': {
+    name: 'Rishikesh & Haridwar (Uttarakhand)',
+    slug: 'rishikesh-uttarakhand',
+    heroTitle: 'Voyage à Rishikesh & Haridwar',
+    h1Title: 'Rishikesh & Haridwar : Capitale Mondiale du Yoga et Gange Sauvage',
+    tagline: 'Ashrams mythiques, ponts suspendus Lakshman Jhula et Aarti vibrant à Har Ki Pauri',
+    image: '/images/image-12.jpg',
+    satisfaction: '98% de satisfaction (82 avis)',
+    shortDescription: "Aux portes de l'Himalaya, là où les eaux émeraude du Gange descendent des montagnes, Rishikesh et Haridwar forment un sanctuaire de sérénité et de quête spirituelle. Pratiquez le yoga et la méditation dans les ashrams historiques et vibrez aux chants sacrés de l'Aarti.",
+    highlights: [
+      { icon: 'fa-om', title: 'Ashrams & Yoga', desc: 'Pratique ancestrale du yoga et de la méditation guidée par des maîtres certifiés.' },
+      { icon: 'fa-bridge', title: 'Ponts Lakshman & Ram Jhula', desc: 'Passerelles suspendues mythiques au-dessus des eaux cristallines du Gange.' },
+      { icon: 'fa-fire', title: 'Aarti d\'Haridwar', desc: 'Milliers de petites lampes de fleurs allumées flottant sur le fleuve au crépuscule.' },
+      { icon: 'fa-water', title: 'Rafting & Nature Himalaya', desc: 'Descentes d\'eaux vives et randonnées dans les contreforts boisés de l\'Uttarakhand.' }
+    ],
+    region: 'inde-du-nord'
+  },
+  'tamil-nadu': {
+    name: 'Tamil Nadu & Temples Dravidiens',
+    slug: 'tamil-nadu',
+    heroTitle: 'Voyage au Tamil Nadu',
+    h1Title: 'Tamil Nadu : Cités Temples Millénaires & Comptoir de Pondichéry',
+    tagline: 'Gopurams multicolores de Madurai, grands temples Chola de Tanjore et charme français de Pondichéry',
+    image: '/images/dest-karnataka.jpg',
+    satisfaction: '98% de satisfaction (91 avis)',
+    shortDescription: "Terre de la culture dravidienne pure, le Tamil Nadu fascine par ses cités-temples gigantesques aux gopurams vertigineux sculptés de milliers de divinités. De la majesté de Madurai au romantisme colonial de Pondichéry et aux sanctuaires côtiers de Mahabalipuram.",
+    highlights: [
+      { icon: 'fa-gopuram', title: 'Temple Meenakshi de Madurai', desc: 'Chef-d\'œuvre dravidien foisonnant de sculptures polychromes et rituels quotidiens.' },
+      { icon: 'fa-landmark', title: 'Temples Chola de Tanjore', desc: 'Monuments UNESCO en granit pur témoignant du génie architectural de l\'Empire Chola.' },
+      { icon: 'fa-compass', title: 'Pondichéry & Auroville', desc: 'Flânerie dans le quartier blanc aux maisons coloniales françaises et communauté d\'Auroville.' },
+      { icon: 'fa-monument', title: 'Mahabalipuram Côtier', desc: 'Bas-relief de la Descente du Gange et Temples du Rivage face à l\'océan Indien.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  karnataka: {
+    name: 'Karnataka & Hampi',
+    slug: 'karnataka',
+    heroTitle: 'Voyage au Karnataka',
+    h1Title: 'Karnataka : Cité Oubliée de Hampi & Palais des Maharajas de Mysore',
+    tagline: 'Ruines grandioses de Vijayanagara, temples ciselés de Belur et faste oriental de Mysore',
+    image: '/images/image-6.jpg',
+    satisfaction: '99% de satisfaction (67 avis)',
+    shortDescription: "Le Karnataka recèle certains des plus beaux trésors architecturaux d'Inde du Sud. Explorez le site surréaliste de Hampi parsemé d'immenses blocs de granit et de temples en ruines, admirez la dentelle de pierre des temples Hoysala et le somptueux palais illuminé de Mysore.",
+    highlights: [
+      { icon: 'fa-monument', title: 'Hampi Cité Millénaire (UNESCO)', desc: 'Paysage lunaire spectaculaire et ruines colossales du prestigieux empire de Vijayanagara.' },
+      { icon: 'fa-crown', title: 'Palais de Mysore', desc: 'Joyau d\'architecture indo-sarrasine scintillant de 100 000 ampoules chaque dimanche soir.' },
+      { icon: 'fa-gem', title: 'Temples Hoysala de Belur & Halebid', desc: 'Sanctuaires en stéatite ciselés avec la précision et la finesse d\'un orfèvre.' },
+      { icon: 'fa-coffee', title: 'Collines de Coorg & Café', desc: 'Plantations de café ombragées, cascades et forêts tropicales des Ghâts occidentaux.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  goa: {
+    name: 'Goa & Côte Tropicale',
+    slug: 'goa',
+    heroTitle: 'Voyage à Goa',
+    h1Title: 'Goa : Plages Dorées, Églises Portugaises & Douceur Tropicale',
+    tagline: 'Plages frangées de cocotiers, architecture coloniale d\'Old Goa et coucher de soleil sur la mer d\'Arabie',
+    image: '/images/dest-goa.jpg',
+    satisfaction: '97% de satisfaction (58 avis)',
+    shortDescription: "Véritable parenthèse balnéaire et coloniale, Goa mêle harmonieusement traditions indiennes et héritage portugais. Détendez-vous sur des plages de sable doré, découvrez les basiliques baroques classées à l'UNESCO et dégustez une gastronomie savoureuse de fruits de mer et d'épices.",
+    highlights: [
+      { icon: 'fa-umbrella-beach', title: 'Plages Préservées', desc: 'Palolem, Agonda et Mandrem : criques paisibles ombragées de cocotiers.' },
+      { icon: 'fa-church', title: 'Old Goa & Basilique Bom Jesus', desc: 'Sanctuaires baroques classés UNESCO abritant les reliques de Saint François-Xavier.' },
+      { icon: 'fa-pepper-hot', title: 'Plantations d\'Épices Tropicales', desc: 'Visite guidée et dégustation au cœur des jardins aromatiques de cardamome et vanille.' },
+      { icon: 'fa-ship', title: 'Croisière sur la Rivière Mandovi', desc: 'Navigation au soleil couchant avec musique et danses traditionnelles goanaises.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  orissa: {
+    name: 'Orissa / Odisha & Konark',
+    slug: 'orissa',
+    heroTitle: 'Voyage en Orissa',
+    h1Title: 'Orissa : Temple du Soleil de Konark & Tribus Authentiques',
+    tagline: 'Char monumental en pierre de Konark, cité sacrée de Puri et marchés artisanaux',
+    image: '/images/dest-orissa.jpg',
+    satisfaction: '96% de satisfaction (43 avis)',
+    shortDescription: "Bordée par le golfe du Bengale, l'Orissa (Odisha) est un trésor d'art sacré et de traditions vivantes. Admirez le gigantesque Temple du Soleil de Konark, vibrez à la spiritualité de Puri et partez à la rencontre de minorités ethniques perpétuant des savoir-faire ancestraux.",
+    highlights: [
+      { icon: 'fa-sun', title: 'Temple du Soleil de Konark (UNESCO)', desc: 'Immense chariot céleste de pierre sculpté de 24 roues géantes et tiré par sept chevaux.' },
+      { icon: 'fa-place-of-worship', title: 'Puri & Temple de Jagannath', desc: 'L\'un des quatre pèlerinages les plus sacrés de l\'hindouisme (Char Dham).' },
+      { icon: 'fa-water', title: 'Lac Chilika & Dauphins', desc: 'La plus grande lagune côtière d\'Asie, refuge d\'oiseaux migrateurs et de dauphins de l\'Irrawaddy.' },
+      { icon: 'fa-palette', title: 'Village d\'Artisans de Raghurajpur', desc: 'Berceau des peintures traditionnelles Pattachitra sur feuille de palmier et masques sculptés.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  bhoutan: {
+    name: 'Bhoutan – Royaume du Dragon',
+    slug: 'bhoutan',
+    heroTitle: 'Voyage au Bhoutan',
+    h1Title: 'Bhoutan : Le Royaume du Bonheur National Brut & Monastères de l\'Himalaya',
+    tagline: 'Nid du Tigre (Taktshang) suspendu aux falaises, forteresses Dzongs et traditions séculaires',
+    image: '/images/jaipur-travel.jpg',
+    satisfaction: '99% de satisfaction (56 avis)',
+    shortDescription: "Dernier royaume bouddhiste de l'Himalaya, le Bhoutan cultive un art de vivre fondé sur le Bonheur National Brut et la préservation de son environnement. Des forteresses monumentales (Dzongs) de Paro et Punakha jusqu'à l'ascension légendaire du monastère suspendu de Taktshang.",
+    highlights: [
+      { icon: 'fa-place-of-worship', title: 'Monastère du Nid du Tigre (Taktshang)', desc: 'Sanctuaire iconique accroché à une falaise verticale à 3 120 m d\'altitude.' },
+      { icon: 'fa-fort-awesome', title: 'Punakha Dzong Majestueux', desc: 'La plus majestueuse forteresse du pays au confluent de deux rivières sacrées.' },
+      { icon: 'fa-mountain', title: 'Vallée Glaciaire de Phobjikha', desc: 'Havre de paix préservé où viennent hiberner les rares grues à cou noir.' },
+      { icon: 'fa-mask', title: 'Festivals Tshechu & Masques Sacrés', desc: 'Danses mystiques costumées exécutées par les moines dans les cours des Dzongs.' }
+    ],
+    region: 'bhoutan'
   }
 };
 
@@ -169,9 +305,28 @@ const defaultPackages = [
   }
 ];
 
+const slugAliases = {
+  'delhi': 'delhi-agra',
+  'agra': 'delhi-agra',
+  'amritsar': 'amritsar-punjab',
+  'punjab': 'amritsar-punjab',
+  'dharamsala': 'dharamsala-himachal',
+  'himachal': 'dharamsala-himachal',
+  'rishikesh': 'rishikesh-uttarakhand',
+  'uttarakhand': 'rishikesh-uttarakhand',
+  'benares': 'varanasi',
+  'katmandou': 'nepal',
+  'pokhara': 'nepal',
+  'chitwan': 'nepal',
+  'paro': 'bhoutan',
+  'punakha': 'bhoutan',
+  'thimphu': 'bhoutan'
+};
+
 const DestinationDetail = ({ overrideSlug }) => {
   const { slug: paramSlug } = useParams();
-  const currentSlug = overrideSlug || paramSlug || 'rajasthan';
+  const rawSlug = overrideSlug || paramSlug || 'rajasthan';
+  const currentSlug = slugAliases[rawSlug.toLowerCase()] || rawSlug;
 
   const [destInfo, setDestInfo] = useState(null);
   const [packages, setPackages] = useState(defaultPackages);
@@ -236,6 +391,24 @@ const DestinationDetail = ({ overrideSlug }) => {
     if (defaultDestinationsMap[s]) {
       return defaultDestinationsMap[s];
     }
+    const imageMap = {
+      'amritsar-punjab': '/images/dest-jodhpur.jpg',
+      'dharamsala-himachal': '/images/dest-himachal.jpg',
+      'rishikesh-uttarakhand': '/images/image-12.jpg',
+      'tamil-nadu': '/images/dest-karnataka.jpg',
+      'karnataka': '/images/image-6.jpg',
+      'goa': '/images/dest-goa.jpg',
+      'orissa': '/images/dest-orissa.jpg',
+      'bhoutan': '/images/jaipur-travel.jpg',
+      'nepal': '/images/dest-nepal.jpg',
+      'gujarat': '/images/dest-gujarat.jpg',
+      'delhi-agra': '/images/dest-tajmahal.jpg',
+      'varanasi': '/images/dest-varanasi.jpg',
+      'ladakh': '/images/dest-ladakh.jpg',
+      'rajasthan': '/images/dest-rajasthan.jpg',
+      'kerala': '/images/dest-kerala.jpg'
+    };
+
     const formattedName = s.charAt(0).toUpperCase() + s.slice(1).replace(/-/g, ' ');
     return {
       name: formattedName,
@@ -243,7 +416,7 @@ const DestinationDetail = ({ overrideSlug }) => {
       heroTitle: `Voyage ${formattedName}`,
       h1Title: `Voyage & Circuit sur Mesure à ${formattedName}`,
       tagline: `Découvrez les trésors et merveilles de ${formattedName} avec nos experts locaux`,
-      image: `/images/dest-${s}.jpg`,
+      image: imageMap[s] || `/images/dest-${s}.jpg`,
       satisfaction: '98% de satisfaction (110 avis)',
       shortDescription: `Découvrez ${formattedName} avec Jodhpur Voyage. Laissez-vous séduire par des paysages spectaculaires, des monuments historiques d'exception et une culture authentique au cœur de l'Inde et de l'Himalaya.`,
       fullDescription: `Nos itinéraires personnalisés à ${formattedName} combinent chauffeurs privés, guides expérimentés francophones et hébergements de charme soigneusement sélectionnés.`,

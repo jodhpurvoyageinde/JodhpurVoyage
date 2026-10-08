@@ -339,39 +339,27 @@
   white-space: normal;
 }
 
-/* Generous hover bridge connecting nav item to mega menu (prevents closing gap) */
-.nav-item.has-mega::after {
-  content: '';
-  position: absolute;
-  bottom: -25px;
-  left: 0;
-  right: 0;
-  height: 25px;
-  background: transparent;
-  pointer-events: auto;
-  z-index: 1290;
-}
-
-.mega-menu::before {
-  content: '';
-  position: absolute;
-  top: -45px;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background: transparent;
-  pointer-events: auto;
-  z-index: 1295;
-}
-
-.nav-item.has-mega:hover .mega-menu,
-.nav-item.has-mega.mega-active .mega-menu,
-.mega-menu:hover {
+/* Precise hover display only when hovering the exact nav-item or when active */
+.nav-item.has-mega:hover > .mega-menu,
+.nav-item.has-mega.mega-active > .mega-menu {
   opacity: 1 !important;
   visibility: visible !important;
-  pointer-events: all !important;
+  pointer-events: auto !important;
   transform: translateX(-50%) translateY(0) !important;
   transition-delay: 0s !important;
+}
+
+/* Micro bridge only directly below the active nav item */
+.nav-item.has-mega:hover > .mega-menu::before,
+.nav-item.has-mega.mega-active > .mega-menu::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: transparent;
+  pointer-events: auto;
 }
 
 /* Mega Menu Grid Structures */
@@ -5788,21 +5776,11 @@ a.review-card {
     max-height: none !important;
   }
 
-  .nav-item.has-mega:hover .mega-menu,
-  .nav-item.has-mega.mega-active .mega-menu,
-  .nav-item.has-mega:hover .mega-menu-inspirations,
-  .nav-item.has-mega:hover .mega-menu-about,
-  .nav-item.has-mega:hover .mega-menu-destinations,
-  .nav-item.has-mega.mega-active .mega-menu-inspirations,
-  .nav-item.has-mega.mega-active .mega-menu-about,
-  .nav-item.has-mega.mega-active .mega-menu-destinations,
-  .mega-menu:hover,
-  .mega-menu-inspirations:hover,
-  .mega-menu-about:hover,
-  .mega-menu-destinations:hover {
+  .nav-item.has-mega:hover > .mega-menu,
+  .nav-item.has-mega.mega-active > .mega-menu {
     opacity: 1 !important;
     visibility: visible !important;
-    pointer-events: all !important;
+    pointer-events: auto !important;
     transform: translateX(-50%) translateY(0) !important;
     transition-delay: 0s !important;
   }
@@ -7032,25 +7010,25 @@ a.review-card {
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.nav-dropdown-menu::before {
-  content: '';
-  position: absolute;
-  top: -30px;
-  left: -20px;
-  right: -20px;
-  height: 35px;
-  background: transparent;
-  pointer-events: auto;
-}
-
-.nav-item.has-dropdown:hover .nav-dropdown-menu,
-.nav-item.has-dropdown.mega-active .nav-dropdown-menu,
-.nav-dropdown-menu:hover {
+.nav-item.has-dropdown:hover > .nav-dropdown-menu,
+.nav-item.has-dropdown.mega-active > .nav-dropdown-menu {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
   transform: translateX(-50%) translateY(0) !important;
   transition-delay: 0s !important;
+}
+
+.nav-item.has-dropdown:hover > .nav-dropdown-menu::before,
+.nav-item.has-dropdown.mega-active > .nav-dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: transparent;
+  pointer-events: auto;
 }
 
 .nav-dropdown-list {
