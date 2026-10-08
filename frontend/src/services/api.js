@@ -1,13 +1,10 @@
 import axios from 'axios';
 
 const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isLocalhost) {
-      return 'http://localhost:5000/api';
-    }
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
   }
-  return import.meta.env.VITE_API_URL || 'https://jodhpurvoyage.onrender.com/api';
+  return 'https://jodhpurvoyage.onrender.com/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
