@@ -9,7 +9,12 @@ const Footer = () => {
         {/* Col 1: About */}
         <div className="footer-about">
           <Link to="/" className="brand-logo footer-logo">
-            <img src="/images/logo-transprent.png" alt="Jodhpur Voyage Logo" className="brand-logo-img footer-logo-img" />
+            <img 
+              src="/images/logo-white-text.png" 
+              alt="Jodhpur Voyage Logo" 
+              className="brand-logo-img footer-logo-img" 
+              onError={(e) => { e.currentTarget.src = '/images/logo-transprent.png'; }}
+            />
           </Link>
           <div className="footer-trust-badge">
             <i className="fas fa-shield-alt"></i>

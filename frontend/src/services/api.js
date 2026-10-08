@@ -61,6 +61,7 @@ export const deleteContact = (id) => API.delete(`/contacts/${id}`);
 
 // Reviews API
 export const fetchReviews = (params) => API.get('/reviews', { params });
+export const fetchReviewBySlug = (slugOrId) => API.get(`/reviews/${slugOrId}`);
 export const submitPublicReview = (data) => API.post('/reviews', data);
 export const fetchAdminReviews = (params) => API.get('/reviews/admin/all', { params });
 export const createAdminReview = (data) => API.post('/reviews/admin', data);

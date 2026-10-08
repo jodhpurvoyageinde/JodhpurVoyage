@@ -12,6 +12,7 @@ import Destinations from './pages/Destinations';
 import DestinationDetail from './pages/DestinationDetail';
 import VoyageSurMesure from './pages/VoyageSurMesure';
 import Commentaires from './pages/Commentaires';
+import CommentaireDetail from './pages/CommentaireDetail';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import QuiNousSommes from './pages/QuiNousSommes';
@@ -80,6 +81,8 @@ const AppLayout = () => {
           <Route path="/destination-rajasthan" element={<DestinationDetail />} />
           <Route path="/voyage-sur-mesure" element={<VoyageSurMesure />} />
           <Route path="/commentaires" element={<Commentaires />} />
+          <Route path="/commentaire/:slug" element={<CommentaireDetail />} />
+          <Route path="/commentaires/:slug" element={<CommentaireDetail />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/blog_category/:category" element={<Blog />} />

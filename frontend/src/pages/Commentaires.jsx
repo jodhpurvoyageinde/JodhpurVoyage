@@ -5,17 +5,17 @@ import ReviewModal from '../components/ReviewModal';
 import SEO from '../components/SEO';
 
 const Commentaires = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
   const loadReviewsData = () => {
     setLoading(true);
-    fetchReviews({ category: 'all' })
+    fetchReviews()
       .then((res) => {
         if (res.data?.reviews && Array.isArray(res.data.reviews)) {
           setReviews(res.data.reviews);
@@ -35,44 +35,21 @@ const Commentaires = () => {
     loadReviewsData();
   }, []);
 
-  // Reset to page 1 whenever category or search query changes
+  // Reset to page 1 whenever search query changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
+  }, [searchQuery]);
 
-  // Compute category counts for filter buttons
-  const counts = {
-    all: reviews.length,
-    rajasthan: reviews.filter((r) => r.category === 'rajasthan').length,
-    'inde-du-nord': reviews.filter((r) => r.category === 'inde-du-nord').length,
-    ladakh: reviews.filter((r) => r.category === 'ladakh').length,
-    'inde-du-sud': reviews.filter((r) => r.category === 'inde-du-sud').length,
-    gujarat: reviews.filter((r) => r.category === 'gujarat' || r.category === 'nepal').length
-  };
-
-  // Compute average rating score dynamically
-  const avgRating = reviews.length > 0
-    ? (reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0) / reviews.length).toFixed(1)
-    : '4.9';
-
-  // Filter reviews by selected category and search input
+  // Filter reviews by search query on the 4 fields
   const filteredReviews = reviews.filter((item) => {
-    const itemCat = (item.category || '').toLowerCase();
-    const matchesCat = selectedCategory === 'all' 
-      || itemCat === selectedCategory
-      || (selectedCategory === 'gujarat' && (itemCat === 'gujarat' || itemCat === 'nepal'));
-
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return matchesCat;
+    if (!q) return true;
 
-    const titleText = item.title || item.tourTitle || '';
-    const bodyText = item.comment || item.excerpt || '';
-    const author = item.authorName || '';
-    const tagText = item.tag || '';
-    const cityText = item.authorCity || '';
+    const headingText = (item.heading || item.title || item.tourTitle || '').toLowerCase();
+    const shortText = (item.shortDescription || item.excerpt || '').toLowerCase();
+    const longText = (item.longDescription || item.comment || '').toLowerCase();
 
-    const combinedText = `${titleText} ${bodyText} ${author} ${tagText} ${cityText} ${itemCat}`.toLowerCase();
-    return matchesCat && combinedText.includes(q);
+    return headingText.includes(q) || shortText.includes(q) || longText.includes(q);
   });
 
   // Pagination calculations
@@ -120,130 +97,44 @@ const Commentaires = () => {
           className="reviews-hero-bg" 
         />
         <div className="container reviews-hero-content">
-          <span className="hero-badge"><i className="fas fa-star"></i> Retours d'Expérience</span>
+          <span className="hero-badge"><i className="fas fa-comment-dots"></i> Retours d'Expérience</span>
           <h1 className="reviews-hero-title">Vos Avis &amp; Commentaires</h1>
           <p className="reviews-hero-desc">
-            La confiance et la satisfaction de nos voyageurs francophones sont notre plus grande fierté.
+            Découvrez les retours et récits d'expérience de nos voyageurs francophones partis avec Jodhpur Voyage.
           </p>
         </div>
       </section>
 
-      {/* RATING SUMMARY SCORECARD & TRUST BADGES */}
-      <section className="section-padding bg-white pb-0">
-        <div className="container">
-          <div className="scorecard-wrapper">
-            {/* Rating Score */}
-            <div className="score-col">
-              <span className="score-badge-label">Score de Satisfaction</span>
-              <div className="score-number">{avgRating}<span>/5</span></div>
-              <div className="score-stars">
-                {[...Array(5)].map((_, i) => (
-                  <i 
-                    key={i} 
-                    className={`fas ${i < Math.floor(Number(avgRating)) ? 'fa-star' : (i < Number(avgRating) ? 'fa-star-half-alt' : 'fa-star')}`}
-                  ></i>
-                ))}
-              </div>
-              <p className="score-text">
-                Basé sur <strong>+{reviews.length > 0 ? `${reviews.length}` : '500'} témoignages</strong> de voyageurs francophones
-              </p>
-            </div>
-
-            {/* Satisfaction Metrics */}
-            <div className="metrics-col">
-              <div className="metric-card">
-                <div className="metric-value">99%</div>
-                <div className="metric-label">Organisation &amp; Rigueur</div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-value">98%</div>
-                <div className="metric-label">Chauffeurs &amp; Ponctualité</div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-value">97%</div>
-                <div className="metric-label">Hôtels &amp; Charme Haveli</div>
-              </div>
-            </div>
-
-            {/* External Verification Badges */}
-            <div className="badges-col">
-              <span className="badge-verify-text">Avis vérifiés indépendants</span>
-              <a 
-                href="https://www.tripadvisor.in/Attraction_Review-g297668-d26864310-Reviews-Jodhpur_Voyage_Pvt_Ltd-Jodhpur_Jodhpur_District_Rajasthan.html" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="badge-img-link"
-              >
-                <img src="/images/tripad-icon.png" alt="TripAdvisor Jodhpur Voyage" className="badge-img-tripad" />
-              </a>
-              <a 
-                href="https://www.trustpilot.com/review/jodhpurvoyage.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="badge-img-link"
-              >
-                <img src="/images/trustpilot-icon.png" alt="Trustpilot Jodhpur Voyage" className="badge-img-trust" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SEARCH & FILTER BAR */}
+      {/* SEARCH BAR & HEADER ACTIONS */}
       <section className="reviews-filter-section bg-white">
         <div className="container">
-          <div className="reviews-filter-bar">
-            {/* Category Filter Chips */}
-            <div className="reviews-filter-chips" id="review-category-filters">
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'all' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('all')}
-              >
-                Tous les avis ({counts.all > 0 ? counts.all : '...'})
-              </button>
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'rajasthan' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('rajasthan')}
-              >
-                Rajasthan {counts.rajasthan > 0 && `(${counts.rajasthan})`}
-              </button>
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'inde-du-nord' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('inde-du-nord')}
-              >
-                Inde du Nord {counts['inde-du-nord'] > 0 && `(${counts['inde-du-nord']})`}
-              </button>
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'ladakh' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('ladakh')}
-              >
-                Ladakh &amp; Himalaya {counts.ladakh > 0 && `(${counts.ladakh})`}
-              </button>
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'inde-du-sud' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('inde-du-sud')}
-              >
-                Inde du Sud &amp; Kerala {counts['inde-du-sud'] > 0 && `(${counts['inde-du-sud']})`}
-              </button>
-              <button 
-                className={`review-filter-chip ${selectedCategory === 'gujarat' ? 'active' : ''}`}
-                onClick={() => setSelectedCategory('gujarat')}
-              >
-                Gujarat &amp; Népal {counts.gujarat > 0 && `(${counts.gujarat})`}
-              </button>
+          <div className="reviews-filter-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <div className="reviews-count-text" style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--color-dark)' }}>
+              <i className="fas fa-comments" style={{ color: 'var(--color-primary)', marginRight: '8px' }}></i>
+              <span>{filteredReviews.length} {filteredReviews.length > 1 ? 'Commentaires Voyageurs' : 'Commentaire Voyageur'}</span>
             </div>
 
-            {/* Search Input */}
-            <div className="reviews-search-box">
-              <i className="fas fa-search reviews-search-icon"></i>
-              <input 
-                type="text" 
-                id="review-search-input" 
-                placeholder="Rechercher un avis (ex: Chauffeur, Singh, Jaisalmer...)" 
-                className="reviews-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', flex: '1', maxWidth: '560px', justifyContent: 'flex-end' }}>
+              <div className="reviews-search-box" style={{ margin: 0, flex: '1', minWidth: '240px' }}>
+                <i className="fas fa-search reviews-search-icon"></i>
+                <input 
+                  type="text" 
+                  id="review-search-input" 
+                  placeholder="Rechercher dans les commentaires..." 
+                  className="reviews-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <button 
+                type="button" 
+                className="btn btn-primary btn-sm"
+                onClick={() => setIsReviewModalOpen(true)}
+                style={{ padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}
+              >
+                <i className="fas fa-pen"></i> Laisser un avis
+              </button>
             </div>
           </div>
         </div>
@@ -255,8 +146,8 @@ const Commentaires = () => {
           {/* Loading Indicator */}
           {loading ? (
             <div style={{ textAlign: 'center', padding: '80px 20px', background: '#fff', borderRadius: '16px', margin: '20px 0' }}>
-              <i className="fas fa-circle-notch fa-spin" style={{ fontSize: '2.5rem', color: 'var(--primary-color)', marginBottom: '16px' }}></i>
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Chargement des avis voyageurs...</p>
+              <i className="fas fa-circle-notch fa-spin" style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '16px' }}></i>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Chargement des commentaires...</p>
             </div>
           ) : (
             <>
@@ -264,7 +155,7 @@ const Commentaires = () => {
               {filteredReviews.length > 0 && (
                 <div className="reviews-count-header">
                   <div className="reviews-count-text">
-                    Affichage de <strong>{startIndex + 1} à {endIndex}</strong> sur <strong>{filteredReviews.length}</strong> avis voyageurs vérifiés
+                    Affichage de <strong>{startIndex + 1} à {endIndex}</strong> sur <strong>{filteredReviews.length}</strong> commentaires
                   </div>
                   {totalPages > 1 && (
                     <div className="reviews-page-indicator">
@@ -278,71 +169,51 @@ const Commentaires = () => {
                 {filteredReviews.length === 0 ? (
                   <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px 20px', background: '#fff', borderRadius: '16px' }}>
                     <i className="fas fa-comment-slash" style={{ fontSize: '3rem', color: 'var(--text-muted)', marginBottom: '16px' }}></i>
-                    <h3 style={{ fontSize: '1.4rem', color: 'var(--secondary-color)', marginBottom: '8px' }}>Aucun avis ne correspond à votre recherche</h3>
-                    <p style={{ color: 'var(--text-muted)' }}>Essayez un autre mot-clé ou réinitialisez les filtres.</p>
-                    <button 
-                      className="btn btn-primary" 
-                      onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                      style={{ marginTop: '16px' }}
-                    >
-                      Voir tous les avis
-                    </button>
+                    <h3 style={{ fontSize: '1.4rem', color: 'var(--secondary-color)', marginBottom: '8px' }}>Aucun commentaire trouvé</h3>
+                    <p style={{ color: 'var(--text-muted)' }}>Essayez un autre mot-clé ou réinitialisez votre recherche.</p>
+                    {searchQuery && (
+                      <button 
+                        className="btn btn-primary" 
+                        onClick={() => setSearchQuery('')}
+                        style={{ marginTop: '16px' }}
+                      >
+                        Voir tous les commentaires
+                      </button>
+                    )}
                   </div>
                 ) : (
                   currentReviews.map((rev) => {
                     const revId = rev._id || rev.id;
+                    const slugifyText = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                    const revSlug = rev.slug || slugifyText(rev.heading || rev.title || rev.tourTitle) || revId;
                     const cardImg = rev.image || rev.img || '/images/image-8.jpg';
-                    const fallbackImg = rev.fallbackImg || '/images/image-8.jpg';
-                    const tagIcon = rev.tagIcon || 'fas fa-map-marker-alt';
-                    const tagLabel = rev.tag || `${rev.tourTitle || 'Voyage'} • ${rev.authorCity || 'Avis Client'}`;
-                    const targetLink = rev.link || (rev.category === 'rajasthan' ? '/tour-rajasthan' : '/tours');
-                    const reviewTitle = rev.title || rev.tourTitle || 'Expérience Exceptionnelle';
-                    const commentText = rev.excerpt || (rev.comment ? (rev.comment.startsWith('"') ? rev.comment : `"${rev.comment}"`) : '');
-                    const avatarInitials = rev.authorAvatar || (rev.authorName ? rev.authorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'JV');
-                    const authorDisplayName = rev.authorName || 'Voyageur Francophone';
-                    const dateDisplay = rev.reviewDate || `Avis Vérifié • ${rev.travelDate || 'Voyage Récent'}`;
+                    const headingText = rev.heading || rev.title || rev.tourTitle || 'Commentaire Voyageur';
+                    const shortDescText = rev.shortDescription || rev.excerpt || rev.comment || '';
 
                     return (
                       <Link 
                         key={revId} 
-                        to={targetLink} 
-                        className="review-card" 
-                        data-category={rev.category}
+                        to={`/commentaire/${revSlug}`}
+                        className="review-card"
+                        style={{ textDecoration: 'none', color: 'inherit' }}
                       >
                         <div className="review-card-img-wrap">
                           <img 
                             src={cardImg} 
-                            onError={(e) => { e.currentTarget.src = fallbackImg; }}
-                            alt={reviewTitle} 
+                            onError={(e) => { e.currentTarget.src = '/images/image-8.jpg'; }}
+                            alt={headingText} 
                             className="review-card-img" 
                           />
-                          <span className="review-tag-badge">
-                            <i className={tagIcon}></i> {tagLabel}
-                          </span>
                         </div>
                         <div className="review-card-body">
                           <div>
-                            <div className="review-card-header">
-                              <h3 className="review-card-heading">{reviewTitle}</h3>
-                              <div className="review-stars">
-                                {[...Array(Number(rev.rating) || 5)].map((_, i) => (
-                                  <i key={i} className="fas fa-star"></i>
-                                ))}
-                              </div>
-                            </div>
+                            <h3 className="review-card-heading">{headingText}</h3>
                             <p className="review-excerpt">
-                              {commentText}
+                              "{shortDescText}"
                             </p>
                           </div>
-                          <div className="review-author-info">
-                            <div className="author-avatar">{avatarInitials}</div>
-                            <div>
-                              <span className="author-name">{authorDisplayName}</span>
-                              <span className="review-date"><i className="fas fa-check-circle"></i> {dateDisplay}</span>
-                            </div>
-                          </div>
                           <div className="review-card-footer-link">
-                            <span>Voir le circuit &amp; les détails</span>
+                            <span>Lire le témoignage complet</span>
                             <i className="fas fa-arrow-right"></i>
                           </div>
                         </div>
@@ -403,6 +274,66 @@ const Commentaires = () => {
           )}
         </div>
       </section>
+
+      {/* FULL TESTIMONIAL DETAIL MODAL (Displays Heading, Image, Short Description, and Full Long Description) */}
+      {selectedReview && (
+        <div className="modal-backdrop" onClick={() => setSelectedReview(null)}>
+          <div 
+            className="modal-dialog review-detail-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '720px', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+          >
+            <div className="modal-header">
+              <h3 className="modal-title" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem' }}>
+                {selectedReview.heading || selectedReview.title || 'Témoignage Voyageur'}
+              </h3>
+              <button type="button" className="modal-close" onClick={() => setSelectedReview(null)} title="Fermer">
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ overflowY: 'auto', padding: '1.8rem 2rem' }}>
+              {(selectedReview.image || selectedReview.img) && (
+                <div style={{ width: '100%', height: '280px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.08)' }}>
+                  <img 
+                    src={selectedReview.image || selectedReview.img} 
+                    alt={selectedReview.heading || 'Voyage'} 
+                    onError={(e) => { e.currentTarget.src = '/images/image-8.jpg'; }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+              )}
+
+              {(selectedReview.shortDescription || selectedReview.excerpt) && (
+                <blockquote style={{ 
+                  fontSize: '1.05rem', 
+                  fontStyle: 'italic', 
+                  color: 'var(--color-primary)', 
+                  borderLeft: '4px solid var(--color-primary)', 
+                  paddingLeft: '1rem', 
+                  margin: '0 0 1.5rem 0',
+                  lineHeight: '1.6',
+                  background: 'rgba(12, 118, 138, 0.04)',
+                  padding: '0.9rem 1.2rem',
+                  borderRadius: '0 8px 8px 0'
+                }}>
+                  "{selectedReview.shortDescription || selectedReview.excerpt}"
+                </blockquote>
+              )}
+
+              <div style={{ fontSize: '0.98rem', color: '#334155', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
+                {selectedReview.longDescription || selectedReview.comment || selectedReview.shortDescription || selectedReview.excerpt}
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={() => setSelectedReview(null)}>
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CTA INVITATION TO WRITE A REVIEW OR PLAN A TRIP */}
       <section className="section-padding bg-white">

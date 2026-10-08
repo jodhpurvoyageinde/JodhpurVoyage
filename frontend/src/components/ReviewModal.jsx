@@ -3,13 +3,10 @@ import { submitPublicReview } from '../services/api';
 
 const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
   const [formData, setFormData] = useState({
-    authorName: '',
-    authorCity: '',
-    tourTitle: 'Voyage au Rajasthan 14 Jours',
-    category: 'rajasthan',
-    rating: 5,
-    travelDate: '',
-    comment: ''
+    heading: '',
+    shortDescription: '',
+    longDescription: '',
+    image: ''
   });
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -28,15 +25,25 @@ const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
     setSuccessMsg('');
 
     try {
-      const res = await submitPublicReview(formData);
-      setSuccessMsg(res.data.message || 'Merci pour votre avis ! Il sera visible après validation.');
+      const payload = {
+        heading: formData.heading,
+        title: formData.heading,
+        shortDescription: formData.shortDescription,
+        excerpt: formData.shortDescription,
+        longDescription: formData.longDescription,
+        comment: formData.longDescription,
+        image: formData.image || '/images/image-8.jpg'
+      };
+      const res = await submitPublicReview(payload);
+      setSuccessMsg(res.data.message || 'Merci pour votre commentaire ! Il sera visible après validation.');
       if (onReviewSubmitted) onReviewSubmitted();
       setTimeout(() => {
         onClose();
         setSuccessMsg('');
-      }, 2500);
+        setFormData({ heading: '', shortDescription: '', longDescription: '', image: '' });
+      }, 2200);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Erreur lors de l’enregistrement de votre avis.');
+      setErrorMsg(err.response?.data?.message || 'Erreur lors de l’enregistrement de votre commentaire.');
     } finally {
       setLoading(false);
     }
@@ -44,9 +51,9 @@ const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '620px' }}>
         <div className="modal-header">
-          <h3 className="modal-title"><i className="fas fa-star" style={{ color: 'var(--gold-color)' }}></i> Laisser un Témoignage</h3>
+          <h3 className="modal-title"><i className="fas fa-comment-dots" style={{ color: 'var(--gold-color)' }}></i> Laisser un Commentaire</h3>
           <button className="modal-close" onClick={onClose}><i className="fas fa-times"></i></button>
         </div>
 
@@ -54,7 +61,7 @@ const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
           {successMsg ? (
             <div style={{ padding: '30px', textAlign: 'center', color: '#15803d' }}>
               <i className="fas fa-check-circle" style={{ fontSize: '3rem', marginBottom: '16px' }}></i>
-              <h4>Avis enregistré avec succès !</h4>
+              <h4>Commentaire envoyé avec succès !</h4>
               <p>{successMsg}</p>
             </div>
           ) : (
@@ -65,56 +72,59 @@ const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                <div className="form-group">
-                  <label className="form-label">Votre nom & prénom *</label>
-                  <input type="text" name="authorName" required className="form-control" placeholder="ex: Michel & Claire" value={formData.authorName} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Ville / Région *</label>
-                  <input type="text" name="authorCity" required className="form-control" placeholder="ex: Lyon, France" value={formData.authorCity} onChange={handleChange} />
-                </div>
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: '600' }}>Titre / Heading *</label>
+                <input 
+                  type="text" 
+                  name="heading" 
+                  required 
+                  className="form-control" 
+                  placeholder="ex: Séjour inoubliable au Rajasthan" 
+                  value={formData.heading} 
+                  onChange={handleChange} 
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                <div className="form-group">
-                  <label className="form-label">Circuit réalisé</label>
-                  <input type="text" name="tourTitle" className="form-control" placeholder="ex: Circuit Rajasthan 14 Jours" value={formData.tourTitle} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Région</label>
-                  <select name="category" className="form-control" value={formData.category} onChange={handleChange}>
-                    <option value="rajasthan">Rajasthan</option>
-                    <option value="inde-du-nord">Inde du Nord / Varanasi</option>
-                    <option value="ladakh">Ladakh & Himalaya</option>
-                    <option value="inde-du-sud">Inde du Sud & Kerala</option>
-                    <option value="gujarat">Gujarat & Népal</option>
-                  </select>
-                </div>
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: '600' }}>Lien ou URL de la Photo (Optionnel)</label>
+                <input 
+                  type="text" 
+                  name="image" 
+                  className="form-control" 
+                  placeholder="https://..." 
+                  value={formData.image} 
+                  onChange={handleChange} 
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                <div className="form-group">
-                  <label className="form-label">Période du voyage</label>
-                  <input type="text" name="travelDate" className="form-control" placeholder="ex: Janvier 2026" value={formData.travelDate} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Note globale (sur 5 étoiles)</label>
-                  <select name="rating" className="form-control" value={formData.rating} onChange={handleChange}>
-                    <option value="5">⭐⭐⭐⭐⭐ (5/5) Exceptionnel</option>
-                    <option value="4">⭐⭐⭐⭐ (4/5) Très Bien</option>
-                    <option value="3">⭐⭐⭐ (3/5) Bien</option>
-                  </select>
-                </div>
+              <div className="form-group" style={{ marginBottom: '16px' }}>
+                <label className="form-label" style={{ fontWeight: '600' }}>Description courte (Short Description) *</label>
+                <textarea 
+                  name="shortDescription" 
+                  required 
+                  rows="3" 
+                  className="form-control" 
+                  placeholder="Résumé court de votre expérience..." 
+                  value={formData.shortDescription} 
+                  onChange={handleChange}
+                ></textarea>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Votre avis détaillé *</label>
-                <textarea name="comment" required rows="4" className="form-control" placeholder="Partagez votre expérience avec notre chauffeur, l’accueil, les hôtels et le voyage..." value={formData.comment} onChange={handleChange}></textarea>
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label" style={{ fontWeight: '600' }}>Description longue (Long Description) *</label>
+                <textarea 
+                  name="longDescription" 
+                  required 
+                  rows="5" 
+                  className="form-control" 
+                  placeholder="Racontez en détail votre voyage, l'accueil, les visites et vos impressions..." 
+                  value={formData.longDescription} 
+                  onChange={handleChange}
+                ></textarea>
               </div>
 
               <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                {loading ? <i className="fas fa-spinner fa-spin"></i> : <><i className="fas fa-check"></i> Publier mon avis</>}
+                {loading ? <i className="fas fa-spinner fa-spin"></i> : <><i className="fas fa-check"></i> Envoyer mon commentaire</>}
               </button>
             </form>
           )}

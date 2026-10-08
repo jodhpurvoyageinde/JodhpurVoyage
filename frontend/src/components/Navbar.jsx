@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { fetchTours, fetchDestinations, fetchMegaMenuConfig } from '../services/api';
 import { loadCustomUrlMappings, getCustomPath } from '../utils/customUrlHelper';
@@ -302,7 +302,41 @@ const Navbar = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const [hoveredMega, setHoveredMega] = useState(null);
+  const megaCloseTimeoutRef = useRef(null);
+
+  const handleMegaMouseEnter = (megaKey) => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+      megaCloseTimeoutRef.current = null;
+    }
+    setForceCloseMega(false);
+    setHoveredMega(megaKey);
+  };
+
+  const handleMegaMouseLeave = () => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+    }
+    megaCloseTimeoutRef.current = setTimeout(() => {
+      setHoveredMega(null);
+    }, 350);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (megaCloseTimeoutRef.current) {
+        clearTimeout(megaCloseTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const closeMobileMenu = () => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+      megaCloseTimeoutRef.current = null;
+    }
+    setHoveredMega(null);
     setMobileMenuOpen(false);
     setOpenMobileMega(null);
     setForceCloseMega(true);
@@ -310,7 +344,7 @@ const Navbar = () => {
   };
 
   const handleHeaderMouseLeave = () => {
-    setForceCloseMega(false);
+    handleMegaMouseLeave();
   };
 
   const handleNavMouseEnter = () => {
@@ -330,6 +364,11 @@ const Navbar = () => {
   };
 
   const handleMegaItemClick = (e, targetUrl) => {
+    if (megaCloseTimeoutRef.current) {
+      clearTimeout(megaCloseTimeoutRef.current);
+      megaCloseTimeoutRef.current = null;
+    }
+    setHoveredMega(null);
     closeMobileMenu();
     if (!targetUrl) return;
 
@@ -512,11 +551,19 @@ const Navbar = () => {
               </div>
 
               {/* QUI SOMMES NOUS MEGA MENU */}
-              <div className={`nav-item has-mega ${openMobileMega === 'about' ? 'mobile-open' : ''}`} onMouseEnter={handleNavMouseEnter}>
+              <div
+                className={`nav-item has-mega ${openMobileMega === 'about' ? 'mobile-open' : ''} ${hoveredMega === 'about' ? 'mega-active' : ''}`}
+                onMouseEnter={() => handleMegaMouseEnter('about')}
+                onMouseLeave={handleMegaMouseLeave}
+              >
                 <a href="#about" className="nav-link" onClick={(e) => handleParentNavClick(e, 'about')}>
                   Qui sommes nous <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'about' ? 'rotate' : ''}`}></i>
                 </a>
-                <div className={`mega-menu mega-menu-about ${forceCloseMega ? 'force-closed' : ''}`}>
+                <div
+                  className={`mega-menu mega-menu-about ${forceCloseMega ? 'force-closed' : ''}`}
+                  onMouseEnter={() => handleMegaMouseEnter('about')}
+                  onMouseLeave={handleMegaMouseLeave}
+                >
                   <div className="mega-inspirations-header text-center">
                     {aboutMenu.headerText || 'CRÉATEUR DES PLUS BEAUX'} <span>{aboutMenu.headerHighlight || 'VOYAGES DEPUIS 20+ ANS'}</span>
                   </div>
@@ -539,11 +586,19 @@ const Navbar = () => {
               </div>
 
               {/* DESTINATION MEGA MENU */}
-              <div className={`nav-item has-mega ${openMobileMega === 'destinations' ? 'mobile-open' : ''} ${isActive('/destinations') ? 'active' : ''}`} onMouseEnter={handleNavMouseEnter}>
+              <div
+                className={`nav-item has-mega ${openMobileMega === 'destinations' ? 'mobile-open' : ''} ${isActive('/destinations') ? 'active' : ''} ${hoveredMega === 'destinations' ? 'mega-active' : ''}`}
+                onMouseEnter={() => handleMegaMouseEnter('destinations')}
+                onMouseLeave={handleMegaMouseLeave}
+              >
                 <Link to="/destinations" className="nav-link" onClick={(e) => handleParentNavClick(e, 'destinations')}>
                   Destination <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'destinations' ? 'rotate' : ''}`}></i>
                 </Link>
-                <div className={`mega-menu mega-menu-destinations ${forceCloseMega ? 'force-closed' : ''}`}>
+                <div
+                  className={`mega-menu mega-menu-destinations ${forceCloseMega ? 'force-closed' : ''}`}
+                  onMouseEnter={() => handleMegaMouseEnter('destinations')}
+                  onMouseLeave={handleMegaMouseLeave}
+                >
                   <div className="mega-grid-destinations">
                     {packageNavGroups.map((group) => (
                       <div key={group.key}>
@@ -573,11 +628,19 @@ const Navbar = () => {
               </div>
 
               {/* INFOS PRATIQUES MEGA MENU */}
-              <div className={`nav-item has-mega ${openMobileMega === 'infos' ? 'mobile-open' : ''} ${isActive('/infos-pratiques') ? 'active' : ''}`} onMouseEnter={handleNavMouseEnter}>
+              <div
+                className={`nav-item has-mega ${openMobileMega === 'infos' ? 'mobile-open' : ''} ${isActive('/infos-pratiques') ? 'active' : ''} ${hoveredMega === 'infos' ? 'mega-active' : ''}`}
+                onMouseEnter={() => handleMegaMouseEnter('infos')}
+                onMouseLeave={handleMegaMouseLeave}
+              >
                 <Link to="/infos-pratiques" className="nav-link" onClick={(e) => handleParentNavClick(e, 'infos')}>
                   Infos pratiques <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'infos' ? 'rotate' : ''}`}></i>
                 </Link>
-                <div className={`mega-menu ${forceCloseMega ? 'force-closed' : ''}`}>
+                <div
+                  className={`mega-menu ${forceCloseMega ? 'force-closed' : ''}`}
+                  onMouseEnter={() => handleMegaMouseEnter('infos')}
+                  onMouseLeave={handleMegaMouseLeave}
+                >
                   <div className="mega-grid-3col">
                     {processedInfosColumns.map((col, cIdx) => (
                       <div key={cIdx}>
@@ -608,11 +671,19 @@ const Navbar = () => {
               </div>
 
               {/* INSPIRATION MEGA MENU */}
-              <div className={`nav-item has-mega ${openMobileMega === 'inspiration' ? 'mobile-open' : ''}`} onMouseEnter={handleNavMouseEnter}>
+              <div
+                className={`nav-item has-mega ${openMobileMega === 'inspiration' ? 'mobile-open' : ''} ${isActive('/inspiration') ? 'active' : ''} ${hoveredMega === 'inspiration' ? 'mega-active' : ''}`}
+                onMouseEnter={() => handleMegaMouseEnter('inspiration')}
+                onMouseLeave={handleMegaMouseLeave}
+              >
                 <a href="#inspiration" className="nav-link" onClick={(e) => handleParentNavClick(e, 'inspiration')}>
                   Inspiration <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'inspiration' ? 'rotate' : ''}`}></i>
                 </a>
-                <div className={`mega-menu mega-menu-inspirations ${forceCloseMega ? 'force-closed' : ''}`}>
+                <div
+                  className={`mega-menu mega-menu-inspirations ${forceCloseMega ? 'force-closed' : ''}`}
+                  onMouseEnter={() => handleMegaMouseEnter('inspiration')}
+                  onMouseLeave={handleMegaMouseLeave}
+                >
                   <div className="mega-inspirations-header text-center">
                     {inspirationMenu.headerText || 'LE VOYAGE SELON'} <span>{inspirationMenu.headerHighlight || 'VOS ENVIES'}</span>
                   </div>
@@ -630,11 +701,19 @@ const Navbar = () => {
               </div>
 
               {/* BLOG DROPDOWN */}
-              <div className={`nav-item has-dropdown ${openMobileMega === 'blog' ? 'mobile-open' : ''} ${isActive('/blog') || isActive('/blog_category') ? 'active' : ''}`} onMouseEnter={handleNavMouseEnter}>
+              <div
+                className={`nav-item has-dropdown ${openMobileMega === 'blog' ? 'mobile-open' : ''} ${isActive('/blog') || isActive('/blog_category') ? 'active' : ''} ${hoveredMega === 'blog' ? 'mega-active' : ''}`}
+                onMouseEnter={() => handleMegaMouseEnter('blog')}
+                onMouseLeave={handleMegaMouseLeave}
+              >
                 <Link to="/blog" className="nav-link" onClick={(e) => handleParentNavClick(e, 'blog')}>
                   Blog <i className={`fas fa-chevron-down mega-chevron ${openMobileMega === 'blog' ? 'rotate' : ''}`}></i>
                 </Link>
-                <div className={`nav-dropdown-menu ${forceCloseMega ? 'force-closed' : ''}`}>
+                <div
+                  className={`nav-dropdown-menu ${forceCloseMega ? 'force-closed' : ''}`}
+                  onMouseEnter={() => handleMegaMouseEnter('blog')}
+                  onMouseLeave={handleMegaMouseLeave}
+                >
                   <ul className="nav-dropdown-list">
                     <li>
                       <Link to="/blog_category/inde" className="nav-dropdown-item" onClick={closeMobileMenu}>

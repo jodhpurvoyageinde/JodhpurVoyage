@@ -6,50 +6,36 @@ import { defaultReviewsData } from '../seed/reviewsSeedData.js';
 
 const router = express.Router();
 
+const slugify = (text) =>
+  String(text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
 const normalizeReview = (r) => {
   const doc = r && r.toObject ? r.toObject() : (r || {});
-  const authorName = doc.authorName || doc.author?.name || doc.name || 'Client Jodhpur Voyage';
-  const authorAvatar = doc.avatar || (authorName ? authorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'JV');
-  const cat = (doc.category || 'rajasthan').toLowerCase();
-
-  let defaultTagIcon = 'fas fa-map-marker-alt';
-  if (cat.includes('ladakh') || cat.includes('himalaya')) defaultTagIcon = 'fas fa-mountain';
-  else if (cat.includes('sud') || cat.includes('kerala')) defaultTagIcon = 'fas fa-water';
-  else if (cat.includes('nord')) defaultTagIcon = 'fas fa-place-of-worship';
-  else if (cat.includes('gujarat')) defaultTagIcon = 'fas fa-compass';
-
-  let defaultImg = '/images/image-8.jpg';
-  if (cat === 'rajasthan') defaultImg = '/images/Voyage-Jaisalmer.jpg';
-  else if (cat === 'ladakh') defaultImg = '/images/dest-ladakh.jpg';
-  else if (cat === 'inde-du-nord') defaultImg = '/images/dest-himachal.jpg';
-  else if (cat === 'inde-du-sud') defaultImg = '/images/dest-kerala.jpg';
-  else if (cat === 'gujarat') defaultImg = '/images/dest-gujarat.jpg';
-
-  const tTitle = doc.tourTitle || doc.tourName || doc.title || 'Voyage en Inde';
-  const tCity = doc.authorCity || doc.author?.location || doc.location || 'France';
-  const rawComment = doc.comment || doc.excerpt || doc.content || '';
-  const cleanExcerpt = doc.excerpt || (rawComment ? (rawComment.startsWith('"') ? rawComment : `"${rawComment}"`) : '');
+  const heading = doc.heading || doc.title || doc.tourTitle || 'Commentaire Voyageur';
+  const slug = doc.slug || slugify(heading);
+  const image = doc.image || doc.img || '/images/image-8.jpg';
+  const rawComment = doc.longDescription || doc.comment || doc.excerpt || doc.content || '';
+  const rawExcerpt = doc.shortDescription || doc.excerpt || (rawComment ? (rawComment.length > 200 ? rawComment.substring(0, 200) + '...' : rawComment) : '');
 
   return {
     _id: doc._id,
     id: String(doc._id || doc.id),
-    authorName,
-    authorAvatar,
-    authorCity: tCity,
-    tourTitle: tTitle,
-    title: doc.title || tTitle,
-    category: cat,
-    rating: typeof doc.rating === 'number' ? doc.rating : 5,
-    travelDate: doc.travelDate || (doc.createdAt ? new Date(doc.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : 'Janvier 2026'),
-    reviewDate: doc.reviewDate || `Avis Vérifié • ${doc.travelDate || 'Organisé par Jodhpur Voyage'}`,
+    slug,
+    heading,
+    title: heading,
+    image,
+    img: image,
+    shortDescription: rawExcerpt,
+    longDescription: rawComment,
+    // Backward compatibility for existing UI components
+    excerpt: rawExcerpt,
     comment: rawComment,
-    excerpt: cleanExcerpt,
-    image: doc.image || doc.img || defaultImg,
-    img: doc.img || doc.image || defaultImg,
-    fallbackImg: doc.fallbackImg || defaultImg,
-    tag: doc.tag || `${tTitle} • ${tCity}`,
-    tagIcon: doc.tagIcon || defaultTagIcon,
-    link: doc.link || (cat === 'rajasthan' ? '/tour-rajasthan' : '/tours'),
+    authorName: doc.authorName || 'Voyageur Jodhpur Voyage',
     status: doc.status === 'Published' || doc.status === 'approved' ? 'approved' : (doc.status || 'approved'),
     featured: Boolean(doc.featured === true),
     createdAt: doc.createdAt,
@@ -60,7 +46,7 @@ const normalizeReview = (r) => {
 // GET /api/reviews (Public approved reviews)
 router.get('/', async (req, res) => {
   try {
-    const { category, search, limit } = req.query;
+    const { search, limit } = req.query;
 
     if (isMongoConnected()) {
       // Auto-seed default reviews if collection is empty
@@ -70,16 +56,14 @@ router.get('/', async (req, res) => {
       }
 
       let query = { status: { $ne: 'rejected' } };
-      if (category && category !== 'all') query.category = category;
       if (search) {
         query.$or = [
-          { authorName: { $regex: search, $options: 'i' } },
-          { authorCity: { $regex: search, $options: 'i' } },
-          { comment: { $regex: search, $options: 'i' } },
-          { excerpt: { $regex: search, $options: 'i' } },
-          { tourTitle: { $regex: search, $options: 'i' } },
+          { heading: { $regex: search, $options: 'i' } },
           { title: { $regex: search, $options: 'i' } },
-          { tag: { $regex: search, $options: 'i' } }
+          { shortDescription: { $regex: search, $options: 'i' } },
+          { longDescription: { $regex: search, $options: 'i' } },
+          { comment: { $regex: search, $options: 'i' } },
+          { excerpt: { $regex: search, $options: 'i' } }
         ];
       }
 
@@ -222,12 +206,71 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
   }
 });
 
+// GET /api/reviews/:slugOrId (Public single review by slug or id)
+router.get('/:slugOrId', async (req, res) => {
+  try {
+    const { slugOrId } = req.params;
+    if (!slugOrId || slugOrId === 'admin') {
+      return res.status(404).json({ message: 'Avis introuvable' });
+    }
+
+    if (isMongoConnected()) {
+      let review = null;
+      // 1. Try finding by MongoDB _id if valid ObjectId
+      if (slugOrId.match(/^[0-9a-fA-F]{24}$/)) {
+        review = await Review.findById(slugOrId);
+      }
+      // 2. Try finding by explicit slug field
+      if (!review) {
+        review = await Review.findOne({ slug: slugOrId });
+      }
+      // 3. Fallback: match by slugified heading or title or _id string
+      if (!review) {
+        const allReviews = await Review.find({ status: { $ne: 'rejected' } });
+        review = allReviews.find(
+          (r) =>
+            slugify(r.heading || r.title || r.tourTitle) === slugOrId ||
+            String(r._id) === slugOrId
+        );
+      }
+
+      if (!review) {
+        return res.status(404).json({ message: 'Commentaire introuvable' });
+      }
+
+      return res.json(normalizeReview(review));
+    }
+
+    // Memory store fallback
+    const list = memoryStore.reviews || defaultReviewsData;
+    const found = list.find(
+      (r) =>
+        String(r._id) === slugOrId ||
+        r.slug === slugOrId ||
+        slugify(r.heading || r.title || r.tourTitle) === slugOrId
+    );
+
+    if (!found) {
+      return res.status(404).json({ message: 'Commentaire introuvable' });
+    }
+
+    return res.json(normalizeReview(found));
+  } catch (error) {
+    console.error('Erreur get single review:', error);
+    res.status(500).json({ message: 'Erreur lors de la récupération du commentaire' });
+  }
+});
+
 // POST /api/reviews/admin
 router.post('/admin', protect, adminOnly, async (req, res) => {
   try {
     const data = { ...req.body };
     delete data._id;
     if (!data.status) data.status = 'approved';
+    if (data.heading) data.title = data.heading;
+    if (data.shortDescription) data.excerpt = data.shortDescription;
+    if (data.longDescription) data.comment = data.longDescription;
+    if (data.image) data.img = data.image;
 
     if (isMongoConnected()) {
       const review = new Review(data);
@@ -254,6 +297,10 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
     delete updateData._id; // CRITICAL: Prevent Mongo immutable _id error
+    if (updateData.heading) updateData.title = updateData.heading;
+    if (updateData.shortDescription) updateData.excerpt = updateData.shortDescription;
+    if (updateData.longDescription) updateData.comment = updateData.longDescription;
+    if (updateData.image) updateData.img = updateData.image;
 
     if (isMongoConnected()) {
       let updated;

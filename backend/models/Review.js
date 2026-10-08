@@ -1,41 +1,20 @@
 import mongoose from 'mongoose';
 
 const reviewSchema = new mongoose.Schema({
-  authorName: {
+  slug: {
     type: String,
-    required: true,
-    trim: true
+    trim: true,
+    default: ''
   },
-  authorCity: {
+  heading: {
     type: String,
-    default: 'France'
+    trim: true,
+    default: ''
   },
-  tourTitle: {
+  title: {
     type: String,
-    default: 'Voyage au Rajasthan'
-  },
-  category: {
-    type: String,
-    enum: ['rajasthan', 'inde-du-nord', 'ladakh', 'inde-du-sud', 'gujarat', 'nepal'],
-    default: 'rajasthan'
-  },
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
-    default: 5
-  },
-  travelDate: {
-    type: String,
-    default: 'Janvier 2026'
-  },
-  comment: {
-    type: String,
-    required: true
-  },
-  avatar: {
-    type: String
+    trim: true,
+    default: ''
   },
   image: {
     type: String,
@@ -45,29 +24,48 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     default: '/images/image-8.jpg'
   },
-  fallbackImg: {
-    type: String,
-    default: '/images/image-8.jpg'
-  },
-  title: {
+  shortDescription: {
     type: String,
     default: ''
   },
-  slug: {
-    type: String,
-    sparse: true
-  },
-  tag: {
+  longDescription: {
     type: String,
     default: ''
   },
-  tagIcon: {
+  // Legacy / backward-compatible fields
+  comment: {
     type: String,
-    default: 'fas fa-map-marker-alt'
+    default: ''
   },
-  link: {
+  excerpt: {
     type: String,
-    default: '/tour-rajasthan'
+    default: ''
+  },
+  authorName: {
+    type: String,
+    default: ''
+  },
+  authorCity: {
+    type: String,
+    default: 'France'
+  },
+  tourTitle: {
+    type: String,
+    default: ''
+  },
+  category: {
+    type: String,
+    default: 'rajasthan'
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: 5
+  },
+  travelDate: {
+    type: String,
+    default: ''
   },
   status: {
     type: String,
@@ -82,6 +80,26 @@ const reviewSchema = new mongoose.Schema({
   timestamps: true,
   collection: 'commentaires',
   strict: false
+});
+
+reviewSchema.pre('save', function (next) {
+  if (this.heading && !this.title) this.title = this.heading;
+  if (this.title && !this.heading) this.heading = this.title;
+  if (this.shortDescription && !this.excerpt) this.excerpt = this.shortDescription;
+  if (this.excerpt && !this.shortDescription) this.shortDescription = this.excerpt;
+  if (this.longDescription && !this.comment) this.comment = this.longDescription;
+  if (this.comment && !this.longDescription) this.longDescription = this.comment;
+  if (this.image && !this.img) this.img = this.image;
+  if (this.img && !this.image) this.image = this.img;
+  if (!this.slug && (this.heading || this.title)) {
+    this.slug = String(this.heading || this.title)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+  }
+  next();
 });
 
 const Review = mongoose.model('Review', reviewSchema);

@@ -74,6 +74,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Desktop Mega Menu Hover Intent with Grace Period
+  hasSubmenuItems.forEach(item => {
+    let leaveTimer = null;
+    item.addEventListener('mouseenter', () => {
+      if (window.innerWidth > 991) {
+        if (leaveTimer) clearTimeout(leaveTimer);
+        item.classList.add('mega-active');
+      }
+    });
+    item.addEventListener('mouseleave', () => {
+      if (window.innerWidth > 991) {
+        leaveTimer = setTimeout(() => {
+          item.classList.remove('mega-active');
+        }, 350);
+      }
+    });
+  });
+
   // ESC key to close mobile drawer
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && navMenu && navMenu.classList.contains('active')) {

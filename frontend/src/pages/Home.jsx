@@ -529,7 +529,12 @@ const Home = () => {
               key={index}
               className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
             >
-              <img src={slide.image} alt={slide.title} className="hero-slide-bg" />
+              <img 
+                src={slide.image} 
+                alt={slide.title} 
+                className="hero-slide-bg" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="hero-slide-overlay"></div>
               <div className="container hero-slide-content">
                 <span className="hero-badge">
@@ -778,7 +783,11 @@ const Home = () => {
                 return (
                   <div key={tour._id || tourSlug || idx} className="tour-card">
                     <Link to={`/${tourSlug}`} className="tour-card-image-wrap" title="Voir l'itinéraire">
-                      <img src={tourImage} alt={tourTitle} />
+                      <img 
+                        src={tourImage} 
+                        alt={tourTitle} 
+                        onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+                      />
                       <span className="tour-card-badge">{tourBadge}</span>
                       <div className="tour-card-duration">
                         <i className="far fa-clock"></i> {tourDuration}
@@ -822,7 +831,11 @@ const Home = () => {
 
           <div className="editorial-grid">
             <div className="editorial-card grid-col-8">
-              <img src="/images/image-9.jpg" alt="Rajasthan Grid" />
+              <img 
+                src="/images/image-9.jpg" 
+                alt="Rajasthan Grid" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="editorial-card-overlay">
                 <h3 className="editorial-card-title">Rajasthan</h3>
                 <p className="editorial-card-text">Terre des forts et des Maharajas</p>
@@ -830,7 +843,11 @@ const Home = () => {
             </div>
 
             <div className="editorial-card grid-col-4">
-              <img src="/images/dest-gujarat.jpg" alt="Gujarat Grid" />
+              <img 
+                src="/images/dest-gujarat.jpg" 
+                alt="Gujarat Grid" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="editorial-card-overlay">
                 <h3 className="editorial-card-title">Gujarat</h3>
                 <p className="editorial-card-text">Architecture & Faune sauvage</p>
@@ -838,7 +855,11 @@ const Home = () => {
             </div>
 
             <div className="editorial-card grid-col-4">
-              <img src="/images/dest-karnataka.jpg" alt="Karnataka Grid" />
+              <img 
+                src="/images/dest-karnataka.jpg" 
+                alt="Karnataka Grid" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="editorial-card-overlay">
                 <h3 className="editorial-card-title">Karnataka</h3>
                 <p className="editorial-card-text">Temples royaux de Hampi</p>
@@ -846,7 +867,11 @@ const Home = () => {
             </div>
 
             <div className="editorial-card grid-col-4">
-              <img src="/images/dest-ladakh.jpg" alt="Ladakh Grid" />
+              <img 
+                src="/images/dest-ladakh.jpg" 
+                alt="Ladakh Grid" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="editorial-card-overlay">
                 <h3 className="editorial-card-title">Ladakh</h3>
                 <p className="editorial-card-text">Le Petit Tibet indien</p>
@@ -854,7 +879,11 @@ const Home = () => {
             </div>
 
             <div className="editorial-card grid-col-4">
-              <img src="/images/dest-kerala.jpg" alt="Inde du Sud Grid" />
+              <img 
+                src="/images/dest-kerala.jpg" 
+                alt="Inde du Sud Grid" 
+                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+              />
               <div className="editorial-card-overlay">
                 <h3 className="editorial-card-title">Inde du Sud</h3>
                 <p className="editorial-card-text">Kerala, Backwaters & Épices</p>
@@ -893,7 +922,11 @@ const Home = () => {
                 return (
                   <div key={item._id || itemSlug || idx} className="tour-card">
                     <Link to={`/${itemSlug}`} className="tour-card-image-wrap" title="Voir l'itinéraire">
-                      <img src={itemImage} alt={itemTitle} />
+                      <img 
+                        src={itemImage} 
+                        alt={itemTitle} 
+                        onError={(e) => { e.currentTarget.src = '/images/dest-gujarat.jpg'; }}
+                      />
                     </Link>
                     <div className="tour-card-body">
                       <div className="tour-card-location">
@@ -1069,7 +1102,12 @@ const Home = () => {
               </div>
             ) : (
               filteredRegions.map((region, idx) => (
-                <div key={region.id || idx} className="editorial-card grid-col-4 region-card">
+                <Link 
+                  key={region.id || idx} 
+                  to={region.link} 
+                  className="editorial-card grid-col-4 region-card"
+                  style={{ textDecoration: 'none' }}
+                >
                   <img 
                     src={region.image || '/images/dest-rajasthan.jpg'} 
                     alt={region.title} 
@@ -1077,12 +1115,11 @@ const Home = () => {
                   />
                   <div className="editorial-card-overlay">
                     <h3 className="editorial-card-title region-card-title">{region.title}</h3>
-                    <p className="region-card-desc">{region.desc}</p>
-                    <Link to={region.link} className="destination-card-link">
+                    <span className="destination-card-link">
                       Découvrir <i className="fas fa-arrow-right"></i>
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>

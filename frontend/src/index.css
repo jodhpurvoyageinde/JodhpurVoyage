@@ -89,7 +89,6 @@ a.search-tag {
 .hero-slider-section {
   position: relative;
   overflow: hidden;
-  min-height: 580px;
 }
 
 .hero-slider-wrapper {
@@ -224,6 +223,17 @@ a.search-tag {
   color: #59D2D9 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
+  transition: gap 0.3s ease, color 0.3s ease !important;
+}
+
+.destination-card:hover .destination-card-link,
+.editorial-card:hover .destination-card-link {
+  color: #FFFFFF !important;
+  gap: 0.75rem !important;
+}
+
+.editorial-card.region-card {
+  text-decoration: none !important;
 }
 
 .editorial-card-overlay {
