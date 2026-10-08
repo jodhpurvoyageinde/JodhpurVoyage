@@ -7,12 +7,12 @@
   RewriteCond %{REQUEST_URI} (.+)/$
   RewriteRule ^ %1 [L,R=301]
 
-  # Route all requests to index.html for React SPA
-  RewriteRule ^index\.html$ - [L]
+  # Route requests to index.php for dynamic SSR meta injection (fallback to index.html)
+  RewriteRule ^index\.(html|php)$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
+  RewriteRule . /index.php [L]
 </IfModule>
 
 # Caching for static assets

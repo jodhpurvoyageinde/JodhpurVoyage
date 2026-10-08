@@ -7237,6 +7237,13 @@ a.review-card {
   align-items: start !important;
 }
 
+.tour-detail-container aside {
+  position: sticky !important;
+  top: 100px !important;
+  align-self: start !important;
+  z-index: 10;
+}
+
 @media (max-width: 1100px) {
   .tour-detail-container {
     grid-template-columns: minmax(0, 1fr) 340px !important;
@@ -7250,6 +7257,12 @@ a.review-card {
     grid-template-columns: 1fr !important;
     gap: 32px !important;
     padding: 0 1rem !important;
+  }
+
+  .tour-detail-container aside {
+    position: static !important;
+    top: auto !important;
+    width: 100% !important;
   }
 }
 

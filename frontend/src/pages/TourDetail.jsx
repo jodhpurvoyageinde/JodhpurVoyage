@@ -101,7 +101,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
       ];
 
   return (
-    <div style={{ width: '100%', overflowX: 'hidden' }}>
+    <div style={{ width: '100%', overflowX: 'clip' }}>
       <SEO
         title={tour.seoTitle || tour.metaTitle || `${tour.title} — Circuit Privé ${tour.duration || ''} | Jodhpur Voyage`}
         description={tour.seoDescription || tour.metaDescription || tour.subtitle || `Découvrez le circuit privatif ${tour.title} à ${tour.location || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance francophone 24h/24.`}
@@ -373,7 +373,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
           </div>
 
           {/* Sidebar */}
-          <aside style={{ alignSelf: 'start' }}>
+          <aside className="tour-detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start', zIndex: 10 }}>
             <div style={{ background: '#ffffff', borderRadius: '12px', padding: '28px', boxShadow: 'var(--shadow-md)', border: '2px solid var(--gold-light)' }}>
               <span className="badge-gold" style={{ marginBottom: '10px', display: 'inline-block' }}>Devis 100% Personnalisé</span>
               <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--secondary-color)', margin: '8px 0', fontFamily: 'var(--font-heading)' }}>
