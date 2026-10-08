@@ -108,8 +108,8 @@ const SEO = ({
   useEffect(() => {
     // 1. Title (Priority: Specific item prop > Page SEO config > Default site title)
     const finalTitle =
-      propTitle ||
-      seoData?.title ||
+      (propTitle && propTitle.trim()) ||
+      (seoData?.title && seoData.title.trim()) ||
       'Jodhpur Voyage - Tour Opérateur en Inde et Népal | Agence de Voyage Spécialisée';
     document.title = finalTitle;
     let titleElement = document.querySelector('title');
@@ -121,15 +121,15 @@ const SEO = ({
 
     // 2. Meta Description
     const finalDescription =
-      propDescription ||
-      seoData?.description ||
+      (propDescription && propDescription.trim()) ||
+      (seoData?.description && seoData.description.trim()) ||
       'Jodhpur Voyage : agence locale francophone spécialiste des circuits sur mesure au Rajasthan, en Inde du Nord, Inde du Sud et Népal. Plus de 20 ans d’expérience avec chauffeurs privés et guides experts.';
     updateMetaTag('meta[name="description"]', 'name', 'description', finalDescription);
 
     // 3. Keywords
     const finalKeywords =
-      propKeywords ||
-      seoData?.keywords ||
+      (propKeywords && propKeywords.trim()) ||
+      (seoData?.keywords && seoData.keywords.trim()) ||
       'voyage inde, circuit rajasthan, agence de voyage inde, voyage sur mesure nepal, chauffeur prive inde, jodhpur voyage, tour operateur inde, circuit francophone inde';
     updateMetaTag('meta[name="keywords"]', 'name', 'keywords', finalKeywords);
 

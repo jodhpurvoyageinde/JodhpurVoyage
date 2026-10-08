@@ -33,6 +33,9 @@ const defaultDestinationsMap = {
     satisfaction: '99% de satisfaction (245 avis)',
     shortDescription: "Le Rajasthan est la terre mythique des forteresses grandioses, des palais des Mille et Une Nuits et des cités colorées. De Jaïpur la rose à Jodhpur la bleue, d'Udaipur la romantique à Jaisalmer la dorée au cœur des dunes de sable du désert du Thar, découvrez une féérie architecturale unique au monde.",
     fullDescription: "Séjournez dans des palais de patrimoine restaurés, parcourez les ruelles des cités fortifiées et passez une nuit inoubliable sous les étoiles du désert. Nos chauffeurs privés et nos guides locaux vous feront vivre une expérience féérique et authentique.",
+    seoTitle: "Voyage au Rajasthan — Circuits & Séjours sur Mesure | Jodhpur Voyage",
+    seoDescription: "Découvrez le Rajasthan avec Jodhpur Voyage : palais des Maharajas, forteresses du désert du Thar, cités royales et circuits 100% sur mesure avec chauffeur privé francophone.",
+    seoKeywords: "voyage rajasthan, circuit rajasthan, sejour rajasthan sur mesure, voyage maharajas, chauffeur prive rajasthan, agence locale rajasthan, jodhpur voyage",
     highlights: [
       { icon: 'fa-crown', title: 'Forts & Palais Royaux', desc: 'Fort de Mehrangarh à Jodhpur, Palais des Vents à Jaipur et City Palace d\'Udaipur.' },
       { icon: 'fa-campground', title: 'Désert du Thar', desc: 'Randonnée en chameau et campement de charme sous les étoiles du désert de Jaisalmer.' },
@@ -485,11 +488,13 @@ const DestinationDetail = ({ overrideSlug }) => {
   return (
     <>
       <SEO
-        pageKey="destinations"
-        title={activeDest.seoTitle || `Voyage ${activeDest.name} — Circuits & Séjours sur Mesure | Jodhpur Voyage`}
-        description={activeDest.seoDescription || activeDest.shortDescription}
-        keywords={activeDest.seoKeywords || `voyage ${activeDest.name.toLowerCase()}, circuit ${activeDest.name.toLowerCase()}, trek ${activeDest.name.toLowerCase()}`}
+        title={activeDest.seoTitle || activeDest.metaTitle || `Voyage au ${activeDest.name} — Circuits & Séjours sur Mesure | Jodhpur Voyage`}
+        description={activeDest.seoDescription || activeDest.metaDescription || activeDest.shortDescription}
+        keywords={activeDest.seoKeywords || activeDest.metaKeywords || `voyage ${activeDest.name?.toLowerCase()}, circuit ${activeDest.name?.toLowerCase()}, sejour sur mesure ${activeDest.name?.toLowerCase()}`}
+        ogTitle={activeDest.seoTitle || activeDest.metaTitle || `Voyage au ${activeDest.name} — Circuits & Séjours sur Mesure | Jodhpur Voyage`}
+        ogDescription={activeDest.seoDescription || activeDest.metaDescription || activeDest.shortDescription}
         ogImage={activeDest.image || '/images/dest-rajasthan.jpg'}
+        canonicalUrl={`https://jodhpurvoyage.com/destinations/${activeDest.slug || currentSlug}`}
       />
 
       {/* =========================================================================
