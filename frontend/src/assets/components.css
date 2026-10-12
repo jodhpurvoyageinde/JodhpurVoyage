@@ -313,53 +313,55 @@
 /* --------------------------------------------------------------------------
    2. MEGA MENUS (PREMIUM DROPDOWNS)
    -------------------------------------------------------------------------- */
-.nav-item.has-mega {
-  position: static;
-}
+@media (min-width: 992px) {
+  .nav-item.has-mega {
+    position: static;
+  }
 
-.mega-menu {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(8px);
-  width: calc(100vw - 3rem);
-  max-width: 1260px;
-  overflow: visible;
-  background-color: var(--color-white);
-  border-radius: var(--radius-md);
-  box-shadow: 0 20px 50px rgba(26, 43, 44, 0.14), 0 2px 6px rgba(0,0,0,0.04);
-  padding: 2.2rem;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), visibility 0.25s ease;
-  transition-delay: 0.35s;
-  border-top: 4px solid var(--color-primary);
-  z-index: 1300;
-  white-space: normal;
-}
+  .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    width: calc(100vw - 3rem);
+    max-width: 1260px;
+    overflow: visible;
+    background-color: var(--color-white);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 50px rgba(26, 43, 44, 0.14), 0 2px 6px rgba(0,0,0,0.04);
+    padding: 2.2rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), visibility 0.25s ease;
+    transition-delay: 0.35s;
+    border-top: 4px solid var(--color-primary);
+    z-index: 1300;
+    white-space: normal;
+  }
 
-/* Precise hover display only when hovering the exact nav-item or when active */
-.nav-item.has-mega:hover > .mega-menu,
-.nav-item.has-mega.mega-active > .mega-menu {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  transform: translateX(-50%) translateY(0) !important;
-  transition-delay: 0s !important;
-}
+  /* Precise hover display only when hovering the exact nav-item or when active */
+  .nav-item.has-mega:hover > .mega-menu,
+  .nav-item.has-mega.mega-active > .mega-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) !important;
+    transition-delay: 0s !important;
+  }
 
-/* Micro bridge only directly below the active nav item */
-.nav-item.has-mega:hover > .mega-menu::before,
-.nav-item.has-mega.mega-active > .mega-menu::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 0;
-  right: 0;
-  height: 14px;
-  background: transparent;
-  pointer-events: auto;
+  /* Micro bridge only directly below the active nav item */
+  .nav-item.has-mega:hover > .mega-menu::before,
+  .nav-item.has-mega.mega-active > .mega-menu::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 14px;
+    background: transparent;
+    pointer-events: auto;
+  }
 }
 
 /* Mega Menu Grid Structures */
@@ -4898,6 +4900,137 @@ a.review-card {
   gap: 2.5rem;
 }
 
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.vocab-card {
+  background: var(--color-white);
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.vocab-fr {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-dark, #1a2b2c);
+}
+
+.vocab-hi {
+  font-size: 0.88rem;
+  color: var(--color-primary, #1d747a);
+  font-weight: 500;
+}
+
+.festival-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.festival-card {
+  background: var(--color-white);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+}
+
+.festival-img-wrap {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.festival-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.festival-card:hover .festival-img-wrap img {
+  transform: scale(1.05);
+}
+
+.festival-date-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(18, 31, 32, 0.88);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.festival-body {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.festival-location {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary, #1d747a);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.festival-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--color-dark, #1a2b2c);
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.festival-desc {
+  font-size: 0.86rem;
+  color: var(--color-text-muted, #64748b);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.infos-conseils-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.unesco-card {
+  grid-column: 1 / -1;
+}
+
+.unesco-subgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.reviews-grid-related {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
 /* --------------------------------------------------------------------------
    QUI NOUS SOMMES PAGE STYLES
    -------------------------------------------------------------------------- */
@@ -5889,14 +6022,16 @@ a.review-card {
   color: var(--color-primary);
 }
 
-.mega-inspirations-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.1rem;
-}
+@media (min-width: 992px) {
+  .mega-inspirations-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.1rem;
+  }
 
-.mega-menu-about .mega-inspirations-grid {
-  grid-template-columns: repeat(4, 1fr) !important;
+  .mega-menu-about .mega-inspirations-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 
 .mega-inspiration-card {
@@ -7237,11 +7372,13 @@ a.review-card {
   align-items: start !important;
 }
 
-.tour-detail-container aside {
+.tour-detail-container aside,
+.tour-detail-sidebar {
+  position: -webkit-sticky !important;
   position: sticky !important;
-  top: 100px !important;
+  top: 110px !important;
   align-self: start !important;
-  z-index: 10;
+  z-index: 20 !important;
 }
 
 @media (max-width: 1100px) {
@@ -7259,10 +7396,147 @@ a.review-card {
     padding: 0 1rem !important;
   }
 
-  .tour-detail-container aside {
+  .tour-detail-container aside,
+  .tour-detail-sidebar {
     position: static !important;
     top: auto !important;
     width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   STICKY MOBILE "SUR DEVIS GRATUIT" ACTION BAR
+   ========================================================================== */
+.tour-mobile-sticky-bar {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .tour-mobile-sticky-bar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 2px solid var(--gold-color, #EAB308);
+    box-shadow: 0 -8px 28px rgba(15, 23, 42, 0.16);
+    z-index: 998;
+    transform: translateY(115%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease, visibility 0.28s;
+    padding: 10px 16px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+  }
+
+  .tour-mobile-sticky-bar.visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tour-mobile-sticky-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .tour-mobile-sticky-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .tour-mobile-sticky-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--primary-color, #0D9488);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tour-mobile-sticky-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--secondary-color, #0F172A);
+    line-height: 1.2;
+    font-family: var(--font-heading, inherit);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tour-mobile-sticky-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted, #64748B);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .tour-mobile-sticky-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .tour-mobile-sticky-whatsapp {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #25D366;
+    color: #FFFFFF !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.35);
+    border: none;
+    text-decoration: none;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+  }
+
+  .tour-mobile-sticky-whatsapp:hover,
+  .tour-mobile-sticky-whatsapp:active {
+    background: #1EBE5D;
+    transform: scale(0.95);
+  }
+
+  .tour-mobile-sticky-btn {
+    padding: 10px 16px !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.32) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Automatically raise floating action buttons on mobile when sticky bar is active */
+  body:has(.tour-mobile-sticky-bar.visible) .floating-whatsapp,
+  .tour-mobile-sticky-bar.visible ~ * .floating-whatsapp {
+    bottom: calc(75px + env(safe-area-inset-bottom, 10px)) !important;
+  }
+
+  body:has(.tour-mobile-sticky-bar.visible) .scroll-to-top,
+  .tour-mobile-sticky-bar.visible ~ * .scroll-to-top {
+    bottom: calc(125px + env(safe-area-inset-bottom, 10px)) !important;
   }
 }
 

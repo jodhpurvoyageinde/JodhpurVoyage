@@ -123,7 +123,7 @@ const InfosPratiques = () => {
                 </h3>
                 <p className="contact-lead-desc">
                   Le site officiel du gouvernement indien pour effectuer votre demande en ligne est :{' '}
-                  <a href="https://indianvisaonline.gov.in/visa/tvoa.html" target="_blank" rel="noopener noreferrer" className="footer-contact-link">
+                  <a href="https://indianvisaonline.gov.in/visa/tvoa.html" target="_blank" rel="noopener noreferrer" className="footer-contact-link" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
                     https://indianvisaonline.gov.in/visa/tvoa.html
                   </a>. Vous y trouverez la liste complète des instructions à suivre (en anglais) et des documents à fournir.
                 </p>
@@ -691,7 +691,7 @@ const InfosPratiques = () => {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+          <div className="infos-conseils-grid">
             {/* Card 1: Monnaie, Taxes & Pourboires */}
             <div className="climat-card" id="monnaie-change">
               <div id="monnaie"></div>
@@ -747,9 +747,9 @@ const InfosPratiques = () => {
             </div>
 
             {/* Card 6: Monuments Classés UNESCO */}
-            <div className="climat-card" id="unesco" style={{ gridColumn: '1 / -1' }}>
+            <div className="climat-card unesco-card" id="unesco">
               <h3 className="climat-card-title"><i className="fas fa-landmark"></i> Les Trésors Classés au Patrimoine UNESCO</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '12px' }}>
+              <div className="unesco-subgrid">
                 <div>
                   <strong>Inde du Nord :</strong>
                   <ul className="visas-list" style={{ marginTop: '6px' }}>

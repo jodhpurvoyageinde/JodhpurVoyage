@@ -288,3 +288,44 @@ npm run build
 | **New Component** | [`frontend/src/components/RichTextEditor.jsx`](file:///c:/laragon/www/react/jodhpur_voyage/frontend/src/components/RichTextEditor.jsx) | Created comprehensive WYSIWYG editor component with formatting toolbar, direct 1-click photo upload, image options modal with captions & alignment, link modal, and HTML source mode. |
 | **React Admin** | [`frontend/src/pages/admin/AdminBlogs.jsx`](file:///c:/laragon/www/react/jodhpur_voyage/frontend/src/pages/admin/AdminBlogs.jsx) | 1. Imported `RichTextEditor`.<br>2. Replaced `<textarea rows="8">` with `<RichTextEditor>`.<br>3. Widened modal dialog to `maxWidth: '960px'` for spacious editing.<br>4. Added validation in `handleSubmit` to ensure non-empty article content. |
 | **CSS Styling** | [`frontend/src/assets/components.css`](file:///c:/laragon/www/react/jodhpur_voyage/frontend/src/assets/components.css) | Added `.rich-btn`, `.rich-editor-content`, `.blog-content-figure`, figure alignments (`.align-center`, `.align-full`, `.align-left`, `.align-right`), captions, and responsive mobile overrides. |
+
+## 11. Itinerary Page – Backend Slider Image Management
+
+### Overview
+Administrators can now fully manage, upload, reorder, and delete slider images displayed in the Itinerary page directly from the Admin Panel without needing code changes.
+
+### Key Capabilities
+1. **Multi-Image Upload & Batch Adding:**
+   - Admin can upload multiple photos at once from their device (Cloudinary with local server fallback) or paste direct image URLs.
+   - Batch upload endpoint `POST /api/upload/multiple` supports up to 30 files in a single request with client-side fallback.
+2. **Dedicated Itinerary Sliders Management Dashboard (`/admin/itinerary-slider`):**
+   - New dedicated navigation item in Admin Sidebar: **Catalog & Content $\to$ Itinerary Sliders**.
+   - Tour selector with search filter and current photo count badges.
+   - Interactive reordering (move left/right), set as cover/first slide, delete, replace image, and reset changes.
+   - Live interactive slider preview with **Desktop View** vs **Mobile (375px)** simulation.
+3. **Integrated in Tours & Itineraries Management (`/admin/tours`):**
+   - Quick action link on every tour row: **`🖼️ Slider (X)`** linking directly to the itinerary slider manager.
+   - In-modal "Itinerary Slider Photos" section for managing slider gallery photos directly while editing tour packages.
+4. **Dynamic Frontend Rendering & Mobile Responsiveness (`TourImageSlider.jsx`):**
+   - Slider dynamically prioritizes admin-uploaded `tour.gallery` photos without injecting unwanted library images into custom galleries.
+   - Viewport height adapts smoothly across mobile and desktop (`clamp(260px, 45vw, 440px)`).
+   - Thumbnails row uses a smooth scrollable flex track with snap alignment that never squishes thumbnails regardless of photo count.
+   - Full keyboard navigation (arrow keys, Escape to close lightbox) and touch swipe gestures.
+
+## 12. Itinerary Page – Sticky “Sur Devis Gratuit” Section (Desktop & Mobile)
+
+### Business Requirement
+Make the **“Sur Devis Gratuit”** section sticky while scrolling through the itinerary on both desktop and mobile devices so that it remains easily accessible without obstructing readability or compromising responsiveness.
+
+### Implementation Details
+1. **Desktop Sticky Sidebar (`.tour-detail-sidebar`):**
+   - Fixed `position: sticky; top: 92px; align-self: start; z-index: 20;`.
+   - Resolved CSS clipping issue in [`frontend/src/assets/style.css`](file:///c:/laragon/www/react/jodhpur_voyage/frontend/src/assets/style.css) by transitioning `html`, `body`, and `#root` from `overflow-x: hidden` to `overflow-x: clip`, allowing standard CSS sticky context to execute smoothly along the entire day-by-day itinerary.
+2. **Mobile Sticky Action Bar (`.tour-mobile-sticky-bar`):**
+   - On screens under 992px, once the user scrolls past the top hero banner, a sleek bottom sticky action bar slides into view (`position: fixed; bottom: 0; left: 0; right: 0; z-index: 998;`).
+   - Features:
+     - Badge: **"Devis 100% Personnalisé"**
+     - Price: **"Sur Devis Gratuit"** with duration and response time indication.
+     - Direct WhatsApp quick chat button with encoded tour context.
+     - Primary **"Demander un Devis"** button opening the inquiry modal.
+   - Designed with safe-area insets (`env(safe-area-inset-bottom)`), frosted-glass blur backdrop, gold accent border, and adjusted offset for floating WhatsApp / scroll-to-top buttons to avoid overlap.

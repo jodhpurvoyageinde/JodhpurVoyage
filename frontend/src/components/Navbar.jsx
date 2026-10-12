@@ -301,7 +301,20 @@ const Navbar = () => {
   const [hoveredMega, setHoveredMega] = useState(null);
   const megaCloseTimeoutRef = useRef(null);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined' && window.innerWidth <= 991) {
+        setHoveredMega(null);
+      } else {
+        setOpenMobileMega(null);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleMegaMouseEnter = (megaKey) => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 991) return;
     if (megaCloseTimeoutRef.current) {
       clearTimeout(megaCloseTimeoutRef.current);
       megaCloseTimeoutRef.current = null;
@@ -311,6 +324,7 @@ const Navbar = () => {
   };
 
   const handleMegaMouseLeave = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 991) return;
     if (megaCloseTimeoutRef.current) {
       clearTimeout(megaCloseTimeoutRef.current);
     }
@@ -320,6 +334,7 @@ const Navbar = () => {
   };
 
   const handleNonMegaMouseEnter = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 991) return;
     if (megaCloseTimeoutRef.current) {
       clearTimeout(megaCloseTimeoutRef.current);
       megaCloseTimeoutRef.current = null;
@@ -356,16 +371,19 @@ const Navbar = () => {
   };
 
   const handleNavMouseEnter = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 991) return;
     setForceCloseMega(false);
   };
 
   const toggleMobileMega = (megaName) => {
+    setHoveredMega(null);
     setOpenMobileMega(prev => (prev === megaName ? null : megaName));
   };
 
   const handleParentNavClick = (e, megaKey) => {
     setForceCloseMega(false);
-    if (window.innerWidth <= 991) {
+    setHoveredMega(null);
+    if (typeof window !== 'undefined' && window.innerWidth <= 991) {
       e.preventDefault();
       toggleMobileMega(megaKey);
     }

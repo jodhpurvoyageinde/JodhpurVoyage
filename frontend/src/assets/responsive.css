@@ -270,6 +270,10 @@
   }
 
   /* Convert Mega Menus to Mobile Accordions */
+  .site-header .mega-menu,
+  .site-header .mega-menu-inspirations,
+  .site-header .mega-menu-about,
+  .site-header .mega-menu-destinations,
   .mega-menu,
   .mega-menu-inspirations,
   .mega-menu-about,
@@ -278,57 +282,320 @@
     top: auto !important;
     left: auto !important;
     right: auto !important;
+    bottom: auto !important;
     transform: none !important;
     width: 100% !important;
+    min-width: 0 !important;
     max-width: 100% !important;
-    box-shadow: none !important;
-    border-top: none !important;
-    padding: 0.8rem 0.6rem !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: all !important;
-    display: none;
-    background-color: #FAFAFA;
-    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-top: 3px solid var(--color-primary, #0c768a) !important;
+    padding: 0.85rem 0.75rem !important;
+    margin: 0.4rem 0 0.8rem 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    display: none !important;
+    height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    background-color: #f8fafc !important;
+    border-radius: 10px !important;
     box-sizing: border-box !important;
+    white-space: normal !important;
+    transition: none !important;
   }
 
+  /* Only display when mobile-open is present */
+  .site-header .nav-item.has-mega.mobile-open > .mega-menu,
+  .site-header .nav-item.mobile-open .mega-menu,
   .nav-item.mobile-open .mega-menu,
   .nav-item.mobile-open .mega-menu-inspirations,
   .nav-item.mobile-open .mega-menu-about,
   .nav-item.mobile-open .mega-menu-destinations {
     display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    transform: none !important;
   }
 
-  .mega-grid-3col, 
-  .mega-grid-2col, 
-  .mega-grid-destinations, 
-  .mega-inspirations-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    grid-template-columns: 1fr !important;
-    gap: 1.2rem !important;
-    padding: 0.8rem 0.5rem !important;
+  /* Neutralize desktop hover and active triggers on mobile */
+  .site-header .nav-item.has-mega:not(.mobile-open):hover > .mega-menu,
+  .site-header .nav-item.has-mega:not(.mobile-open).mega-active > .mega-menu,
+  .nav-item.has-mega:not(.mobile-open):hover > .mega-menu,
+  .nav-item.has-mega:not(.mobile-open).mega-active > .mega-menu {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    transform: none !important;
+  }
+
+  .site-header .nav-item.has-mega > .mega-menu::before,
+  .nav-item.has-mega > .mega-menu::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .mega-inspirations-header {
+    font-size: 0.76rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 0.35rem !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+  }
+
+  /* Mega Inspirations & About Grids (2 columns on mobile) */
+  .mega-inspirations-grid,
+  .mega-menu-about .mega-inspirations-grid,
+  .mega-menu-inspirations .mega-inspirations-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
     width: 100% !important;
     max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
     box-sizing: border-box !important;
   }
 
   .mega-inspiration-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
     width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-inspiration-card:active {
+    transform: scale(0.98) !important;
   }
 
   .inspiration-img-wrap {
-    height: 140px !important;
+    width: 100% !important;
+    height: 85px !important;
+    border-radius: 8px 8px 0 0 !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    background-color: #e2e8f0 !important;
+  }
+
+  .inspiration-img-wrap img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  .inspiration-card-title {
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    color: var(--color-dark, #1a2b2c) !important;
+    padding: 0.45rem 0.35rem !important;
+    margin: 0 !important;
+    text-align: center !important;
+    line-height: 1.25 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+  }
+
+  /* Destination Mega Menu on Mobile */
+  .mega-grid-destinations {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-grid-destinations > div {
+    width: 100% !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 0.6rem 0.75rem !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-grid-destinations .mega-column-title {
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary, #0c768a) !important;
+    margin-bottom: 0.45rem !important;
+    padding-bottom: 0.35rem !important;
+    border-bottom: 1px solid #edf2f7 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+  }
+
+  .mega-grid-destinations .mega-column-title i {
+    font-size: 0.85rem !important;
+    color: var(--color-primary, #0c768a) !important;
+  }
+
+  .mega-grid-destinations .mega-link-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  .mega-grid-destinations .mega-link-item {
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 0.32rem 0.45rem !important;
+    border-radius: 6px !important;
+    color: #4a5568 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    text-decoration: none !important;
+    background-color: transparent !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+  }
+
+  .mega-grid-destinations .mega-link-item:hover,
+  .mega-grid-destinations .mega-link-item:active {
+    background-color: var(--color-primary-light, #e6f4f6) !important;
+    color: var(--color-primary, #0c768a) !important;
+  }
+
+  .mega-grid-destinations .mega-link-item i {
+    font-size: 0.65rem !important;
+    color: var(--color-primary, #0c768a) !important;
+    opacity: 0.8 !important;
+  }
+
+  /* Infos Pratiques Mega Menu on Mobile */
+  .mega-grid-3col {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-grid-3col > div {
+    width: 100% !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 0.6rem 0.75rem !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-grid-3col .mega-column-title {
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary, #0c768a) !important;
+    margin-bottom: 0.45rem !important;
+    padding-bottom: 0.35rem !important;
+    border-bottom: 1px solid #edf2f7 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+  }
+
+  .mega-grid-3col .mega-column-title i {
+    font-size: 0.85rem !important;
+    color: var(--color-primary, #0c768a) !important;
+  }
+
+  .mega-grid-3col .mega-link-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  .mega-grid-3col .mega-link-item {
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 0.32rem 0.45rem !important;
+    border-radius: 6px !important;
+    color: #4a5568 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+  }
+
+  .mega-grid-3col .mega-link-item:hover,
+  .mega-grid-3col .mega-link-item:active {
+    background-color: var(--color-primary-light, #e6f4f6) !important;
+    color: var(--color-primary, #0c768a) !important;
+  }
+
+  .mega-grid-3col .mega-link-item i {
+    font-size: 0.72rem !important;
+    color: var(--color-primary, #0c768a) !important;
+    opacity: 0.8 !important;
+  }
+
+  .mega-help-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #e6fffa 100%) !important;
+    border: 1px solid #b2f5ea !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .mega-help-title {
+    font-size: 0.84rem !important;
+    font-weight: 700 !important;
+    color: #234e52 !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .mega-help-desc {
+    font-size: 0.75rem !important;
+    color: #285e61 !important;
+    margin-bottom: 0.6rem !important;
+    line-height: 1.35 !important;
   }
 
   .mega-sublink-grid {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
+    grid-template-columns: 1fr !important;
+    gap: 0.4rem !important;
   }
 
   .mega-blog-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 
   /* Hero Section */
@@ -1173,5 +1440,290 @@
 
 table {
   max-width: 100%;
+}
+
+/* ==========================================================================
+   INFOS PRATIQUES & COMMENTAIRE DETAIL - FULL MOBILE RESPONSIVENESS
+   ========================================================================== */
+
+/* Universal anti-overflow container rules */
+.infos-hero-section,
+.commentaire-detail-hero,
+.commentaire-detail-page,
+.visas-grid,
+.climat-grid,
+.unesco-grid,
+.vocab-grid,
+.festival-grid,
+.infos-conseils-grid,
+.unesco-subgrid,
+.castes-grid,
+.commentaire-layout-grid,
+.reviews-grid-related {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Tablet & Mobile (max-width: 991px) */
+@media (max-width: 991px) {
+  /* Infos Pratiques Grids */
+  .visas-grid,
+  .climat-grid,
+  .unesco-grid,
+  .infos-conseils-grid,
+  .unesco-subgrid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+  }
+
+  .vocab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.85rem !important;
+    width: 100% !important;
+  }
+
+  .festival-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+  }
+
+  .religions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+  }
+
+  .castes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.85rem !important;
+    width: 100% !important;
+  }
+
+  .visas-main-card,
+  .visas-steps-card,
+  .visas-sidebar-card,
+  .visas-sidebar-card-alt,
+  .climat-card,
+  .castes-box {
+    padding: 1.6rem 1.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Commentaire Detail Grid Stacking */
+  .commentaire-layout-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+    width: 100% !important;
+  }
+
+  .commentaire-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .commentaire-article-card {
+    padding: 1.8rem 1.4rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .commentaire-cta-card {
+    padding: 1.8rem 1.4rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .reviews-grid-related {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+  }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Infos Pratiques Hero & Cards */
+  .infos-hero-section {
+    min-height: 240px !important;
+    padding: 4.5rem 0 2.5rem 0 !important;
+  }
+
+  .infos-hero-title {
+    font-size: clamp(1.4rem, 4.8vw, 1.85rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  .infos-hero-desc {
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .visas-card-title,
+  .climat-card-title {
+    font-size: 1.2rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .visas-main-card,
+  .visas-steps-card,
+  .visas-sidebar-card,
+  .visas-sidebar-card-alt,
+  .climat-card,
+  .castes-box,
+  .caste-card,
+  .sidebar-widget {
+    padding: 1.25rem 1rem !important;
+    border-radius: 10px !important;
+  }
+
+  .visas-list-item {
+    font-size: 0.86rem !important;
+    line-height: 1.5 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .visas-list {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .visas-alert-box {
+    padding: 0.85rem 0.95rem !important;
+    font-size: 0.84rem !important;
+  }
+
+  .vocab-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .vocab-card {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .festival-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem !important;
+  }
+
+  .festival-img-wrap {
+    height: 190px !important;
+  }
+
+  .religions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .castes-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Commentaire Detail Mobile */
+  .commentaire-detail-hero {
+    min-height: 280px !important;
+    padding: 5rem 0 2.5rem 0 !important;
+  }
+
+  .commentaire-detail-title {
+    font-size: clamp(1.4rem, 5vw, 1.85rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  .commentaire-detail-meta {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .commentaire-article-card {
+    padding: 1.25rem 1rem !important;
+  }
+
+  .commentaire-article-header {
+    gap: 0.75rem !important;
+    margin-bottom: 1.2rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .quote-mark {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1.1rem !important;
+    border-radius: 8px !important;
+  }
+
+  .commentaire-article-heading {
+    font-size: 1.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .commentaire-article-text {
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+  }
+
+  .commentaire-cta-card {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .commentaire-cta-inner h3 {
+    font-size: 1.3rem !important;
+  }
+
+  .commentaire-cta-btns {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .commentaire-cta-btns .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .reviews-grid-related {
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem !important;
+  }
+}
+
+/* Small Phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .visas-main-card,
+  .visas-steps-card,
+  .visas-sidebar-card,
+  .visas-sidebar-card-alt,
+  .climat-card,
+  .castes-box,
+  .commentaire-article-card,
+  .commentaire-cta-card,
+  .sidebar-widget {
+    padding: 1rem 0.85rem !important;
+  }
+
+  .visas-card-title,
+  .climat-card-title {
+    font-size: 1.1rem !important;
+  }
+
+  .footer-contact-link,
+  .visas-main-card a,
+  .commentaire-article-card a {
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+  }
 }
 

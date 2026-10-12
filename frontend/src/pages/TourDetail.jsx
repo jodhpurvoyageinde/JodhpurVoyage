@@ -33,6 +33,21 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
   const [loading, setLoading] = useState(!initialTour);
   const [openDay, setOpenDay] = useState(1);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [showMobileStickyBar, setShowMobileStickyBar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show mobile sticky bar as user scrolls down the page
+      if (window.scrollY > 80) {
+        setShowMobileStickyBar(true);
+      } else {
+        setShowMobileStickyBar(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -373,7 +388,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
           </div>
 
           {/* Sidebar */}
-          <aside className="tour-detail-sidebar" style={{ position: 'sticky', top: '100px', alignSelf: 'start', zIndex: 10 }}>
+          <aside id="devis-sidebar" className="tour-detail-sidebar" style={{ position: 'sticky', top: '110px', alignSelf: 'start', zIndex: 20 }}>
             <div style={{ background: '#ffffff', borderRadius: '12px', padding: '28px', boxShadow: 'var(--shadow-md)', border: '2px solid var(--gold-light)' }}>
               <span className="badge-gold" style={{ marginBottom: '10px', display: 'inline-block' }}>Devis 100% Personnalisé</span>
               <div style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--secondary-color)', margin: '8px 0', fontFamily: 'var(--font-heading)' }}>
@@ -406,6 +421,45 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
               </div>
             </div>
           </aside>
+        </div>
+      </div>
+
+      {/* Sticky Mobile "Sur Devis Gratuit" Action Bar */}
+      <div 
+        className={`tour-mobile-sticky-bar ${showMobileStickyBar ? 'visible' : ''}`}
+        aria-label="Sur Devis Gratuit Sticky Action Bar"
+      >
+        <div className="tour-mobile-sticky-inner">
+          <div className="tour-mobile-sticky-info">
+            <span className="tour-mobile-sticky-badge">
+              <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i> 100% Personnalisé
+            </span>
+            <div className="tour-mobile-sticky-title">Sur Devis Gratuit</div>
+            <span className="tour-mobile-sticky-sub">
+              {tour.duration ? `${tour.duration} • ` : ''}Réponse sous 24h
+            </span>
+          </div>
+
+          <div className="tour-mobile-sticky-actions">
+            <a
+              href={`https://wa.me/919650698669?text=${encodeURIComponent(`Bonjour, je souhaite un devis gratuit pour le circuit "${tour.title}".`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tour-mobile-sticky-whatsapp"
+              aria-label="Contacter sur WhatsApp"
+              title="Discuter sur WhatsApp"
+            >
+              <i className="fab fa-whatsapp"></i>
+            </a>
+
+            <button
+              type="button"
+              className="btn btn-primary tour-mobile-sticky-btn"
+              onClick={() => setIsBookingOpen(true)}
+            >
+              <i className="fas fa-paper-plane"></i> Demander un Devis
+            </button>
+          </div>
         </div>
       </div>
 

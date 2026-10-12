@@ -4,20 +4,25 @@ const getTourImages = (tour) => {
   if (!tour) return ['/images/dest-rajasthan.jpg'];
   const list = [];
 
-  // 1. Gather images from tour.gallery
+  // 1. Gather images from tour.gallery (admin-managed slider images)
   if (Array.isArray(tour.gallery) && tour.gallery.length > 0) {
     tour.gallery.forEach((img) => {
       if (typeof img === 'string' && img.trim()) list.push(img.trim());
-      else if (img && typeof img.url === 'string') list.push(img.url.trim());
+      else if (img && typeof img.url === 'string' && img.url.trim()) list.push(img.url.trim());
     });
   }
 
-  // 2. Add main tour image at front if not present
+  // If the admin has configured slider images in the backend, display them dynamically!
+  if (list.length > 0) {
+    return list;
+  }
+
+  // 2. Fallback: Add main tour image at front if available
   if (tour.image && !list.includes(tour.image)) {
     list.unshift(tour.image);
   }
 
-  // 3. Supplement with curated high-definition photos from website library based on destination
+  // 3. Fallback: Supplement with curated photos from library if no custom gallery
   const contextText = `${tour.category || ''} ${tour.location || ''} ${tour.title || ''} ${(tour.cities || []).map(c => c.name || '').join(' ')}`.toLowerCase();
 
   const curatedLibrary = [];
@@ -50,7 +55,6 @@ const getTourImages = (tour) => {
       '/images/Voyage-Jaisalmer.jpg'
     );
   } else {
-    // Default Rajasthan & North India circuits
     curatedLibrary.push(
       '/images/dest-rajasthan.jpg',
       '/images/dest-tajmahal.jpg',
@@ -77,6 +81,7 @@ const TourImageSlider = ({ tour }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const thumbnailsContainerRef = useRef(null);
 
   // Auto-play slider every 4.5 seconds
   useEffect(() => {
@@ -87,6 +92,38 @@ const TourImageSlider = ({ tour }) => {
 
     return () => clearInterval(timer);
   }, [images.length, isPaused, isLightboxOpen]);
+
+  // Keep index within range if images change dynamically
+  useEffect(() => {
+    if (currentIndex >= images.length) {
+      setCurrentIndex(0);
+    }
+  }, [images.length, currentIndex]);
+
+  // Scroll active thumbnail into view
+  useEffect(() => {
+    if (thumbnailsContainerRef.current) {
+      const activeThumb = thumbnailsContainerRef.current.children[currentIndex];
+      if (activeThumb && typeof activeThumb.scrollIntoView === 'function') {
+        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    }
+  }, [currentIndex]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'Escape' && isLightboxOpen) {
+        setIsLightboxOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [images.length, isLightboxOpen]);
 
   const handlePrev = (e) => {
     if (e) e.stopPropagation();
@@ -136,7 +173,7 @@ const TourImageSlider = ({ tour }) => {
         style={{
           position: 'relative',
           width: '100%',
-          height: '420px',
+          height: 'clamp(260px, 45vw, 440px)',
           borderRadius: '10px',
           overflow: 'hidden',
           backgroundColor: '#0F172A',
@@ -163,19 +200,18 @@ const TourImageSlider = ({ tour }) => {
           }}
         />
 
-
         {/* Counter Badge */}
         <div
           style={{
             position: 'absolute',
-            top: '14px',
-            right: '14px',
-            background: 'rgba(15, 23, 42, 0.75)',
+            top: '12px',
+            right: '12px',
+            background: 'rgba(15, 23, 42, 0.78)',
             backdropFilter: 'blur(6px)',
             color: '#ffffff',
-            padding: '5px 12px',
+            padding: '4px 10px',
             borderRadius: '20px',
-            fontSize: '0.82rem',
+            fontSize: '0.8rem',
             fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
@@ -191,18 +227,18 @@ const TourImageSlider = ({ tour }) => {
         <div
           style={{
             position: 'absolute',
-            top: '14px',
-            left: '14px',
-            background: 'rgba(15, 23, 42, 0.75)',
+            top: '12px',
+            left: '12px',
+            background: 'rgba(15, 23, 42, 0.78)',
             backdropFilter: 'blur(6px)',
             color: '#ffffff',
-            width: '34px',
-            height: '34px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '0.85rem',
+            fontSize: '0.82rem',
             boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
             zIndex: 3,
             transition: 'background 0.2s'
@@ -211,7 +247,6 @@ const TourImageSlider = ({ tour }) => {
         >
           <i className="fas fa-expand-alt"></i>
         </div>
-
 
         {/* Navigation Arrows */}
         {images.length > 1 && (
@@ -222,19 +257,19 @@ const TourImageSlider = ({ tour }) => {
               style={{
                 position: 'absolute',
                 top: '50%',
-                left: '12px',
+                left: '10px',
                 transform: 'translateY(-50%)',
-                background: 'rgba(255, 255, 255, 0.85)',
+                background: 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(6px)',
                 color: '#1E293B',
                 border: 'none',
-                width: '42px',
-                height: '42px',
+                width: 'clamp(34px, 4.5vw, 42px)',
+                height: 'clamp(34px, 4.5vw, 42px)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.1rem',
+                fontSize: '1rem',
                 cursor: 'pointer',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                 transition: 'all 0.2s ease',
@@ -250,19 +285,19 @@ const TourImageSlider = ({ tour }) => {
               style={{
                 position: 'absolute',
                 top: '50%',
-                right: '12px',
+                right: '10px',
                 transform: 'translateY(-50%)',
-                background: 'rgba(255, 255, 255, 0.85)',
+                background: 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(6px)',
                 color: '#1E293B',
                 border: 'none',
-                width: '42px',
-                height: '42px',
+                width: 'clamp(34px, 4.5vw, 42px)',
+                height: 'clamp(34px, 4.5vw, 42px)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.1rem',
+                fontSize: '1rem',
                 cursor: 'pointer',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                 transition: 'all 0.2s ease',
@@ -279,21 +314,31 @@ const TourImageSlider = ({ tour }) => {
       {/* Thumbnails Row */}
       {images.length > 1 && (
         <div
+          ref={thumbnailsContainerRef}
           style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${images.length}, 1fr)`,
-            gap: '10px',
-            marginTop: '12px'
+            display: 'flex',
+            gap: '8px',
+            marginTop: '12px',
+            overflowX: 'auto',
+            paddingBottom: '4px',
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch'
           }}
         >
           {images.map((img, idx) => {
             const isActive = idx === currentIndex;
             return (
-              <div
+              <button
                 key={idx}
+                type="button"
                 onClick={() => setCurrentIndex(idx)}
                 style={{
-                  height: '68px',
+                  flex: '0 0 auto',
+                  width: images.length <= 5 ? `calc((100% - ${(images.length - 1) * 8}px) / ${images.length})` : 'clamp(68px, 14vw, 90px)',
+                  minWidth: '58px',
+                  height: 'clamp(50px, 9vw, 66px)',
+                  padding: 0,
+                  background: '#0F172A',
                   borderRadius: '8px',
                   overflow: 'hidden',
                   cursor: 'pointer',
@@ -301,8 +346,10 @@ const TourImageSlider = ({ tour }) => {
                   opacity: isActive ? 1 : 0.65,
                   transform: isActive ? 'scale(1.02)' : 'none',
                   transition: 'all 0.2s ease',
-                  boxShadow: isActive ? '0 2px 8px rgba(13,148,136,0.3)' : 'none'
+                  boxShadow: isActive ? '0 2px 8px rgba(13,148,136,0.35)' : 'none',
+                  scrollSnapAlign: 'start'
                 }}
+                aria-label={`Photo ${idx + 1}`}
               >
                 <img
                   src={img}
@@ -317,7 +364,7 @@ const TourImageSlider = ({ tour }) => {
                     display: 'block'
                   }}
                 />
-              </div>
+              </button>
             );
           })}
         </div>

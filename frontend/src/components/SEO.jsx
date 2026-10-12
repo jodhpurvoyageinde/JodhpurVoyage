@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { fetchSeoPageConfig, fetchSeoConfigByPath } from '../services/api';
 
 const updateMetaTag = (selector, attributeName, attributeValue, content) => {
@@ -81,29 +82,40 @@ const SEO = ({
   geoPlacename = 'Jodhpur'
 }) => {
   const [seoData, setSeoData] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     let isMounted = true;
-    const fetchFunc = pageKey ? () => fetchSeoPageConfig(pageKey) : () => fetchSeoConfigByPath(window.location.pathname);
-    
-    fetchFunc()
-      .then((res) => {
+    const currentPath = location.pathname;
+    const targetKey = pageKey || (currentPath === '/' ? 'home' : currentPath.replace(/^\//, '').toLowerCase());
+
+    const loadSeo = async () => {
+      try {
+        const res = await fetchSeoPageConfig(targetKey);
         if (isMounted && res.data) {
           setSeoData(res.data);
+          return;
         }
-      })
-      .catch(() => {
-        if (pageKey && isMounted) {
-          fetchSeoConfigByPath(window.location.pathname)
-            .then((r) => r.data && setSeoData(r.data))
-            .catch(() => {});
+      } catch (e) {
+        // Fallback to lookup by custom path
+      }
+
+      try {
+        const resPath = await fetchSeoConfigByPath(currentPath);
+        if (isMounted && resPath.data) {
+          setSeoData(resPath.data);
         }
-      });
+      } catch (e2) {
+        // Keep fallback
+      }
+    };
+
+    loadSeo();
 
     return () => {
       isMounted = false;
     };
-  }, [pageKey, window.location.pathname]);
+  }, [pageKey, location.pathname]);
 
   useEffect(() => {
     // 1. Title (Priority: Specific item prop > Page SEO config > Default site title)

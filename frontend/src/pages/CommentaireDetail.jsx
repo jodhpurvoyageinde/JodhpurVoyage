@@ -287,7 +287,7 @@ const CommentaireDetail = () => {
               <h2 className="section-title">Autres Témoignages de Voyageurs</h2>
             </div>
 
-            <div className="reviews-grid-related" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+            <div className="reviews-grid-related">
               {filteredRelated.map((rel) => {
                 const relSlug = rel.slug || rel._id || rel.id;
                 const relImg = rel.image || rel.img || '/images/image-8.jpg';

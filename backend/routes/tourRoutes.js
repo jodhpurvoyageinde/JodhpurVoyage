@@ -529,6 +529,61 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   }
 });
 
+// PUT /api/tours/:id/gallery - Update tour slider images directly
+router.put('/:id/gallery', protect, adminOnly, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { gallery } = req.body;
+
+    if (!Array.isArray(gallery)) {
+      return res.status(400).json({ message: 'La galerie doit être un tableau d\'URLs.' });
+    }
+
+    const cleanGallery = gallery
+      .map(item => (typeof item === 'string' ? item.trim() : (item && item.url ? item.url.trim() : '')))
+      .filter(Boolean);
+
+    if (isMongoConnected()) {
+      const cleanId = String(id || '').trim();
+      const queryConditions = [
+        { slug: cleanId.toLowerCase() },
+        { customUrl: cleanId.toLowerCase() }
+      ];
+      if (cleanId.match(/^[0-9a-fA-F]{24}$/)) {
+        queryConditions.unshift({ _id: cleanId });
+      }
+
+      const updated = await Tour.findOneAndUpdate(
+        { $or: queryConditions },
+        { $set: { gallery: cleanGallery } },
+        { new: true, runValidators: false }
+      );
+      if (!updated) return res.status(404).json({ message: 'Circuit introuvable' });
+      return res.json({
+        message: 'Slider mis à jour avec succès',
+        gallery: updated.gallery,
+        tour: normalizeTour(updated)
+      });
+    }
+
+    const tourIndex = (memoryStore.tours || []).findIndex(
+      (t) => String(t._id) === id || t.slug === id.toLowerCase()
+    );
+    if (tourIndex === -1) {
+      return res.status(404).json({ message: 'Circuit introuvable' });
+    }
+    memoryStore.tours[tourIndex].gallery = cleanGallery;
+    return res.json({
+      message: 'Slider mis à jour avec succès (mémoire)',
+      gallery: cleanGallery,
+      tour: normalizeTour(memoryStore.tours[tourIndex])
+    });
+  } catch (error) {
+    console.error('Erreur update gallery:', error);
+    res.status(500).json({ message: error.message || 'Erreur lors de la mise à jour des images du slider' });
+  }
+});
+
 // DELETE /api/tours/:id
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {

@@ -87,6 +87,12 @@ const AdminLayout = ({ children, title, subtitle }) => {
               <span>Tours & Itineraries</span>
             </Link>
           </li>
+          <li className={`admin-nav-item ${isActive('/admin/itinerary-slider') ? 'active' : ''}`}>
+            <Link to="/admin/itinerary-slider">
+              <i className="fas fa-images"></i>
+              <span>Itinerary Sliders</span>
+            </Link>
+          </li>
           <li className={`admin-nav-item ${isActive('/admin/destinations') ? 'active' : ''}`}>
             <Link to="/admin/destinations">
               <i className="fas fa-map-marked-alt"></i>

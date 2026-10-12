@@ -35,6 +35,7 @@ import AdminSEO from './pages/admin/AdminSEO';
 import AdminCustomUrls from './pages/admin/AdminCustomUrls';
 import AdminMegaMenu from './pages/admin/AdminMegaMenu';
 import AdminPages from './pages/admin/AdminPages';
+import AdminItinerarySlider from './pages/admin/AdminItinerarySlider';
 import CustomUrlResolver from './components/CustomUrlResolver';
 import FloatingActions from './components/FloatingActions';
 
@@ -169,6 +170,8 @@ const AppLayout = () => {
           <Route path="/admin/custom-urls" element={<AdminCustomUrls />} />
           <Route path="/admin/mega-menu" element={<AdminMegaMenu />} />
           <Route path="/admin/pages" element={<AdminPages />} />
+          <Route path="/admin/itinerary-slider" element={<AdminItinerarySlider />} />
+          <Route path="/admin/itinerary-sliders" element={<AdminItinerarySlider />} />
 
           {/* Fallback & Custom URL Dynamic Resolver */}
           <Route path="*" element={<CustomUrlResolver />} />

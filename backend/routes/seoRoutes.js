@@ -42,19 +42,22 @@ router.get('/by-path', async (req, res) => {
     }
     const cleanPath = normalizeCustomPath(rawPath);
 
+    const isHome = cleanPath === '/' || cleanPath === '' || rawPath === '/';
+
     if (isMongoConnected()) {
       let config = await Seo.findOne({
         $or: [
           { customUrl: cleanPath },
           { customUrl: rawPath },
-          { pageKey: cleanPath.replace(/^\//, '') },
-          { pageKey: rawPath }
+          { pageKey: isHome ? 'home' : cleanPath.replace(/^\//, '') },
+          { pageKey: rawPath },
+          ...(isHome ? [{ pageKey: 'home' }, { customUrl: '/' }] : [])
         ]
       });
 
       if (!config) {
         const defaultItem = defaultSeoData.find(
-          (s) => s.customUrl === cleanPath || s.pageKey === cleanPath.replace(/^\//, '')
+          (s) => s.customUrl === cleanPath || (isHome && s.pageKey === 'home') || s.pageKey === cleanPath.replace(/^\//, '')
         );
         if (defaultItem) {
           config = new Seo(defaultItem);
@@ -69,7 +72,7 @@ router.get('/by-path', async (req, res) => {
     }
 
     const list = memoryStore.seo || defaultSeoData;
-    const item = list.find((s) => s.customUrl === cleanPath || s.pageKey === cleanPath.replace(/^\//, ''));
+    const item = list.find((s) => s.customUrl === cleanPath || (isHome && s.pageKey === 'home') || s.pageKey === cleanPath.replace(/^\//, ''));
     if (!item) {
       return res.status(404).json({ message: 'Configuration SEO non trouvée' });
     }

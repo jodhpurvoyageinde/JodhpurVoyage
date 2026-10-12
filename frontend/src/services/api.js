@@ -32,6 +32,7 @@ export const fetchTourBySlug = (slug) => API.get(`/tours/${slug}`);
 export const createTour = (data) => API.post('/tours', data);
 export const updateTour = (id, data) => API.put(`/tours/${id}`, data);
 export const deleteTour = (id) => API.delete(`/tours/${id}`);
+export const updateTourGallery = (id, gallery) => API.put(`/tours/${id}/gallery`, { gallery });
 export const unfeatureAllTours = () => API.post('/tours/unfeature-all');
 
 // Destinations & Categories API
@@ -93,6 +94,47 @@ export const uploadImage = (file) => {
     }
   });
 };
+
+export const uploadMultipleImages = async (files) => {
+  const fileArray = Array.from(files);
+  if (!fileArray.length) return { data: { success: true, files: [], urls: [] } };
+
+  // Try bulk multiple endpoint first
+  try {
+    const formData = new FormData();
+    fileArray.forEach((file) => {
+      formData.append('images', file);
+    });
+    const res = await API.post('/upload/multiple', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    if (res.data && res.data.urls) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('Batch upload endpoint failed, falling back to individual upload:', err);
+  }
+
+  // Graceful fallback to sequential individual uploads
+  const uploadedUrls = [];
+  for (const file of fileArray) {
+    const singleRes = await uploadImage(file);
+    if (singleRes.data && singleRes.data.url) {
+      uploadedUrls.push(singleRes.data.url);
+    }
+  }
+
+  return {
+    data: {
+      success: true,
+      urls: uploadedUrls,
+      files: uploadedUrls.map(url => ({ url }))
+    }
+  };
+};
+
 export const getUploadStatus = () => API.get('/upload/status');
 
 // Custom URLs API

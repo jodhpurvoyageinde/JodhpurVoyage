@@ -65,9 +65,9 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   width: 100% !important;
-  max-width: 100vw !important;
+  max-width: 100% !important;
 }
 
 body {
@@ -76,9 +76,9 @@ body {
   background-color: #FAFCFC;
   line-height: 1.6;
   font-weight: 400;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   width: 100% !important;
-  max-width: 100vw !important;
+  max-width: 100% !important;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -87,8 +87,24 @@ body {
 #root,
 .site-wrapper {
   width: 100% !important;
-  max-width: 100vw !important;
-  overflow-x: hidden !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+}
+
+/* Universal Text & Word Wrapping (Prevents mobile layout break from long URLs/words) */
+p, span, h1, h2, h3, h4, h5, h6, li, dt, dd, blockquote, figcaption {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Typography Rules */

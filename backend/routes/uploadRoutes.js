@@ -111,6 +111,63 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
+// POST /api/upload/multiple - Upload multiple images at once
+router.post('/multiple', upload.array('images', 30), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Aucun fichier image sélectionné.' });
+    }
+
+    const hasCloudinary = configureCloudinary();
+    const results = [];
+
+    for (const file of req.files) {
+      if (hasCloudinary) {
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'jodhpurvoyage',
+            resource_type: 'auto'
+          });
+
+          try {
+            if (fs.existsSync(file.path)) {
+              fs.unlinkSync(file.path);
+            }
+          } catch (e) {}
+
+          results.push({
+            url: result.secure_url,
+            public_id: result.public_id,
+            format: result.format,
+            provider: 'cloudinary'
+          });
+          continue;
+        } catch (cloudErr) {
+          console.warn('Cloudinary upload warning, falling back to local file server:', cloudErr.message);
+        }
+      }
+
+      const host = req.get('host');
+      const protocol = req.protocol;
+      const localUrl = `${protocol}://${host}/uploads/${file.filename}`;
+      results.push({
+        url: localUrl,
+        filename: file.filename,
+        provider: 'local'
+      });
+    }
+
+    return res.json({
+      success: true,
+      files: results,
+      urls: results.map(r => r.url)
+    });
+  } catch (err) {
+    console.error('Erreur upload multiple:', err);
+    res.status(500).json({ message: err.message || 'Erreur lors du téléchargement des images.' });
+  }
+});
+
 // GET /api/upload/status - Check Cloudinary configuration status
 router.get('/status', (req, res) => {
   const isConfigured = !!(

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import AdminImageUpload from '../../components/AdminImageUpload';
 import { 
@@ -8,7 +9,8 @@ import {
   createTour, 
   updateTour, 
   deleteTour, 
-  unfeatureAllTours 
+  unfeatureAllTours,
+  uploadMultipleImages
 } from '../../services/api';
 
 const DEFAULT_DESTINATIONS_PRESETS = [
@@ -62,6 +64,7 @@ const AdminTours = () => {
     rating: 4.9,
     reviewCount: 30,
     image: '/images/dest-rajasthan.jpg',
+    gallery: [],
     overview: '',
     highlights: ['Visit Taj Mahal', 'Jaipur Royal Palaces', 'Mehrangarh Fort of Jodhpur'],
     itinerary: [
@@ -81,6 +84,9 @@ const AdminTours = () => {
   };
 
   const [formData, setFormData] = useState(initialForm);
+  const [galleryUrlInput, setGalleryUrlInput] = useState('');
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const galleryFileInputRef = useRef(null);
 
   const loadTours = () => {
     setLoading(true);
@@ -228,6 +234,7 @@ const AdminTours = () => {
       seoDescription: tour.seoDescription || tour.metaDescription || '',
       metaDescription: tour.seoDescription || tour.metaDescription || '',
       highlights: tour.highlights || [],
+      gallery: Array.isArray(tour.gallery) && tour.gallery.length > 0 ? tour.gallery : (tour.image ? [tour.image] : []),
       itinerary: tour.itinerary || [],
       inclusions: tour.inclusions || [],
       exclusions: tour.exclusions || []
@@ -477,9 +484,17 @@ const AdminTours = () => {
                       )}
                     </td>
                     <td>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <Link 
+                          to={`/admin/itinerary-slider?tour=${t._id}`} 
+                          className="btn btn-sm btn-outline" 
+                          style={{ background: '#F0FDFA', color: '#0D9488', borderColor: '#99F6E4', padding: '4px 8px', fontSize: '0.78rem' }} 
+                          title="Manage Slider Images"
+                        >
+                          <i className="fas fa-images"></i> Slider ({Array.isArray(t.gallery) && t.gallery.length > 0 ? t.gallery.length : (t.image ? 1 : 0)})
+                        </Link>
                         <button className="btn btn-sm btn-outline" onClick={() => handleOpenEdit(t)} title="Edit">
-                          <i className="fas fa-edit"></i> Edit
+                          <i className="fas fa-edit"></i>
                         </button>
                         <button className="btn btn-sm" style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FECACA' }} onClick={() => handleDelete(t._id)} title="Delete">
                           <i className="fas fa-trash-alt"></i>
@@ -703,6 +718,221 @@ const AdminTours = () => {
                   onChange={(url) => setFormData({ ...formData, image: url })}
                   placeholder="https://... or click 'Upload from Device'"
                 />
+
+                {/* Itinerary Slider Images Management */}
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px', marginBottom: '18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                    <label className="form-label" style={{ fontWeight: '700', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', color: '#0F172A' }}>
+                      <i className="fas fa-images" style={{ color: '#0D9488' }}></i>
+                      Itinerary Slider Photos ({formData.gallery?.length || 0})
+                    </label>
+                    {editingTour && (
+                      <Link
+                        to={`/admin/itinerary-slider?tour=${editingTour._id}`}
+                        target="_blank"
+                        style={{ fontSize: '0.78rem', color: '#0D9488', fontWeight: '600', textDecoration: 'underline' }}
+                      >
+                        Open Full Dedicated Slider Manager ↗
+                      </Link>
+                    )}
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: '#64748B', margin: '0 0 12px' }}>
+                    These photos are dynamically rendered in the multiple-image slider on the Itinerary page.
+                  </p>
+
+                  {/* Add images controls */}
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
+                    <input
+                      type="file"
+                      ref={galleryFileInputRef}
+                      multiple
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={async (e) => {
+                        const files = e.target.files;
+                        if (!files || !files.length) return;
+                        setUploadingGallery(true);
+                        try {
+                          const res = await uploadMultipleImages(files);
+                          if (res.data?.urls?.length) {
+                            setFormData(prev => ({
+                              ...prev,
+                              gallery: [...(prev.gallery || []), ...res.data.urls]
+                            }));
+                          }
+                        } catch (err) {
+                          alert('Error uploading slider images');
+                        } finally {
+                          setUploadingGallery(false);
+                          if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline"
+                      style={{ background: '#FFFFFF', borderColor: '#0D9488', color: '#0D9488' }}
+                      disabled={uploadingGallery}
+                      onClick={() => galleryFileInputRef.current?.click()}
+                    >
+                      {uploadingGallery ? (
+                        <><i className="fas fa-spinner fa-spin"></i> Uploading...</>
+                      ) : (
+                        <><i className="fas fa-cloud-upload-alt"></i> Upload Multiple Photos</>
+                      )}
+                    </button>
+
+                    <div style={{ display: 'flex', gap: '4px', flex: 1, minWidth: '220px' }}>
+                      <input
+                        type="url"
+                        className="form-control"
+                        placeholder="Or paste photo URL..."
+                        style={{ fontSize: '0.82rem' }}
+                        value={galleryUrlInput}
+                        onChange={(e) => setGalleryUrlInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (galleryUrlInput.trim()) {
+                              setFormData(prev => ({
+                                ...prev,
+                                gallery: [...(prev.gallery || []), galleryUrlInput.trim()]
+                              }));
+                              setGalleryUrlInput('');
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        onClick={() => {
+                          if (galleryUrlInput.trim()) {
+                            setFormData(prev => ({
+                              ...prev,
+                              gallery: [...(prev.gallery || []), galleryUrlInput.trim()]
+                            }));
+                            setGalleryUrlInput('');
+                          }
+                        }}
+                      >
+                        <i className="fas fa-plus"></i> Add
+                      </button>
+                    </div>
+
+                    {formData.image && (!formData.gallery || !formData.gallery.includes(formData.image)) && (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        style={{ fontSize: '0.78rem' }}
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            gallery: [prev.image, ...(prev.gallery || [])]
+                          }));
+                        }}
+                        title="Include main banner in slider"
+                      >
+                        + Add Main Banner
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Slider Thumbnails Strip */}
+                  {formData.gallery && formData.gallery.length > 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
+                      {formData.gallery.map((imgUrl, gIdx) => (
+                        <div
+                          key={gIdx}
+                          style={{
+                            border: gIdx === 0 ? '2px solid #0D9488' : '1px solid #CBD5E1',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            background: '#FFFFFF',
+                            position: 'relative',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+                          }}
+                        >
+                          <div style={{ position: 'relative', height: '80px', background: '#0F172A' }}>
+                            <img
+                              src={imgUrl}
+                              alt={`Slide ${gIdx + 1}`}
+                              onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                            <span style={{ position: 'absolute', top: '4px', left: '4px', background: 'rgba(0,0,0,0.7)', color: '#FFFFFF', fontSize: '0.68rem', padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>
+                              #{gIdx + 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const list = formData.gallery.filter((_, i) => i !== gIdx);
+                                setFormData({ ...formData, gallery: list });
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '4px',
+                                right: '4px',
+                                background: '#EF4444',
+                                color: '#FFFFFF',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '20px',
+                                height: '20px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '0.65rem'
+                              }}
+                              title="Remove photo"
+                            >
+                              &times;
+                            </button>
+                          </div>
+                          {/* Reorder arrows */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', background: '#F8FAFC' }}>
+                            <button
+                              type="button"
+                              disabled={gIdx === 0}
+                              onClick={() => {
+                                const list = [...formData.gallery];
+                                const temp = list[gIdx - 1];
+                                list[gIdx - 1] = list[gIdx];
+                                list[gIdx] = temp;
+                                setFormData({ ...formData, gallery: list });
+                              }}
+                              style={{ border: 'none', background: 'transparent', cursor: gIdx === 0 ? 'not-allowed' : 'pointer', color: gIdx === 0 ? '#CBD5E1' : '#334155', padding: '2px 4px' }}
+                              title="Move left"
+                            >
+                              <i className="fas fa-chevron-left" style={{ fontSize: '0.7rem' }}></i>
+                            </button>
+                            <span style={{ fontSize: '0.7rem', color: '#64748B' }}>{gIdx === 0 ? 'Cover' : ''}</span>
+                            <button
+                              type="button"
+                              disabled={gIdx === formData.gallery.length - 1}
+                              onClick={() => {
+                                const list = [...formData.gallery];
+                                const temp = list[gIdx + 1];
+                                list[gIdx + 1] = list[gIdx];
+                                list[gIdx] = temp;
+                                setFormData({ ...formData, gallery: list });
+                              }}
+                              style={{ border: 'none', background: 'transparent', cursor: gIdx === formData.gallery.length - 1 ? 'not-allowed' : 'pointer', color: gIdx === formData.gallery.length - 1 ? '#CBD5E1' : '#334155', padding: '2px 4px' }}
+                              title="Move right"
+                            >
+                              <i className="fas fa-chevron-right" style={{ fontSize: '0.7rem' }}></i>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.78rem', color: '#94A3B8', fontStyle: 'italic', padding: '8px 0' }}>
+                      No custom slider photos yet. Upload photos above to display them in this itinerary's slider.
+                    </div>
+                  )}
+                </div>
 
                 {/* Subtitle / Tagline (Aperçu du Circuit Intro) */}
                 <div className="form-group" style={{ marginBottom: '18px' }}>
