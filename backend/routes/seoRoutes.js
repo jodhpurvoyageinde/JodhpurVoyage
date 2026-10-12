@@ -66,7 +66,7 @@ router.get('/by-path', async (req, res) => {
       }
 
       if (!config) {
-        return res.status(404).json({ message: 'Configuration SEO non trouvée pour ce chemin' });
+        return res.json(null);
       }
       return res.json(config);
     }
@@ -74,7 +74,7 @@ router.get('/by-path', async (req, res) => {
     const list = memoryStore.seo || defaultSeoData;
     const item = list.find((s) => s.customUrl === cleanPath || (isHome && s.pageKey === 'home') || s.pageKey === cleanPath.replace(/^\//, ''));
     if (!item) {
-      return res.status(404).json({ message: 'Configuration SEO non trouvée' });
+      return res.json(null);
     }
     return res.json(item);
   } catch (error) {
@@ -108,7 +108,7 @@ router.get('/:pageKey', async (req, res) => {
       }
 
       if (!config) {
-        return res.status(404).json({ message: 'Configuration SEO non trouvée pour cette page' });
+        return res.json(null);
       }
       return res.json(config);
     }
@@ -116,7 +116,7 @@ router.get('/:pageKey', async (req, res) => {
     const list = memoryStore.seo || defaultSeoData;
     const item = list.find((s) => s.pageKey === rawKey || s.customUrl === cleanPath);
     if (!item) {
-      return res.status(404).json({ message: 'Configuration SEO non trouvée' });
+      return res.json(null);
     }
     return res.json(item);
   } catch (error) {

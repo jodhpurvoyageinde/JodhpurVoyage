@@ -64,14 +64,34 @@ function fetchApiData($url) {
     return null;
 }
 
-$apiUrl = "https://jodhpurvoyage.onrender.com/api";
+function getApiBaseUrl() {
+    $localUrl = "http://127.0.0.1:5000/api";
+    $ctx = stream_context_create([
+        'http' => ['timeout' => 0.5, 'ignore_errors' => true]
+    ]);
+    $test = @file_get_contents("$localUrl/health", false, $ctx);
+    if ($test && strpos($test, 'OK') !== false) {
+        return $localUrl;
+    }
+    return "https://jodhpurvoyage.onrender.com/api";
+}
+
+$apiUrl = getApiBaseUrl();
 $metaTitle = null;
 $metaDesc = null;
 $metaKeywords = null;
 $metaImage = null;
 
+// Check for explicit Custom SEO override from Admin SEO table first
+$customData = fetchApiData("$apiUrl/seo/by-path?path=" . urlencode('/' . $cleanPath));
+if ($customData && !empty($customData['title'])) {
+    $metaTitle = $customData['title'] ?? null;
+    $metaDesc = $customData['description'] ?? null;
+    $metaKeywords = $customData['keywords'] ?? null;
+    $metaImage = $customData['ogImage'] ?? null;
+}
 // 1. Destination Route (/destinations/:slug or /destination-rajasthan)
-if (preg_match('/^destinations\/([^\/]+)/i', $cleanPath, $m) || $cleanPath === 'destination-rajasthan') {
+elseif (preg_match('/^destinations\/([^\/]+)/i', $cleanPath, $m) || $cleanPath === 'destination-rajasthan') {
     $destSlug = isset($m[1]) ? $m[1] : 'rajasthan';
     $destData = fetchApiData("$apiUrl/destinations/" . urlencode($destSlug));
     if ($destData) {
@@ -96,47 +116,41 @@ elseif (preg_match('/^blog\/([^\/]+)/i', $cleanPath, $m)) {
 else {
     $tourSlug = preg_replace('/^tours\//', '', $cleanPath);
     $tourData = fetchApiData("$apiUrl/tours/" . urlencode($tourSlug));
+    if (!$tourData && !str_starts_with($tourSlug, '-')) {
+        $tourData = fetchApiData("$apiUrl/tours/" . urlencode('-' . $tourSlug));
+    }
     if ($tourData) {
         $metaTitle = !empty($tourData['seoTitle']) ? $tourData['seoTitle'] : (!empty($tourData['metaTitle']) ? $tourData['metaTitle'] : ($tourData['title'] ?? 'Circuit') . " — Circuit Privé | Jodhpur Voyage");
         $metaDesc = !empty($tourData['seoDescription']) ? $tourData['seoDescription'] : (!empty($tourData['metaDescription']) ? $tourData['metaDescription'] : (!empty($tourData['subtitle']) ? $tourData['subtitle'] : "Découvrez le circuit " . ($tourData['title'] ?? '')));
         $metaKeywords = !empty($tourData['seoKeywords']) ? $tourData['seoKeywords'] : (!empty($tourData['metaKeywords']) ? $tourData['metaKeywords'] : strtolower($tourData['title'] ?? '') . ", voyage inde, circuit rajasthan");
         $metaImage = !empty($tourData['image']) ? $tourData['image'] : '/images/dest-rajasthan.jpg';
-    } else {
-        // Check Custom URL endpoint
-        $customData = fetchApiData("$apiUrl/seo/by-path?path=" . urlencode('/' . $cleanPath));
-        if ($customData) {
-            $metaTitle = $customData['title'] ?? null;
-            $metaDesc = $customData['description'] ?? null;
-            $metaKeywords = $customData['keywords'] ?? null;
-            $metaImage = $customData['ogImage'] ?? null;
-        }
     }
 }
 
 // If dynamic metadata found, replace in HTML
 if ($metaTitle) {
     $safeTitle = htmlspecialchars(trim($metaTitle), ENT_QUOTES, 'UTF-8');
-    $html = preg_replace('/<title>.*?<\/title>/s', "<title>{$safeTitle}</title>", $html);
-    $html = preg_replace('/<meta property="og:title" content=".*?" \/>/s', "<meta property=\"og:title\" content=\"{$safeTitle}\" />", $html);
-    $html = preg_replace('/<meta name="twitter:title" content=".*?" \/>/s', "<meta name=\"twitter:title\" content=\"{$safeTitle}\" />", $html);
+    $html = preg_replace('/<title>.*?<\/title>/is', "<title>{$safeTitle}</title>", $html);
+    $html = preg_replace('/<meta\s+property=["\']og:title["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta property=\"og:title\" content=\"{$safeTitle}\" />", $html);
+    $html = preg_replace('/<meta\s+name=["\']twitter:title["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta name=\"twitter:title\" content=\"{$safeTitle}\" />", $html);
 }
 
 if ($metaDesc) {
     $safeDesc = htmlspecialchars(trim(strip_tags($metaDesc)), ENT_QUOTES, 'UTF-8');
-    $html = preg_replace('/<meta name="description" content=".*?" \/>/s', "<meta name=\"description\" content=\"{$safeDesc}\" />", $html);
-    $html = preg_replace('/<meta property="og:description" content=".*?" \/>/s', "<meta property=\"og:description\" content=\"{$safeDesc}\" />", $html);
-    $html = preg_replace('/<meta name="twitter:description" content=".*?" \/>/s', "<meta name=\"twitter:description\" content=\"{$safeDesc}\" />", $html);
+    $html = preg_replace('/<meta\s+name=["\']description["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta name=\"description\" content=\"{$safeDesc}\" />", $html);
+    $html = preg_replace('/<meta\s+property=["\']og:description["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta property=\"og:description\" content=\"{$safeDesc}\" />", $html);
+    $html = preg_replace('/<meta\s+name=["\']twitter:description["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta name=\"twitter:description\" content=\"{$safeDesc}\" />", $html);
 }
 
 if ($metaKeywords) {
     $safeKeywords = htmlspecialchars(trim($metaKeywords), ENT_QUOTES, 'UTF-8');
-    $html = preg_replace('/<meta name="keywords" content=".*?" \/>/s', "<meta name=\"keywords\" content=\"{$safeKeywords}\" />", $html);
+    $html = preg_replace('/<meta\s+name=["\']keywords["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta name=\"keywords\" content=\"{$safeKeywords}\" />", $html);
 }
 
 if ($metaImage) {
     $safeImage = htmlspecialchars(trim($metaImage), ENT_QUOTES, 'UTF-8');
-    $html = preg_replace('/<meta property="og:image" content=".*?" \/>/s', "<meta property=\"og:image\" content=\"{$safeImage}\" />", $html);
-    $html = preg_replace('/<meta name="twitter:image" content=".*?" \/>/s', "<meta name=\"twitter:image\" content=\"{$safeImage}\" />", $html);
+    $html = preg_replace('/<meta\s+property=["\']og:image["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta property=\"og:image\" content=\"{$safeImage}\" />", $html);
+    $html = preg_replace('/<meta\s+name=["\']twitter:image["\']\s+content=["\'].*?["\']\s*\/?>/is', "<meta name=\"twitter:image\" content=\"{$safeImage}\" />", $html);
 }
 
 // Canonical

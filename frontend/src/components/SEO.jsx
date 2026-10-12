@@ -87,26 +87,37 @@ const SEO = ({
   useEffect(() => {
     let isMounted = true;
     const currentPath = location.pathname;
-    const targetKey = pageKey || (currentPath === '/' ? 'home' : currentPath.replace(/^\//, '').toLowerCase());
+    setSeoData(null);
 
     const loadSeo = async () => {
-      try {
-        const res = await fetchSeoPageConfig(targetKey);
-        if (isMounted && res.data) {
-          setSeoData(res.data);
-          return;
-        }
-      } catch (e) {
-        // Fallback to lookup by custom path
+      // 1. If explicit pageKey passed (e.g. home, destinations, tours)
+      if (pageKey) {
+        try {
+          const res = await fetchSeoPageConfig(pageKey);
+          if (isMounted && res.data) {
+            setSeoData(res.data);
+            return;
+          }
+        } catch (e) {}
       }
 
+      // 2. Check if an explicit custom SEO rule exists for this path in Admin SEO
       try {
         const resPath = await fetchSeoConfigByPath(currentPath);
-        if (isMounted && resPath.data) {
+        if (isMounted && resPath.data && resPath.data.title) {
           setSeoData(resPath.data);
+          return;
         }
-      } catch (e2) {
-        // Keep fallback
+      } catch (e2) {}
+
+      // 3. Fallback for root path ONLY if no propTitle is provided
+      if (!pageKey && !propTitle && (currentPath === '/' || currentPath === '')) {
+        try {
+          const resHome = await fetchSeoPageConfig('home');
+          if (isMounted && resHome.data) {
+            setSeoData(resHome.data);
+          }
+        } catch (e3) {}
       }
     };
 
@@ -115,14 +126,24 @@ const SEO = ({
     return () => {
       isMounted = false;
     };
-  }, [pageKey, location.pathname]);
+  }, [pageKey, location.pathname, propTitle]);
 
   useEffect(() => {
-    // 1. Title (Priority: Specific item prop > Page SEO config > Default site title)
+    // Check if seoData represents an explicit match for the current custom URL path
+    const hasExplicitPathMatch = Boolean(
+      seoData && seoData.customUrl && (
+        seoData.customUrl.toLowerCase() === location.pathname.toLowerCase() ||
+        seoData.customUrl.toLowerCase() === location.pathname.replace(/^\//, '').toLowerCase()
+      )
+    );
+
+    // 1. Title Priority: Specific prop (from Tour/Destination/Blog) > Explicit custom SEO > Generic page SEO > Default
     const finalTitle =
+      (hasExplicitPathMatch && seoData.title?.trim()) ||
       (propTitle && propTitle.trim()) ||
       (seoData?.title && seoData.title.trim()) ||
       'Jodhpur Voyage - Tour Opérateur en Inde et Népal | Agence de Voyage Spécialisée';
+
     document.title = finalTitle;
     let titleElement = document.querySelector('title');
     if (!titleElement) {
@@ -133,6 +154,7 @@ const SEO = ({
 
     // 2. Meta Description
     const finalDescription =
+      (hasExplicitPathMatch && seoData.description?.trim()) ||
       (propDescription && propDescription.trim()) ||
       (seoData?.description && seoData.description.trim()) ||
       'Jodhpur Voyage : agence locale francophone spécialiste des circuits sur mesure au Rajasthan, en Inde du Nord, Inde du Sud et Népal. Plus de 20 ans d’expérience avec chauffeurs privés et guides experts.';
@@ -140,6 +162,7 @@ const SEO = ({
 
     // 3. Keywords
     const finalKeywords =
+      (hasExplicitPathMatch && seoData.keywords?.trim()) ||
       (propKeywords && propKeywords.trim()) ||
       (seoData?.keywords && seoData.keywords.trim()) ||
       'voyage inde, circuit rajasthan, agence de voyage inde, voyage sur mesure nepal, chauffeur prive inde, jodhpur voyage, tour operateur inde, circuit francophone inde';

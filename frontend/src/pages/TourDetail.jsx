@@ -51,7 +51,12 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!initialTour || (tour && tour.slug !== slug && tour.customUrl !== slug)) {
+    if (initialTour) {
+      setTour(initialTour);
+      setLoading(false);
+      return;
+    }
+    if (slug) {
       setLoading(true);
       fetchTourBySlug(slug)
         .then((res) => {
@@ -62,18 +67,32 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
           console.error(err);
           setLoading(false);
         });
-    } else if (initialTour && !tour) {
-      setTour(initialTour);
-      setLoading(false);
     }
   }, [slug, initialTour]);
 
+  useEffect(() => {
+    if (initialTour) {
+      setTour(initialTour);
+      setLoading(false);
+    }
+  }, [initialTour]);
+
   if (loading) {
+    const seoObj = initialTour || tour;
     return (
-      <div style={{ textAlign: 'center', padding: '120px 20px' }}>
-        <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: 'var(--primary-color)' }}></i>
-        <p style={{ marginTop: '16px' }}>Chargement de l'itinéraire...</p>
-      </div>
+      <>
+        {seoObj && (
+          <SEO
+            title={seoObj.seoTitle || seoObj.metaTitle || `${seoObj.title} — Circuit Privé | Jodhpur Voyage`}
+            description={seoObj.seoDescription || seoObj.metaDescription || seoObj.subtitle}
+            keywords={seoObj.seoKeywords || seoObj.metaKeywords}
+          />
+        )}
+        <div style={{ textAlign: 'center', padding: '120px 20px' }}>
+          <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: 'var(--primary-color)' }}></i>
+          <p style={{ marginTop: '16px' }}>Chargement de l'itinéraire...</p>
+        </div>
+      </>
     );
   }
 
@@ -124,7 +143,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
         ogTitle={tour.seoTitle || tour.metaTitle || tour.title}
         ogDescription={tour.seoDescription || tour.metaDescription || tour.subtitle || `Circuit privatif ${tour.title}`}
         ogImage={tour.image || '/images/dest-rajasthan.jpg'}
-        canonicalUrl={`https://jodhpurvoyage.com/tours/${tour.slug || slug}`}
+        canonicalUrl={`https://jodhpurvoyage.com/${tour.customUrl ? tour.customUrl.replace(/^\//, '') : (tour.slug || slug)}`}
         structuredData={JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'TouristTrip',

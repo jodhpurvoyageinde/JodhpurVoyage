@@ -9,7 +9,9 @@ const createSlug = (text) => {
   return (text || '')
     .toLowerCase()
     .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
+    .trim()
+    .replace(/ +/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 const cleanHtml = (rawStr) => {
@@ -116,10 +118,10 @@ const normalizeTour = (tour) => {
       'Dépenses personnelles'
     ],
     faq: Array.isArray(doc.faq) ? doc.faq : [],
-    seoTitle: doc.seoTitle || doc.metaTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
+    seoTitle: doc.seoTitle || doc.metaTitle || (doc.duration ? `${cleanTitle} | Circuit ${doc.duration} | Jodhpur Voyage` : `${cleanTitle} — Circuit Privé | Jodhpur Voyage`),
     seoKeywords: doc.seoKeywords || doc.metaKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
     seoDescription: doc.seoDescription || doc.metaDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
-    metaTitle: doc.metaTitle || doc.seoTitle || `${cleanTitle} | Circuit ${doc.duration || ''} | Jodhpur Voyage`,
+    metaTitle: doc.metaTitle || doc.seoTitle || (doc.duration ? `${cleanTitle} | Circuit ${doc.duration} | Jodhpur Voyage` : `${cleanTitle} — Circuit Privé | Jodhpur Voyage`),
     metaKeywords: doc.metaKeywords || doc.seoKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
     metaDescription: doc.metaDescription || doc.seoDescription || cleanExcerpt || `Réservez le circuit ${cleanTitle} à ${doc.category || 'l\'Inde'} avec chauffeur privé, hébergements de charme et assistance 24h/24.`,
     createdAt: doc.createdAt,
@@ -346,13 +348,18 @@ router.get('/:identifier', async (req, res) => {
         tour = await Tour.findById(identifier);
       }
       if (!tour) {
+        const rawSlug = cleanId.replace(/^-+|-+$/g, '');
         tour = await Tour.findOne({
           $or: [
             { slug: cleanId },
+            { slug: rawSlug },
+            { slug: '-' + rawSlug },
             { customUrl: cleanId },
-            { customUrl: `/${cleanId}` }
+            { customUrl: `/${cleanId}` },
+            { customUrl: rawSlug },
+            { customUrl: `/${rawSlug}` }
           ]
-        });
+        }).sort({ updatedAt: -1 });
       }
       if (!tour) {
         tour = (memoryStore.tours || []).find((t) => t.slug === cleanId || t.customUrl === cleanId || String(t._id) === identifier);

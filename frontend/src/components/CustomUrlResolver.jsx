@@ -39,7 +39,7 @@ const CustomUrlResolver = () => {
       try {
         // 1. Try Resolving against backend CustomUrl rules
         const customRes = await resolveCustomUrl(path);
-        if (isMounted && customRes.data) {
+        if (isMounted && customRes && customRes.data && customRes.data.targetUrl) {
           const item = customRes.data;
 
           if (item.targetUrl) {
@@ -100,19 +100,49 @@ const CustomUrlResolver = () => {
             // Entity detail pages
             if (item.targetType === 'tour') {
               const slugPart = item.targetUrl.replace(/^\/tours\//, '').replace(/^\//, '');
-              setResolvedSlug(slugPart || item.targetId || path.replace(/^\//, ''));
+              const s = slugPart || item.targetId || path.replace(/^\//, '');
+              try {
+                const tourRes = await fetchTourBySlug(s);
+                if (isMounted && tourRes && tourRes.data) {
+                  setResolvedSlug(s);
+                  setResolvedData(tourRes.data);
+                  setResolvedType('tour');
+                  return;
+                }
+              } catch (e) {}
+              setResolvedSlug(s);
               setResolvedType('tour');
               return;
             }
             if (item.targetType === 'destination') {
               const slugPart = item.targetUrl.replace(/^\/destinations\//, '').replace(/^\//, '');
-              setResolvedSlug(slugPart || item.targetId || path.replace(/^\//, ''));
+              const s = slugPart || item.targetId || path.replace(/^\//, '');
+              try {
+                const destRes = await fetchDestinationBySlug(s);
+                if (isMounted && destRes && destRes.data) {
+                  setResolvedSlug(s);
+                  setResolvedData(destRes.data);
+                  setResolvedType('destination');
+                  return;
+                }
+              } catch (e) {}
+              setResolvedSlug(s);
               setResolvedType('destination');
               return;
             }
             if (item.targetType === 'blog') {
               const slugPart = item.targetUrl.replace(/^\/blog\//, '').replace(/^\//, '');
-              setResolvedSlug(slugPart || item.targetId || path.replace(/^\//, ''));
+              const s = slugPart || item.targetId || path.replace(/^\//, '');
+              try {
+                const blogRes = await fetchBlogBySlug(s);
+                if (isMounted && blogRes && blogRes.data) {
+                  setResolvedSlug(s);
+                  setResolvedData(blogRes.data);
+                  setResolvedType('blog');
+                  return;
+                }
+              } catch (e) {}
+              setResolvedSlug(s);
               setResolvedType('blog');
               return;
             }
@@ -127,15 +157,25 @@ const CustomUrlResolver = () => {
       }
 
       // 2. Try fetching entity directly by slug/customUrl
-      const cleanSlug = path.replace(/^\//, '').trim();
+      const cleanSlug = path.replace(/^\/+/, '').trim();
       if (!cleanSlug) {
         if (isMounted) setResolvedType('home');
         return;
       }
 
       try {
-        const tourRes = await fetchTourBySlug(cleanSlug);
-        if (isMounted && tourRes.data) {
+        let tourRes = null;
+        try {
+          tourRes = await fetchTourBySlug(cleanSlug);
+        } catch (e1) {
+          const stripped = cleanSlug.replace(/^-+/, '');
+          if (stripped && stripped !== cleanSlug) {
+            try {
+              tourRes = await fetchTourBySlug(stripped);
+            } catch (e2) {}
+          }
+        }
+        if (isMounted && tourRes && tourRes.data) {
           setResolvedSlug(cleanSlug);
           setResolvedData(tourRes.data);
           setResolvedType('tour');

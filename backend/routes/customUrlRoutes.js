@@ -78,7 +78,8 @@ router.get('/resolve', async (req, res) => {
       }
     }
 
-    res.status(404).json({ message: 'Aucune URL personnalisée trouvée pour ce chemin' });
+    // Return 200 with null instead of 404 to avoid console error spam when resolving unmatched URLs
+    return res.json(null);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la résolution du chemin' });
   }
