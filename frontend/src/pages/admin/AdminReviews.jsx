@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import AdminImageUpload from '../../components/AdminImageUpload';
+import RichTextEditor from '../../components/RichTextEditor';
 import { fetchAdminReviews, updateReview, deleteReview, createAdminReview } from '../../services/api';
 
 const DEFAULT_REVIEW_FORM = {
@@ -270,7 +271,7 @@ const AdminReviews = () => {
       {/* Modal Add / Edit Review (ONLY 4 FIELDS: Heading, Image, Short Description, Long Description) */}
       {isModalOpen && (
         <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '680px' }}>
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '920px', width: '96%' }}>
             <form onSubmit={handleSubmitForm} style={{ display: 'flex', flexDirection: 'column', height: '100%', margin: 0, overflow: 'hidden' }}>
               <div className="modal-header">
                 <h3 className="modal-title">
@@ -329,18 +330,16 @@ const AdminReviews = () => {
                 </div>
 
                 {/* Field 4: Long Description */}
-                <div className="form-group" style={{ marginBottom: '16px' }}>
-                  <label className="form-label" style={{ fontWeight: '600' }}>Description longue (Long Description) *</label>
-                  <textarea 
-                    rows="6" 
-                    required 
-                    className="form-control" 
-                    placeholder="Témoignage complet et détaillé du voyageur sur son expérience avec Jodhpur Voyage..." 
-                    value={formData.longDescription} 
-                    onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })} 
-                  ></textarea>
-                  <small style={{ color: 'var(--admin-text-muted)', fontSize: '0.8rem', marginTop: '4px', display: 'block' }}>
-                    Texte intégral affiché lors de l'ouverture du témoignage complet.
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <RichTextEditor
+                    label="Description longue (Long Description - Éditeur Enrichi avec Images) *"
+                    value={formData.longDescription || ''}
+                    onChange={(content) => setFormData((prev) => ({ ...prev, longDescription: content }))}
+                    placeholder="Témoignage complet et détaillé du voyageur... Vous pouvez insérer des titres, paragraphes, listes, citations et photos."
+                    minHeight="300px"
+                  />
+                  <small style={{ color: 'var(--admin-text-muted)', fontSize: '0.8rem', marginTop: '6px', display: 'block' }}>
+                    Texte intégral affiché lors de l'ouverture du témoignage complet avec mise en forme et images.
                   </small>
                 </div>
 

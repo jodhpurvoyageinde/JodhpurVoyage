@@ -251,7 +251,7 @@ const defaultDestinationsMap = {
     region: 'inde-du-sud'
   },
   bhoutan: {
-    name: 'Bhoutan – Royaume du Dragon',
+    name: 'Bhoutan',
     slug: 'bhoutan',
     heroTitle: 'Voyage au Bhoutan',
     h1Title: 'Bhoutan : Le Royaume du Bonheur National Brut & Monastères de l\'Himalaya',
@@ -669,7 +669,7 @@ const DestinationDetail = ({ overrideSlug }) => {
               <div key={pkg._id || pkg.slug || idx} className="tour-card">
                 <Link to={`/${pkg.slug}`} className="tour-card-image-wrap" title="Voir l'itinéraire du voyage">
                   <img src={pkg.image || activeDest.image || '/images/dest-rajasthan.jpg'} alt={pkg.title} />
-                  <span className="tour-card-badge">{pkg.badge || 'Populaire'}</span>
+                  <span className="tour-card-badge">{(pkg.badge && pkg.badge.trim().toLowerCase() === 'popular') ? 'Populaire' : (pkg.badge || 'Populaire')}</span>
                   <div className="tour-card-duration">
                     <i className="far fa-clock"></i> {pkg.duration}
                   </div>

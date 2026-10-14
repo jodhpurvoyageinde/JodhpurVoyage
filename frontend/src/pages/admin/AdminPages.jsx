@@ -59,6 +59,19 @@ const AdminPages = () => {
     loadPage(selectedPageKey);
   }, [selectedPageKey]);
 
+  useEffect(() => {
+    const pageFromUrl = searchParams.get('page');
+    if (pageFromUrl && pageFromUrl !== selectedPageKey) {
+      setSelectedPageKey(pageFromUrl);
+    }
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl) {
+      setActiveSectionTab(tabFromUrl);
+    } else if (pageFromUrl === 'notre-equipe') {
+      setActiveSectionTab('team');
+    }
+  }, [searchParams]);
+
   const loadPage = async (key) => {
     setLoading(true);
     try {
@@ -207,10 +220,14 @@ const AdminPages = () => {
       members: [
         ...(prev.members || []),
         {
-          name: 'New Team Member',
-          role: 'Guide / Travel Advisor',
-          desc: 'Brief biography and role description...',
-          image: '/images/image-12.jpg'
+          name: 'Nouveau Membre',
+          role: 'Guide Francophone',
+          category: 'Guides Francophones',
+          specialty: 'Rajasthan & Inde du Nord',
+          desc: 'Biographie et compétences du membre...',
+          quote: "« Partager notre amour profond pour l'Inde avec professionnalisme et authenticité. »",
+          image: '/images/image-12.jpg',
+          objectPosition: 'center 25%'
         }
       ]
     }));
@@ -510,9 +527,12 @@ const AdminPages = () => {
                     <input
                       type="text"
                       className="form-control"
-                      value={pageData.identity?.subtitle || ''}
-                      onChange={(e) => updateNested('identity', 'subtitle', e.target.value)}
-                      placeholder="e.g. Our Identity & Core Mission"
+                      value={pageData.intro?.subtitle || pageData.identity?.subtitle || ''}
+                      onChange={(e) => {
+                        updateNested('identity', 'subtitle', e.target.value);
+                        if (pageData.intro) updateNested('intro', 'subtitle', e.target.value);
+                      }}
+                      placeholder="e.g. VISAGES & TALENTS"
                     />
                   </div>
 
@@ -521,31 +541,52 @@ const AdminPages = () => {
                     <input
                       type="text"
                       className="form-control"
-                      value={pageData.identity?.title || ''}
-                      onChange={(e) => updateNested('identity', 'title', e.target.value)}
-                      placeholder="e.g. A Local, Passionate Travel Agency"
+                      value={pageData.intro?.title || pageData.identity?.title || ''}
+                      onChange={(e) => {
+                        updateNested('identity', 'title', e.target.value);
+                        if (pageData.intro) updateNested('intro', 'title', e.target.value);
+                      }}
+                      placeholder="e.g. À Vos Côtés de A à Z"
                     />
                   </div>
 
-                  <div className="form-group" style={{ marginBottom: '14px' }}>
-                    <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Paragraph 1</label>
-                    <textarea
-                      className="form-control"
-                      rows="4"
-                      value={pageData.identity?.paragraph1 || ''}
-                      onChange={(e) => updateNested('identity', 'paragraph1', e.target.value)}
-                    />
-                  </div>
+                  {pageData.intro ? (
+                    <div className="form-group" style={{ marginBottom: '14px' }}>
+                      <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Description</label>
+                      <textarea
+                        className="form-control"
+                        rows="4"
+                        value={pageData.intro?.description || pageData.identity?.paragraph1 || ''}
+                        onChange={(e) => {
+                          updateNested('intro', 'description', e.target.value);
+                          updateNested('identity', 'paragraph1', e.target.value);
+                        }}
+                        placeholder="De la conception de votre itinéraire..."
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="form-group" style={{ marginBottom: '14px' }}>
+                        <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Paragraph 1</label>
+                        <textarea
+                          className="form-control"
+                          rows="4"
+                          value={pageData.identity?.paragraph1 || ''}
+                          onChange={(e) => updateNested('identity', 'paragraph1', e.target.value)}
+                        />
+                      </div>
 
-                  <div className="form-group" style={{ marginBottom: '14px' }}>
-                    <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Paragraph 2</label>
-                    <textarea
-                      className="form-control"
-                      rows="4"
-                      value={pageData.identity?.paragraph2 || ''}
-                      onChange={(e) => updateNested('identity', 'paragraph2', e.target.value)}
-                    />
-                  </div>
+                      <div className="form-group" style={{ marginBottom: '14px' }}>
+                        <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Paragraph 2</label>
+                        <textarea
+                          className="form-control"
+                          rows="4"
+                          value={pageData.identity?.paragraph2 || ''}
+                          onChange={(e) => updateNested('identity', 'paragraph2', e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="form-group">
                     <label className="form-label" style={{ fontWeight: '600', fontSize: '0.85rem' }}>Paragraph 3</label>
@@ -854,28 +895,68 @@ const AdminPages = () => {
                       </label>
                     </div>
 
-                    <div className="form-group" style={{ marginBottom: '8px' }}>
-                      <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Full Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={member.name || ''}
-                        onChange={(e) => handleMemberChange(mIdx, 'name', e.target.value)}
-                      />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Nom & Prénom *</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={member.name || ''}
+                          onChange={(e) => handleMemberChange(mIdx, 'name', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Catégorie *</label>
+                        <select
+                          className="form-control"
+                          value={member.category || 'Guides Francophones'}
+                          onChange={(e) => handleMemberChange(mIdx, 'category', e.target.value)}
+                        >
+                          <option value="Direction">Direction</option>
+                          <option value="Guides Francophones">Guides Francophones</option>
+                          <option value="Management">Management</option>
+                          <option value="Chauffeurs Privés">Chauffeurs Privés</option>
+                          <option value="Conseillers">Conseillers</option>
+                          <option value="Autre">Autre</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Rôle / Titre *</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={member.role || ''}
+                          onChange={(e) => handleMemberChange(mIdx, 'role', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group" style={{ margin: 0 }}>
+                        <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Spécialité / Régions</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={member.specialty || ''}
+                          onChange={(e) => handleMemberChange(mIdx, 'specialty', e.target.value)}
+                          placeholder="e.g. Rajasthan, Inde du Nord..."
+                        />
+                      </div>
                     </div>
 
                     <div className="form-group" style={{ marginBottom: '8px' }}>
-                      <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Role / Designation</label>
+                      <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Citation / Devise (Quote)</label>
                       <input
                         type="text"
                         className="form-control"
-                        value={member.role || ''}
-                        onChange={(e) => handleMemberChange(mIdx, 'role', e.target.value)}
+                        value={member.quote || ''}
+                        onChange={(e) => handleMemberChange(mIdx, 'quote', e.target.value)}
+                        placeholder="« Partager notre amour profond pour l'Inde... »"
                       />
                     </div>
 
                     <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Biography</label>
+                      <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: '600' }}>Biographie</label>
                       <textarea
                         className="form-control"
                         rows="3"

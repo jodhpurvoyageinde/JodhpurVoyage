@@ -32,12 +32,10 @@ const DEFAULT_DESTINATION_GROUPS = [
   },
   {
     key: 'ouest',
-    title: "Inde de l'Ouest",
+    title: "Inde de l'Est & de l'Ouest",
     icon: 'fas fa-compass',
     subcategories: [
-      { name: 'Gujarat & Kutch', path: '/destinations/gujarat', searchKey: 'gujarat' },
-      { name: 'Désert du Rann de Kutch', path: '/destinations/gujarat', searchKey: 'kutch' },
-      { name: 'Palitana & Shatrunjaya', path: '/destinations/gujarat', searchKey: 'palitana' }
+      { name: 'Gujarat', path: '/destinations/gujarat', searchKey: 'gujarat' }
     ]
   },
   {
@@ -45,10 +43,7 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Népal',
     icon: 'fas fa-mountain',
     subcategories: [
-      { name: 'Népal & Katmandou', path: '/destinations/nepal', searchKey: 'nepal' },
-      { name: 'Vallée de Katmandou', path: '/destinations/nepal', searchKey: 'katmandou' },
-      { name: 'Pokhara & Annapurnas', path: '/destinations/nepal', searchKey: 'pokhara' },
-      { name: 'Parc National de Chitwan', path: '/destinations/nepal', searchKey: 'chitwan' }
+      { name: 'Népal', path: '/destinations/nepal', searchKey: 'nepal' }
     ]
   },
   {
@@ -56,10 +51,7 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Bhoutan',
     icon: 'fas fa-place-of-worship',
     subcategories: [
-      { name: 'Bhoutan – Royaume du Dragon', path: '/destinations/bhoutan', searchKey: 'bhoutan' },
-      { name: 'Paro & Nid du Tigre', path: '/destinations/bhoutan', searchKey: 'paro' },
-      { name: 'Punakha & Dzongs', path: '/destinations/bhoutan', searchKey: 'punakha' },
-      { name: 'Thimphu Royale', path: '/destinations/bhoutan', searchKey: 'thimphu' }
+      { name: 'Bhoutan', path: '/destinations/bhoutan', searchKey: 'bhoutan' }
     ]
   }
 ];
@@ -219,7 +211,7 @@ const Navbar = () => {
           },
           ouest: {
             key: 'ouest',
-            title: "Inde de l'Ouest",
+            title: "Inde de l'Est & de l'Ouest",
             icon: 'fas fa-compass',
             subcategories: [...DEFAULT_DESTINATION_GROUPS[2].subcategories]
           },
@@ -237,18 +229,55 @@ const Navbar = () => {
           }
         };
 
+        const EXCLUDED_NAMES = [
+          'désert du rann de kutch',
+          'desert du rann de kutch',
+          'palitana & shatrunjaya',
+          'palitana',
+          'vallée de katmandou',
+          'vallee de katmandou',
+          'pokhara & annapurnas',
+          'parc national de chitwan',
+          'bhoutan – royaume du dragon',
+          'bhoutan - royaume du dragon',
+          'paro & nid du tigre',
+          'punakha & dzongs',
+          'thimphu royale'
+        ];
+
         list.forEach((d) => {
           if (d.published === false) return;
+          let name = d.name || d.title || '';
+          const nameLower = name.trim().toLowerCase();
+
+          // Exclude requested deleted submenus
+          if (EXCLUDED_NAMES.some(ex => nameLower === ex || nameLower.startsWith(ex))) {
+            return;
+          }
+
+          // Normalize 'Bhoutan – Royaume du Dragon' to clean 'Bhoutan'
+          if (nameLower.includes('bhoutan') && nameLower.includes('royaume du dragon')) {
+            name = 'Bhoutan';
+          }
+
           const reg = (d.region || 'inde-du-nord').toLowerCase();
 
           let colKey = 'nord';
           if (reg === 'nepal' || reg.includes('nepal')) colKey = 'nepal';
           else if (reg === 'bhoutan' || reg.includes('bhoutan')) colKey = 'bhoutan';
-          else if (reg === 'inde-de-louest' || reg === 'inde-du-ouest' || reg === 'ouest' || reg.includes('ouest') || reg === 'gujarat') colKey = 'ouest';
+          else if (
+            reg === 'inde-de-louest' || 
+            reg === 'inde-du-ouest' || 
+            reg === 'ouest' || 
+            reg.includes('ouest') || 
+            reg === 'gujarat' ||
+            reg === 'centre-est' ||
+            reg.includes('est') ||
+            (d.slug && (d.slug.includes('darjeeling') || d.slug.includes('sikkim') || d.slug.includes('gujarat')))
+          ) colKey = 'ouest';
           else if (reg === 'inde-du-sud' || reg === 'sud' || reg === 'kerala' || reg === 'karnataka' || reg === 'goa' || reg === 'orissa') colKey = 'sud';
           else colKey = 'nord';
 
-          const name = d.name || d.title;
           const path = d.customUrl || `/destinations/${d.slug}`;
 
           const existingIdx = groupMap[colKey].subcategories.findIndex(

@@ -135,6 +135,9 @@ const AdminDashboard = () => {
         <Link to="/admin/reviews" className="btn btn-outline btn-sm">
           <i className="fas fa-star"></i> Moderate Reviews ({metrics.pendingReviews || 0})
         </Link>
+        <Link to="/admin/hero-slider" className="btn btn-outline btn-sm">
+          <i className="fas fa-sliders-h"></i> Hero Slider (Home)
+        </Link>
         <Link to="/admin/blogs" className="btn btn-outline btn-sm">
           <i className="fas fa-pen-nib"></i> Write Blog Post
         </Link>

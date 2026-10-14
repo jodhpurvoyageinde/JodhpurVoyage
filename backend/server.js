@@ -19,6 +19,7 @@ import seoRoutes from './routes/seoRoutes.js';
 import customUrlRoutes from './routes/customUrlRoutes.js';
 import megaMenuRoutes from './routes/megaMenuRoutes.js';
 import pageRoutes from './routes/pageRoutes.js';
+import heroSliderRoutes from './routes/heroSliderRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,6 +68,7 @@ const registerRoutes = (prefix) => {
   app.use(`${prefix}/custom-urls`, customUrlRoutes);
   app.use(`${prefix}/mega-menu`, megaMenuRoutes);
   app.use(`${prefix}/pages`, pageRoutes);
+  app.use(`${prefix}/hero-slider`, heroSliderRoutes);
 };
 
 // Mount configured API prefix

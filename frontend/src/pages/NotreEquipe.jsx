@@ -149,7 +149,9 @@ const NotreEquipe = () => {
             ...res.data,
             hero: { ...prev.hero, ...(res.data.hero || {}) },
             intro: { ...prev.intro, ...(res.data.intro || {}) },
-            members: (res.data.members && res.data.members.length >= 6) ? res.data.members : DEFAULT_TEAM_MEMBERS,
+            members: (Array.isArray(res.data.members) && res.data.members.length > 0) 
+              ? res.data.members 
+              : DEFAULT_TEAM_MEMBERS,
             contactCard: { ...prev.contactCard, ...(res.data.contactCard || {}) }
           }));
         }
@@ -157,13 +159,37 @@ const NotreEquipe = () => {
       .catch((err) => console.error('Error loading team content:', err));
   }, []);
 
-  const { hero, intro, members, contactCard } = content;
+  const hero = content.hero || {};
+  const intro = content.intro || content.identity || {};
+  const members = (Array.isArray(content.members) && content.members.length > 0) ? content.members : DEFAULT_TEAM_MEMBERS;
+  const contactCard = content.contactCard || {};
 
-  const categories = ['Tous', 'Direction', 'Guides Francophones', 'Management', 'Chauffeurs Privés'];
+  const getMemberCategory = (member) => {
+    if (member?.category) return member.category;
+    const role = (member?.role || '').toLowerCase();
+    const name = (member?.name || '').toLowerCase();
+    if (role.includes('fondateur') || role.includes('directeur') || name.includes('singh')) return 'Direction';
+    if (role.includes('chauffeur') || name.includes('om') || name.includes('monu')) return 'Chauffeurs Privés';
+    if (role.includes('comptable') || role.includes('logistique') || role.includes('manager')) return 'Management';
+    return 'Guides Francophones';
+  };
+
+  const categories = [
+    'Tous', 
+    'Direction', 
+    'Guides Francophones', 
+    'Management', 
+    'Chauffeurs Privés',
+    ...Array.from(new Set(
+      members
+        .map(m => getMemberCategory(m))
+        .filter(c => c && !['Tous', 'Direction', 'Guides Francophones', 'Management', 'Chauffeurs Privés'].includes(c))
+    ))
+  ];
 
   const filteredMembers = activeCategory === 'Tous' 
-    ? (members || DEFAULT_TEAM_MEMBERS)
-    : (members || DEFAULT_TEAM_MEMBERS).filter(m => m.category === activeCategory);
+    ? members
+    : members.filter(m => getMemberCategory(m) === activeCategory);
 
   return (
     <div style={{ backgroundColor: '#FAF8F5', color: '#1E293B' }}>
@@ -247,7 +273,7 @@ const NotreEquipe = () => {
                     }} 
                     onError={(e) => { e.currentTarget.src = '/images/image-12.jpg'; }} 
                   />
-                  {member.category && (
+                  {getMemberCategory(member) && (
                     <span 
                       style={{ 
                         position: 'absolute', 
@@ -262,7 +288,7 @@ const NotreEquipe = () => {
                         boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
                       }}
                     >
-                      {member.category}
+                      {getMemberCategory(member)}
                     </span>
                   )}
                 </div>

@@ -406,6 +406,20 @@ router.post('/', protect, adminOnly, async (req, res) => {
     }
     tourData.cities = formattedCities;
 
+    // Format and sanitize highlights (Les Points Forts du Voyage)
+    if (tourData.highlights !== undefined) {
+      if (typeof tourData.highlights === 'string') {
+        tourData.highlights = tourData.highlights
+          .split(/\r?\n/)
+          .map(h => stripHtmlTags(h).trim())
+          .filter(Boolean);
+      } else if (Array.isArray(tourData.highlights)) {
+        tourData.highlights = tourData.highlights
+          .map(h => (typeof h === 'string' ? stripHtmlTags(h).trim() : ''))
+          .filter(Boolean);
+      }
+    }
+
     if (!tourData.image && tourData.coverImage) {
       tourData.image = tourData.coverImage;
     }
@@ -494,6 +508,20 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
           slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : '')
         };
       }).filter(c => c.name);
+    }
+
+    // Format and sanitize highlights (Les Points Forts du Voyage)
+    if (updateData.highlights !== undefined) {
+      if (typeof updateData.highlights === 'string') {
+        updateData.highlights = updateData.highlights
+          .split(/\r?\n/)
+          .map(h => stripHtmlTags(h).trim())
+          .filter(Boolean);
+      } else if (Array.isArray(updateData.highlights)) {
+        updateData.highlights = updateData.highlights
+          .map(h => (typeof h === 'string' ? stripHtmlTags(h).trim() : ''))
+          .filter(Boolean);
+      }
     }
 
     if (updateData.coverImage && !updateData.image) {

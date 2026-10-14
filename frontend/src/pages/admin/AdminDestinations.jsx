@@ -53,7 +53,7 @@ const REGION_TABS = [
   { key: 'inde-du-nord', label: 'North India', icon: 'fas fa-gopuram' },
   { key: 'rajasthan', label: 'Rajasthan', icon: 'fas fa-chess-king' },
   { key: 'inde-du-sud', label: 'South India', icon: 'fas fa-tree' },
-  { key: 'inde-de-louest', label: "West India (Inde de l'Ouest)", icon: 'fas fa-compass' },
+  { key: 'inde-de-louest', label: "Inde de l'Est & de l'Ouest", icon: 'fas fa-compass' },
   { key: 'ladakh', label: 'Ladakh & Himalaya', icon: 'fas fa-mountain' },
   { key: 'gujarat', label: 'Gujarat', icon: 'fas fa-sun' },
   { key: 'nepal', label: 'Nepal', icon: 'fas fa-hiking' },
@@ -433,7 +433,7 @@ const AdminDestinations = () => {
                       <option value="inde-du-nord">Inde du Nord (Delhi, Agra, Varanasi, Amritsar, Rishikesh...)</option>
                       <option value="rajasthan">Rajasthan (Jodhpur, Jaipur, Udaipur, Jaisalmer...)</option>
                       <option value="inde-du-sud">Inde du Sud (Kerala, Tamil Nadu, Karnataka, Goa...)</option>
-                      <option value="inde-de-louest">Inde de l'Ouest / Inde du Ouest (Gujarat, Rann de Kutch, Palitana...)</option>
+                      <option value="inde-de-louest">Inde de l'Est & de l'Ouest (Gujarat, Darjeeling, Sikkim...)</option>
                       <option value="ladakh">Himalaya & Ladakh (Leh, Spiti, Dharamsala, Sikkim...)</option>
                       <option value="gujarat">Gujarat (Rann de Kutch, Ahmedabad, Palitana...)</option>
                       <option value="nepal">Népal (Katmandou, Chitwan, Pokhara...)</option>

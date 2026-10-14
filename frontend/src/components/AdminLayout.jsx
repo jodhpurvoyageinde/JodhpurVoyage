@@ -31,9 +31,14 @@ const AdminLayout = ({ children, title, subtitle }) => {
     navigate('/admin/login');
   };
 
+  const isTeamPage = location.pathname === '/admin/pages' && new URLSearchParams(location.search).get('page') === 'notre-equipe';
+
   const isActive = (path) => {
     if (path === '/admin/dashboard') {
       return location.pathname === '/admin' || location.pathname === '/admin/dashboard';
+    }
+    if (path === '/admin/pages') {
+      return location.pathname === '/admin/pages' && !isTeamPage;
     }
     return location.pathname.startsWith(path);
   };
@@ -87,6 +92,12 @@ const AdminLayout = ({ children, title, subtitle }) => {
               <span>Tours & Itineraries</span>
             </Link>
           </li>
+          <li className={`admin-nav-item ${isActive('/admin/hero-slider') ? 'active' : ''}`}>
+            <Link to="/admin/hero-slider">
+              <i className="fas fa-sliders-h"></i>
+              <span>Hero Slider (Accueil)</span>
+            </Link>
+          </li>
           <li className={`admin-nav-item ${isActive('/admin/itinerary-slider') ? 'active' : ''}`}>
             <Link to="/admin/itinerary-slider">
               <i className="fas fa-images"></i>
@@ -115,6 +126,12 @@ const AdminLayout = ({ children, title, subtitle }) => {
             <Link to="/admin/pages">
               <i className="fas fa-palette"></i>
               <span>Pages & Sections CMS</span>
+            </Link>
+          </li>
+          <li className={`admin-nav-item ${isTeamPage ? 'active' : ''}`}>
+            <Link to="/admin/pages?page=notre-equipe&tab=team">
+              <i className="fas fa-users"></i>
+              <span>Notre Équipe (Team)</span>
             </Link>
           </li>
           <li className={`admin-nav-item ${isActive('/admin/seo') ? 'active' : ''}`}>

@@ -10,6 +10,7 @@ import Booking from '../models/Booking.js';
 import ContactMessage from '../models/ContactMessage.js';
 import Review from '../models/Review.js';
 import BlogPost from '../models/BlogPost.js';
+import HeroSlider from '../models/HeroSlider.js';
 
 import {
   adminUser,
@@ -20,6 +21,7 @@ import {
   sampleMessages
 } from './seedData.js';
 import { reviewsData } from './reviewsSeedData.js';
+import { defaultHeroSlidesData } from './heroSliderSeedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +66,7 @@ const seedDatabase = async () => {
     await BlogPost.deleteMany();
     await Booking.deleteMany();
     await ContactMessage.deleteMany();
+    await HeroSlider.deleteMany();
 
     console.log('👤 Création du compte administrateur...');
     await User.create(adminUser);
@@ -89,6 +92,10 @@ const seedDatabase = async () => {
     await Booking.insertMany(sampleBookings);
     await ContactMessage.insertMany(sampleMessages);
     console.log(`   👉 Demandes & messages insérés pour le tableau de bord`);
+
+    console.log('🖼️  Insertion des slides de la page d\'accueil (Hero Slider)...');
+    await HeroSlider.insertMany(defaultHeroSlidesData);
+    console.log(`   👉 ${defaultHeroSlidesData.length} hero slides insérées`);
 
     console.log('\n🎉 INITIALISATION DE LA BASE DE DONNÉES RÉUSSIE !');
     console.log('===================================================');

@@ -5407,17 +5407,20 @@ a.review-card {
   flex: 1;
 }
 
-.cta-callout-text .contact-info-title {
-  color: var(--color-white);
+.cta-callout-text .contact-info-title,
+.mesure-cta-callout .contact-info-title {
+  color: #FFFFFF !important;
   display: block;
-  font-size: 0.98rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
-.cta-callout-text .badge-verify-text {
-  color: #B0C4C5;
-  font-size: 0.84rem;
+.cta-callout-text .badge-verify-text,
+.mesure-cta-callout .badge-verify-text {
+  color: #E2E8F0 !important;
+  font-size: 0.92rem;
+  display: block;
 }
 
 .cta-callout-btn {

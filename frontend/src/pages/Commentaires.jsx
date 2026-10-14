@@ -114,8 +114,8 @@ const Commentaires = () => {
               <span>{filteredReviews.length} {filteredReviews.length > 1 ? 'Commentaires Voyageurs' : 'Commentaire Voyageur'}</span>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', flex: '1', maxWidth: '560px', justifyContent: 'flex-end' }}>
-              <div className="reviews-search-box" style={{ margin: 0, flex: '1', minWidth: '240px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', flex: '1', maxWidth: '380px', justifyContent: 'flex-end' }}>
+              <div className="reviews-search-box" style={{ margin: 0, width: '100%' }}>
                 <i className="fas fa-search reviews-search-icon"></i>
                 <input 
                   type="text" 
@@ -126,15 +126,6 @@ const Commentaires = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-
-              <button 
-                type="button" 
-                className="btn btn-primary btn-sm"
-                onClick={() => setIsReviewModalOpen(true)}
-                style={{ padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}
-              >
-                <i className="fas fa-pen"></i> Laisser un avis
-              </button>
             </div>
           </div>
         </div>
@@ -321,9 +312,20 @@ const Commentaires = () => {
                 </blockquote>
               )}
 
-              <div style={{ fontSize: '0.98rem', color: '#334155', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
-                {selectedReview.longDescription || selectedReview.comment || selectedReview.shortDescription || selectedReview.excerpt}
-              </div>
+              {(() => {
+                const text = selectedReview.longDescription || selectedReview.comment || selectedReview.shortDescription || selectedReview.excerpt || '';
+                return text && /<[a-z][\s\S]*>/i.test(text) ? (
+                  <div 
+                    className="modal-rich-review-content"
+                    style={{ fontSize: '0.98rem', color: '#334155', lineHeight: '1.8' }}
+                    dangerouslySetInnerHTML={{ __html: text }}
+                  />
+                ) : (
+                  <div style={{ fontSize: '0.98rem', color: '#334155', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
+                    {text}
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="modal-footer">

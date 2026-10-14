@@ -167,7 +167,7 @@ const allDestinationsData = [
   // 17. Bhoutan
   {
     category: 'bhoutan',
-    title: 'Bhoutan – Royaume du Dragon',
+    title: 'Bhoutan',
     slug: 'bhoutan',
     image: '/images/jaipur-travel.jpg',
     excerpt: 'Le monastère suspendu du Nid du Tigre (Taktshang), les forteresses Dzongs de Paro et Punakha, et le pays du Bonheur National Brut.',
@@ -323,7 +323,7 @@ const Destinations = () => {
               className={`filter-btn ${activeFilter === 'ouest' ? 'active' : ''}`}
               onClick={() => setActiveFilter('ouest')}
             >
-              Inde de l'Ouest
+              Inde de l'Est & de l'Ouest
             </button>
             <button
               className={`filter-btn ${activeFilter === 'nepal' ? 'active' : ''}`}

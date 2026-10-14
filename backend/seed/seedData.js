@@ -318,7 +318,7 @@ export const destinationsData = [
     published: true
   },
   {
-    name: 'Bhoutan – Royaume du Dragon',
+    name: 'Bhoutan',
     slug: 'bhoutan',
     region: 'bhoutan',
     tagline: 'Le Pays du Bonheur National Brut et le Nid du Tigre',

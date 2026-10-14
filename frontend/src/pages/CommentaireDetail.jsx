@@ -162,7 +162,13 @@ const CommentaireDetail = () => {
                 </div>
 
                 <div className="commentaire-article-text">
-                  {paragraphs.length > 0 ? (
+                  {fullContent && /<[a-z][\s\S]*>/i.test(fullContent) ? (
+                    <div 
+                      className="commentaire-rich-content" 
+                      style={{ lineHeight: '1.8', color: 'var(--text-main)' }} 
+                      dangerouslySetInnerHTML={{ __html: fullContent }} 
+                    />
+                  ) : paragraphs.length > 0 ? (
                     paragraphs.map((p, idx) => (
                       <p key={idx} className="commentaire-paragraph">
                         {p}

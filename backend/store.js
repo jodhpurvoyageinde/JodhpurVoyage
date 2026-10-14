@@ -11,6 +11,7 @@ import {
 } from './seed/seedData.js';
 
 import { defaultSeoData } from './seed/seoData.js';
+import { defaultHeroSlidesData } from './seed/heroSliderSeedData.js';
 
 // In-Memory store initialized with prototype seed data
 export const memoryStore = {
@@ -58,6 +59,12 @@ export const memoryStore = {
   seo: defaultSeoData.map((s, idx) => ({
     _id: `seo_${idx + 1}`,
     ...s,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  })),
+  heroSliders: defaultHeroSlidesData.map((slide, idx) => ({
+    _id: `slide_${idx + 1}`,
+    ...slide,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }))

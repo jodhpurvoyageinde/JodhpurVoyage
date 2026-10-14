@@ -544,7 +544,7 @@ const Tours = () => {
                     <div key={tour._id || tour.slug} className="tour-card">
                       <Link to={`/${tour.slug}`} className="tour-card-image-wrap">
                         <img src={tour.image || '/images/dest-rajasthan.jpg'} alt={tour.title} />
-                        <span className="tour-card-badge">{tour.badge || 'Populaire'}</span>
+                        <span className="tour-card-badge">{(tour.badge && tour.badge.trim().toLowerCase() === 'popular') ? 'Populaire' : (tour.badge || 'Populaire')}</span>
                         <div className="tour-card-duration"><i className="far fa-clock"></i> {tour.duration}</div>
                       </Link>
                       <div className="tour-card-body">

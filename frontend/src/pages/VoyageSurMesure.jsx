@@ -250,11 +250,17 @@ const VoyageSurMesure = () => {
                 Dites-nous si vous préférez axer votre voyage sur les grands espaces verts, la musique, la danse, la cuisine locale, l’Histoire, l’architecture, les maharajas, les grands mammifères du sous-continent indien, le yoga… ou concocter un mélange à l’image de la diversité de l’Inde et du Népal. N’hésitez pas à vous inspirer de nos circuits tout faits (A consulter dans ‘destinations’ dans notre menu principal) créés après <strong>20+ ans d’expérience</strong> dans le domaine. Dites-nous si vous voulez des hôtels de luxe, des cabanes en terre, séjourner chez l’habitant, un véhicule, un chauffeur, un guide… personnalisez vos itinéraires au détail près.
               </p>
 
-              <div className="mesure-cta-callout">
-                <i className="fas fa-paper-plane score-stars"></i>
-                <div>
-                  <strong className="contact-info-title">Écrivez-nous à travers le formulaire ci-dessous.</strong>
-                  <span className="badge-verify-text">Tout un monde vous attend. À bientôt ! 🙂</span>
+              <div className="mesure-cta-callout" style={{ color: '#ffffff' }}>
+                <div className="cta-callout-icon" style={{ background: 'linear-gradient(135deg, #D97706, #B45309)', color: '#ffffff' }}>
+                  <i className="fas fa-paper-plane"></i>
+                </div>
+                <div className="cta-callout-text">
+                  <strong className="contact-info-title" style={{ color: '#ffffff', fontSize: '1.05rem', fontWeight: 700, display: 'block' }}>
+                    Écrivez-nous à travers le formulaire ci-dessous.
+                  </strong>
+                  <span className="badge-verify-text" style={{ color: '#E2E8F0', fontSize: '0.92rem', display: 'block', marginTop: '4px' }}>
+                    Tout un monde vous attend. À bientôt ! 🙂
+                  </span>
                 </div>
               </div>
             </div>
@@ -264,18 +270,20 @@ const VoyageSurMesure = () => {
               <div className="welcome-collage">
                 <div className="collage-main-frame">
                   <img
-                    src="/images/Voyage-Jaisalmer.jpg"
-                    alt="Château & Désert du Rajasthan"
+                    src="/images/dest-tajmahal.jpg"
+                    alt="Taj Mahal & Splendeur de l'Inde"
                     className="collage-img-main"
+                    style={{ objectPosition: 'center 30%' }}
                   />
                   <div className="collage-img-overlay"></div>
                 </div>
 
                 <div className="collage-secondary-frame">
                   <img
-                    src="/images/image-8.jpg"
-                    alt="Taj Mahal et spiritualité"
+                    src="/images/dest-nepal.jpg"
+                    alt="Népal & Sommets de l'Himalaya"
                     className="collage-img-secondary"
+                    style={{ objectPosition: 'center center' }}
                   />
                 </div>
 

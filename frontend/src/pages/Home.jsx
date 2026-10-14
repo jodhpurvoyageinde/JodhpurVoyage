@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BookingModal from '../components/BookingModal';
 import SEO from '../components/SEO';
-import { fetchTours, fetchDestinations } from '../services/api';
+import { fetchTours, fetchDestinations, fetchHeroSlides, fetchBlogs } from '../services/api';
 
 const heroSlidesData = [
   {
@@ -294,6 +294,33 @@ const testimonialsData = [
   }
 ];
 
+const fallbackBlogData = [
+  {
+    title: 'Jaisalmer, la ville dorée',
+    slug: 'jaisalmer-la-ville-doree-du-rajasthan',
+    excerpt: 'Plongez dans la magie des ruelles en grès jaune et de la citadelle vivante du désert.',
+    coverImage: '/images/Voyage-Jaisalmer.jpg',
+    category: 'Article Vedette',
+    featured: true
+  },
+  {
+    title: "Comprendre la cérémonie de l'Aarti à Varanasi",
+    slug: 'comprendre-la-ceremonie-de-laarti-a-varanasi',
+    excerpt: "Au coucher du soleil sur les ghats de Dashashwamedh, découvrez l'un des rituels les plus sacrés d'Inde.",
+    coverImage: '/images/image-8.jpg',
+    category: 'Spiritualité',
+    featured: false
+  },
+  {
+    title: 'Comment préparer son premier voyage en Inde',
+    slug: 'comment-preparer-son-premier-voyage-en-inde',
+    excerpt: 'Vaccins, visas, saisons idéales, tenue vestimentaire et coutumes locales : nos conseils indispensables.',
+    coverImage: '/images/slide8-300x176.jpg',
+    category: 'Conseils Pratiques',
+    featured: false
+  }
+];
+
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -308,8 +335,10 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [dynamicDestinations, setDynamicDestinations] = useState([]);
+  const [dynamicHeroSlides, setDynamicHeroSlides] = useState([]);
+  const [recentBlogs, setRecentBlogs] = useState([]);
 
-  // Fetch dynamic tour packages and destinations from backend
+  // Fetch dynamic tour packages, destinations, hero slides and recent blogs from backend
   useEffect(() => {
     let isMounted = true;
     fetchTours()
@@ -332,10 +361,32 @@ const Home = () => {
       })
       .catch((err) => console.error('Erreur chargement destinations dynamiques:', err));
 
+    fetchHeroSlides()
+      .then((res) => {
+        if (!isMounted) return;
+        const slidesList = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+        if (slidesList && slidesList.length > 0) {
+          setDynamicHeroSlides(slidesList);
+        }
+      })
+      .catch((err) => console.error('Erreur chargement slides hero dynamiques:', err));
+
+    fetchBlogs()
+      .then((res) => {
+        if (!isMounted) return;
+        const list = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        if (list && list.length > 0) {
+          setRecentBlogs(list.filter((b) => b.published !== false));
+        }
+      })
+      .catch((err) => console.error('Erreur chargement articles de blog:', err));
+
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const activeHeroSlides = dynamicHeroSlides.length > 0 ? dynamicHeroSlides : heroSlidesData;
 
   const featuredDynamicTours = dynamicTours.filter((tour) => tour.featured === true && tour.published !== false);
 
@@ -363,13 +414,21 @@ const Home = () => {
       }))
     : destinationCarouselData;
 
+  const displayBlogs = recentBlogs.length > 0 ? recentBlogs : fallbackBlogData;
+  const featuredBlog = displayBlogs.find((b) => b.featured) || displayBlogs[0];
+  const sideBlogs = displayBlogs
+    .filter((b) => (b._id || b.slug) !== (featuredBlog?._id || featuredBlog?.slug))
+    .slice(0, 2);
+  const finalSideBlogs = sideBlogs.length > 0 ? sideBlogs : displayBlogs.slice(1, 3);
+
   // Hero auto-slider
   useEffect(() => {
+    if (activeHeroSlides.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlidesData.length);
+      setCurrentSlide((prev) => (prev + 1) % activeHeroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeHeroSlides.length]);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -385,11 +444,13 @@ const Home = () => {
   }, []);
 
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlidesData.length) % heroSlidesData.length);
+    if (activeHeroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + activeHeroSlides.length) % activeHeroSlides.length);
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlidesData.length);
+    if (activeHeroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % activeHeroSlides.length);
   };
 
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
@@ -524,9 +585,9 @@ const Home = () => {
           ========================================================================= */}
       <section className="hero-slider-section">
         <div className="hero-slider-wrapper">
-          {heroSlidesData.map((slide, index) => (
+          {activeHeroSlides.map((slide, index) => (
             <div
-              key={index}
+              key={slide._id || index}
               className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
             >
               <img 
@@ -537,13 +598,15 @@ const Home = () => {
               />
               <div className="hero-slide-overlay"></div>
               <div className="container hero-slide-content">
-                <span className="hero-badge">
-                  <i className={`fas ${slide.badgeIcon}`}></i> {slide.badge}
-                </span>
+                {slide.badge && (
+                  <span className="hero-badge">
+                    <i className={`fas ${slide.badgeIcon || 'fa-star'}`}></i> {slide.badge}
+                  </span>
+                )}
                 <h1 className="hero-title">
-                  {slide.title} <span>{slide.titleHighlight}</span>
+                  {slide.title} {slide.titleHighlight && <span>{slide.titleHighlight}</span>}
                 </h1>
-                <p className="hero-description">{slide.description}</p>
+                {slide.description && <p className="hero-description">{slide.description}</p>}
 
                 {/* Hero Search Box */}
                 <form onSubmit={handleSearchSubmit} className="hero-search-box-container hero-inspired-search">
@@ -574,7 +637,7 @@ const Home = () => {
             <i className="fas fa-chevron-left"></i>
           </button>
           <div className="hero-dots">
-            {heroSlidesData.map((_, idx) => (
+            {activeHeroSlides.map((_, idx) => (
               <span
                 key={idx}
                 className={`hero-dot ${idx === currentSlide ? 'active' : ''}`}
@@ -733,7 +796,7 @@ const Home = () => {
               </div>
 
               <div className="collage-secondary-frame">
-                <img src="/images/image-8.jpg" alt="Ganges Culture" className="collage-img-secondary" />
+                <img src="/images/dest-tajmahal.jpg" alt="Taj Mahal Agra" className="collage-img-secondary" />
               </div>
 
               <div className="collage-badge-experience">
@@ -774,7 +837,8 @@ const Home = () => {
               {displayPopularTours.map((tour, idx) => {
                 const tourSlug = tour.slug || tour.customUrl || tour._id;
                 const tourImage = tour.image || '/images/image-6.jpg';
-                const tourBadge = tour.badge || 'Populaire';
+                const rawBadge = tour.badge || 'Populaire';
+                const tourBadge = rawBadge.trim().toLowerCase() === 'popular' ? 'Populaire' : rawBadge;
                 const tourDuration = tour.duration || '14 Jours / 13 Nuits';
                 const tourLocation = tour.location || tour.region || 'Rajasthan';
                 const tourTitle = tour.title || 'Circuit sur Mesure';
@@ -830,65 +894,120 @@ const Home = () => {
           </div>
 
           <div className="editorial-grid">
-            <div className="editorial-card grid-col-8">
+            <Link 
+              to="/tours?region=rajasthan" 
+              className="editorial-card grid-col-8"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
               <img 
-                src="/images/image-9.jpg" 
-                alt="Rajasthan Grid" 
+                src="/images/dest-rajasthan.jpg" 
+                alt="Rajasthan" 
                 onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
               />
               <div className="editorial-card-overlay">
-                <h3 className="editorial-card-title">Rajasthan</h3>
-                <p className="editorial-card-text">Terre des forts et des Maharajas</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h3 className="editorial-card-title">Rajasthan</h3>
+                    <p className="editorial-card-text">Terre des forts et des Maharajas</p>
+                  </div>
+                  <span style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Voir les circuits <i className="fas fa-arrow-right"></i>
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
 
-            <div className="editorial-card grid-col-4">
+            <Link 
+              to="/tours?region=gujarat" 
+              className="editorial-card grid-col-4"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
               <img 
-                src="/images/dest-gujarat.jpg" 
-                alt="Gujarat Grid" 
+                src="/images/image-4.jpg" 
+                alt="Gujarat" 
                 onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
               />
               <div className="editorial-card-overlay">
-                <h3 className="editorial-card-title">Gujarat</h3>
-                <p className="editorial-card-text">Architecture & Faune sauvage</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h3 className="editorial-card-title">Gujarat</h3>
+                    <p className="editorial-card-text">Architecture & Faune sauvage</p>
+                  </div>
+                  <span style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Voir les circuits <i className="fas fa-arrow-right"></i>
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
 
-            <div className="editorial-card grid-col-4">
+            <Link 
+              to="/tours?search=Karnataka" 
+              className="editorial-card grid-col-4"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
               <img 
                 src="/images/dest-karnataka.jpg" 
-                alt="Karnataka Grid" 
+                alt="Karnataka" 
                 onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
               />
               <div className="editorial-card-overlay">
-                <h3 className="editorial-card-title">Karnataka</h3>
-                <p className="editorial-card-text">Temples royaux de Hampi</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h3 className="editorial-card-title">Karnataka</h3>
+                    <p className="editorial-card-text">Temples royaux de Hampi</p>
+                  </div>
+                  <span style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Voir les circuits <i className="fas fa-arrow-right"></i>
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
 
-            <div className="editorial-card grid-col-4">
+            <Link 
+              to="/tours?region=ladakh" 
+              className="editorial-card grid-col-4"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
               <img 
                 src="/images/dest-ladakh.jpg" 
-                alt="Ladakh Grid" 
+                alt="Ladakh" 
                 onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
               />
               <div className="editorial-card-overlay">
-                <h3 className="editorial-card-title">Ladakh</h3>
-                <p className="editorial-card-text">Le Petit Tibet indien</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h3 className="editorial-card-title">Ladakh</h3>
+                    <p className="editorial-card-text">Le Petit Tibet indien</p>
+                  </div>
+                  <span style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Voir les circuits <i className="fas fa-arrow-right"></i>
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
 
-            <div className="editorial-card grid-col-4">
+            <Link 
+              to="/tours?region=sud" 
+              className="editorial-card grid-col-4"
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
               <img 
                 src="/images/dest-kerala.jpg" 
-                alt="Inde du Sud Grid" 
+                alt="Inde du Sud" 
                 onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
               />
               <div className="editorial-card-overlay">
-                <h3 className="editorial-card-title">Inde du Sud</h3>
-                <p className="editorial-card-text">Kerala, Backwaters & Épices</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h3 className="editorial-card-title">Inde du Sud</h3>
+                    <p className="editorial-card-text">Kerala, Backwaters & Épices</p>
+                  </div>
+                  <span style={{ background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Voir les circuits <i className="fas fa-arrow-right"></i>
+                  </span>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -953,55 +1072,61 @@ const Home = () => {
           ========================================================================= */}
       <section className="section-padding bg-white">
         <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">Récits & Conseils</span>
-            <h2 className="section-title">Notre Blog de Voyage</h2>
+          <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <span className="section-subtitle">Récits & Conseils</span>
+              <h2 className="section-title" style={{ margin: 0 }}>Notre Blog de Voyage</h2>
+            </div>
+            <Link to="/blog" className="btn btn-sm btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span>Tous les articles</span> <i className="fas fa-arrow-right"></i>
+            </Link>
           </div>
 
           <div className="home-blog-grid">
-            <div className="editorial-card blog-featured-card">
-              <img src="/images/Voyage-Jaisalmer.jpg" alt="Jaisalmer ville doree" />
-              <div className="editorial-card-overlay">
-                <span className="badge badge-primary blog-featured-badge">Article Vedette</span>
-                <h3 className="editorial-card-title">Jaisalmer, la ville dorée</h3>
-                <p className="blog-featured-text">
-                  Plongez dans la magie des ruelles en grès jaune et de la citadelle vivante du désert.
-                </p>
-                <Link to="/blog/jaisalmer-la-ville-doree-du-rajasthan" className="btn btn-sm btn-primary blog-featured-btn">
-                  Lire l'article
-                </Link>
+            {/* 1st card: Featured large card */}
+            {featuredBlog && (
+              <div className="editorial-card blog-featured-card">
+                <img 
+                  src={featuredBlog.coverImage || featuredBlog.image || '/images/Voyage-Jaisalmer.jpg'} 
+                  alt={featuredBlog.title}
+                  onError={(e) => { e.currentTarget.src = '/images/Voyage-Jaisalmer.jpg'; }}
+                />
+                <div className="editorial-card-overlay">
+                  <span className="badge badge-primary blog-featured-badge">
+                    {featuredBlog.category || 'Article Vedette'}
+                  </span>
+                  <h3 className="editorial-card-title">{featuredBlog.title}</h3>
+                  <p className="blog-featured-text">
+                    {featuredBlog.excerpt || 'Plongez dans les récits et conseils authentiques de nos experts locaux.'}
+                  </p>
+                  <Link to={featuredBlog.customUrl || `/blog/${featuredBlog.slug}`} className="btn btn-sm btn-primary blog-featured-btn">
+                    Lire l'article
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="tour-card">
-              <div className="tour-card-image-wrap tour-card-image-sm">
-                <img src="/images/image-8.jpg" alt="Varanasi Blog" />
+            {/* Side cards */}
+            {finalSideBlogs.map((blog, idx) => (
+              <div className="tour-card" key={blog._id || blog.slug || idx}>
+                <div className="tour-card-image-wrap tour-card-image-sm">
+                  <img 
+                    src={blog.coverImage || blog.image || '/images/image-8.jpg'} 
+                    alt={blog.title}
+                    onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+                  />
+                </div>
+                <div className="tour-card-body">
+                  <div className="mega-blog-meta">{blog.category || 'Conseils Voyage'}</div>
+                  <h3 className="tour-card-title tour-card-title-sm">
+                    {blog.title}
+                  </h3>
+                  <Link to={blog.customUrl || `/blog/${blog.slug}`} className="btn btn-sm btn-outline mt-auto">
+                    En savoir +
+                  </Link>
+                </div>
               </div>
-              <div className="tour-card-body">
-                <div className="mega-blog-meta">Spiritualité</div>
-                <h3 className="tour-card-title tour-card-title-sm">
-                  Comprendre la cérémonie de l'Aarti à Varanasi
-                </h3>
-                <Link to="/blog/comprendre-la-ceremonie-de-laarti-a-varanasi" className="btn btn-sm btn-outline mt-auto">
-                  En savoir +
-                </Link>
-              </div>
-            </div>
-
-            <div className="tour-card">
-              <div className="tour-card-image-wrap tour-card-image-sm">
-                <img src="/images/slide8-300x176.jpg" alt="Nepal Blog" />
-              </div>
-              <div className="tour-card-body">
-                <div className="mega-blog-meta">Conseils Pratiques</div>
-                <h3 className="tour-card-title tour-card-title-sm">
-                  Comment préparer son premier voyage en Inde
-                </h3>
-                <Link to="/blog/comment-preparer-son-premier-voyage-en-inde" className="btn btn-sm btn-outline mt-auto">
-                  En savoir +
-                </Link>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

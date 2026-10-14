@@ -159,5 +159,15 @@ export const fetchPageContent = (pageKey) => API.get(`/pages/${pageKey}`);
 export const updatePageContent = (pageKey, data) => API.put(`/pages/${pageKey}`, data);
 export const resetPageContent = (pageKey) => API.post(`/pages/${pageKey}/reset`);
 
+// Hero Slider CMS API
+export const fetchHeroSlides = () => API.get('/hero-slider');
+export const fetchAdminHeroSlides = () => API.get('/hero-slider/admin/all');
+export const fetchHeroSlideById = (id) => API.get(`/hero-slider/${id}`);
+export const createHeroSlide = (data) => API.post('/hero-slider', data);
+export const updateHeroSlide = (id, data) => API.put(`/hero-slider/${id}`, data);
+export const deleteHeroSlide = (id) => API.delete(`/hero-slider/${id}`);
+export const reorderHeroSlides = (slideIds) => API.post('/hero-slider/reorder', { slideIds });
+export const resetHeroSlides = () => API.post('/hero-slider/reset');
+
 export default API;
 

@@ -116,16 +116,6 @@ const BlogDetail = ({ overrideSlug }) => {
               </div>
             )}
 
-            {blog.tags && blog.tags.length > 0 && (
-              <div style={{ marginTop: '36px', paddingTop: '20px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--secondary-color)' }}>Tags :</span>
-                {blog.tags.map((tag, i) => (
-                  <span key={i} style={{ background: 'var(--bg-light)', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', color: 'var(--text-main)' }}>
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* CTA Box */}

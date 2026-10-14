@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import AdminImageUpload from '../../components/AdminImageUpload';
+import RichTextEditor from '../../components/RichTextEditor';
 import { 
   fetchAdminTours, 
   fetchAdminDestinations, 
@@ -60,7 +61,7 @@ const AdminTours = () => {
     location: 'Rajasthan',
     region: 'rajasthan',
     theme: 'Culture & Heritage',
-    badge: 'Popular',
+    badge: 'Populaire',
     rating: 4.9,
     reviewCount: 30,
     image: '/images/dest-rajasthan.jpg',
@@ -232,8 +233,9 @@ const AdminTours = () => {
       seoKeywords: tour.seoKeywords || tour.metaKeywords || '',
       metaKeywords: tour.seoKeywords || tour.metaKeywords || '',
       seoDescription: tour.seoDescription || tour.metaDescription || '',
-      metaDescription: tour.seoDescription || tour.metaDescription || '',
-      highlights: tour.highlights || [],
+      highlights: (Array.isArray(tour.highlights) && tour.highlights.length > 0)
+        ? tour.highlights
+        : ['Visite du Taj Mahal', 'Palais royaux de Jaipur', 'Fort de Mehrangarh à Jodhpur'],
       gallery: Array.isArray(tour.gallery) && tour.gallery.length > 0 ? tour.gallery : (tour.image ? [tour.image] : []),
       itinerary: tour.itinerary || [],
       inclusions: tour.inclusions || [],
@@ -303,6 +305,25 @@ const AdminTours = () => {
     const list = [...formData.itinerary];
     list[index][field] = value;
     setFormData({ ...formData, itinerary: list });
+  };
+
+  const handleAddHighlight = () => {
+    setFormData((prev) => ({
+      ...prev,
+      highlights: [...(prev.highlights || []), '']
+    }));
+  };
+
+  const handleHighlightChange = (index, value) => {
+    const list = [...(formData.highlights || [])];
+    list[index] = value;
+    setFormData((prev) => ({ ...prev, highlights: list }));
+  };
+
+  const handleRemoveHighlight = (index) => {
+    const list = [...(formData.highlights || [])];
+    list.splice(index, 1);
+    setFormData((prev) => ({ ...prev, highlights: list }));
   };
 
   const handleSubmit = async (e) => {
@@ -512,7 +533,7 @@ const AdminTours = () => {
       {/* Create / Edit Modal */}
       {isModalOpen && (
         <div className="modal-backdrop" onClick={() => setIsModalOpen(false)}>
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '820px' }}>
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '920px', width: '96%' }}>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%', margin: 0, overflow: 'hidden' }}>
               <div className="modal-header">
                 <h3 className="modal-title">
@@ -957,9 +978,77 @@ const AdminTours = () => {
                   </span>
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '18px' }}>
-                  <label className="form-label" style={{ fontWeight: '600' }}>Overview & Presentation *</label>
-                  <textarea rows="4" required className="form-control" placeholder="Compelling description of the tour..." value={formData.overview} onChange={(e) => setFormData({ ...formData, overview: e.target.value })}></textarea>
+                <div className="form-group" style={{ marginBottom: '22px' }}>
+                  <RichTextEditor
+                    label="Overview & Presentation (Éditeur Enrichi avec Images) *"
+                    value={formData.overview || ''}
+                    onChange={(content) => setFormData((prev) => ({ ...prev, overview: content }))}
+                    placeholder="Compelling description of the tour... Vous pouvez insérer des titres, des paragraphes, des listes à puces, du texte en gras, des liens et des photos."
+                    minHeight="320px"
+                  />
+                  <span style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '6px', display: 'block' }}>
+                    Ce texte complet s'affiche dans la section "Aperçu du Circuit" sur la page de détail du voyage avec tout votre formatage (titres, listes, images).
+                  </span>
+                </div>
+
+                {/* Highlights (Les Points Forts du Voyage) Section */}
+                <div style={{ background: '#FFFBEB', padding: '18px', borderRadius: '12px', marginBottom: '22px', border: '1px solid #FDE68A' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <strong style={{ color: '#92400E', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <i className="fas fa-star" style={{ color: '#D97706' }}></i>
+                        Les Points Forts du Voyage ({formData.highlights?.length || 0})
+                      </strong>
+                      <span style={{ fontSize: '0.8rem', color: '#B45309', display: 'block', marginTop: '2px' }}>
+                        Ces points forts s'affichent avec des coches vertes sur la page du circuit (ex: "Visite du Taj Mahal", "Palais royaux de Jaipur").
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      style={{ background: '#D97706', color: '#FFFFFF', border: 'none', padding: '6px 14px', borderRadius: '6px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                      onClick={handleAddHighlight}
+                    >
+                      <i className="fas fa-plus"></i> Ajouter un Point Fort
+                    </button>
+                  </div>
+
+                  {(!formData.highlights || formData.highlights.length === 0) ? (
+                    <div style={{ textAlign: 'center', padding: '20px', background: '#FFFFFF', borderRadius: '8px', border: '1px dashed #FCD34D' }}>
+                      <p style={{ margin: 0, color: '#92400E', fontSize: '0.88rem' }}>
+                        Aucun point fort personnalisé. Cliquez sur "Ajouter un Point Fort" pour en créer.
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {formData.highlights.map((highlight, hIdx) => (
+                        <div key={hIdx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#FFFFFF', padding: '8px 12px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                          <span style={{ color: '#059669', fontSize: '1rem' }}>
+                            <i className="fas fa-check-circle"></i>
+                          </span>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#92400E', minWidth: '70px' }}>
+                            Point #{hIdx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            className="form-control"
+                            style={{ margin: 0, fontSize: '0.88rem' }}
+                            placeholder="ex: Visite privée du Taj Mahal au lever du soleil"
+                            value={highlight}
+                            onChange={(e) => handleHighlightChange(hIdx, e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            style={{ background: '#FEE2E2', border: 'none', color: '#DC2626', width: '32px', height: '32px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                            onClick={() => handleRemoveHighlight(hIdx)}
+                            title="Supprimer ce point fort"
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Day by Day Itinerary Builder */}

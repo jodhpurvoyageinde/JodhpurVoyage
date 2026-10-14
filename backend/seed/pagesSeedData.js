@@ -130,24 +130,111 @@ export const defaultPagesData = {
 
   'notre-equipe': {
     pageKey: 'notre-equipe',
-    title: 'Notre Équipe à Jodhpur',
+    title: 'Notre Équipe Locale en Inde',
     menuGroup: 'about',
     hero: {
       bgImage: '/images/image-9.jpg',
       badge: 'Des Professionnels Passionnés',
       badgeIcon: 'fas fa-users',
-      title: 'Notre Équipe à Jodhpur',
+      title: 'Notre Équipe Locale en Inde',
       description: 'Une équipe locale francophone dévouée à faire de votre voyage en Inde une aventure humaine inoubliable.'
     },
     intro: {
-      subtitle: 'Visages & Talents',
-      title: 'À Vos Côtés de A à Z',
-      description: 'De la conception de votre itinéraire à l’assistance sur place, découvrez les personnes qui veillent sur votre confort.'
+      subtitle: 'La Team Jodhpur Voyage',
+      title: 'Notre Équipe Locale d\'Experts',
+      description: 'Nous sommes fiers de compter plus de 6 experts voyages vivant et travaillant directement en Inde, au plus près des destinations que nous proposons. Nos experts explorent sans cesse leur pays pour vous offrir des conseils personnalisés.'
     },
     members: [
-      { name: 'Gajendra Singh', role: 'Fondateur & Directeur Général', desc: 'Passionné par le patrimoine du Rajasthan et fort de plus de 20 ans d’expérience dans le réceptif francophone.', image: '/images/image-12.jpg' },
-      { name: 'Claire & Rajendra', role: 'Conseillers Voyages Francophones', desc: 'À votre écoute pour concevoir des itinéraires sur mesure, du premier échange jusqu’au suivi quotidien de votre séjour.', image: '/images/image-9.jpg' },
-      { name: 'Notre Équipe de Chauffeurs Privés', role: 'Chauffeurs Expérimentés & Ponctuels', desc: 'Des professionnels courtois, prudents, formés à l’accueil des voyageurs européens et connaissant chaque route sur le bout des doigts.', image: '/images/image-6.jpg' }
+      {
+        name: 'Mr. Singh',
+        role: 'Fondateur & Interlocuteur Principal',
+        category: 'Direction',
+        specialty: 'Rajasthan, Inde du Nord & Népal',
+        desc: "Passionné par son pays et sa culture, j'ai obtenu mon master de tourisme à l'Université de Jodhpur et j'ai débuté en tant que guide francophone certifié. Fondateur de l'agence Jodhpur Voyage, je supervise la création de vos circuits sur mesure et la qualité de votre séjour.",
+        quote: "« Partager notre amour profond pour l'Inde avec professionnalisme et authenticité. »",
+        image: '/images/mr-singh.jpg',
+        objectPosition: 'top center'
+      },
+      {
+        name: 'Vikey',
+        role: 'Experte Voyage Inde du Nord & Inde Himalayenne',
+        category: 'Guides Francophones',
+        specialty: "Rajasthan, Bénares, Centre de l'Inde, Ladakh, Himachal & Spiti",
+        desc: "Namasté, Je suis Vikey, guide francophone originaire du Rajasthan. J'ai fait mes études d'histoire à Delhi et j'ai obtenu mon diplôme en langue française en 2007 à l'Alliance Française de Pondichéry. Passionnée par l'apprentissage des lieux historiques et le partage de nos traditions.",
+        quote: "« J'aime particulièrement Udaipur, la Venise de l'Inde, pour ses palais au bord du lac, sa romance et son sentiment de paix. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/08/3f297bb8-b810-4825-8074-d197af7e3542.jpg',
+        objectPosition: 'center 25%'
+      },
+      {
+        name: 'Praveen',
+        role: 'Experte Voyage Inde du Nord & Sud',
+        category: 'Guides Francophones',
+        specialty: 'Rajasthan, Inde du Nord et Inde du Sud',
+        desc: "Je m'appelle Praveen, je suis guide francophone diplômé. Je suis passionné par mon métier : faire découvrir ma terre natale à travers mes yeux, une terre magique et fascinante. Je travaille dans le tourisme depuis 2014 et j'ai appris le français à l'Alliance Française de Pondichéry.",
+        quote: "« Les gens, les couleurs, les rites et la nourriture : en vous laissant surprendre, vous découvrirez une population d'une générosité unique. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/08/a07bc3a2-3ec0-4c82-a583-ba5e61f3a911.jpg',
+        objectPosition: 'center 25%'
+      },
+      {
+        name: 'Raj',
+        role: 'Experte Voyage Inde du Nord & Sud',
+        category: 'Guides Francophones',
+        specialty: "Rajasthan, Amritsar, Centre de l'Inde, Inde du Sud & Bénares",
+        desc: "Je suis Raj, je parle français et travaille comme guide francophone depuis 2015. Mon leitmotiv est de tout mettre en œuvre pour vous faire rêver, vivre des expériences inoubliables et ressentir des émotions intenses lors de vos voyages.",
+        quote: "« Tout mettre en œuvre pour transformer votre circuit en un souvenir gravé à jamais dans votre mémoire. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/08/Raj-Guide-francophone-en-Inde.jpg',
+        objectPosition: 'bottom center'
+      },
+      {
+        name: 'Kapil',
+        role: 'Experte Voyage Inde du Nord & Centre de l\'Inde',
+        category: 'Guides Francophones',
+        specialty: 'Rajasthan, Taj Mahal, Varanasi, Gujarat, Karnataka & Kerala',
+        desc: "Bonjour les amis ! Je suis un jeune et dynamique guide touristique français en Inde, originaire du Rajasthan avec 10 ans d'expérience. Spécialiste du patrimoine et des visites culturelles et historiques, j'aime transmettre mes connaissances avec enthousiasme.",
+        quote: "« Venez découvrir l'Inde authentique avec les yeux et le cœur des locaux. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/08/Kapil-guide-francophone-en-Inde.jpg',
+        objectPosition: 'bottom center'
+      },
+      {
+        name: 'Vikram',
+        role: 'Manager Logistique & Assistance Aéroport Francophone',
+        category: 'Management',
+        specialty: 'Jodhpur, Transferts, Hôtels & Assistance 24/7',
+        desc: "Originaire de Jodhpur, j'ai étudié les arts à l'Université de Jodhpur puis passé deux ans à l'Alliance Française de Delhi. Je suis responsable des réservations d'hôtels, des guides, des véhicules et des transferts sur le terrain.",
+        quote: "« Il est temps de vivre la vie que tu t'es imaginée » – Henry James.",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/09/Vikram-Agence-de-voyage-en-Inde.jpg',
+        objectPosition: 'center 25%'
+      },
+      {
+        name: 'Mohit',
+        role: 'Le Comptable d\'Entreprise',
+        category: 'Management',
+        specialty: 'Gestion financière, Comptabilité & Facturation',
+        desc: "Responsable de la comptabilité et des factures au sein de l'agence. Passionné par les randonnées en montagne et les paysages d'altitude, mes récents voyages m'ont conduit dans l'Himachal Pradesh et à Rishikesh.",
+        quote: "« Une gestion rigoureuse et transparente au service d'un séjour parfait. »",
+        image: '/images/image-8.jpg',
+        objectPosition: 'center'
+      },
+      {
+        name: 'Om',
+        role: 'Chauffeur Anglophone Privilégié (8+ Ans d\'Expérience)',
+        category: 'Chauffeurs Privés',
+        specialty: 'Rajasthan, Gujarat, Centre de l\'Inde, Agra & Bénares',
+        desc: "Je suis Om, je travaille comme chauffeur privé pour Jodhpur Voyage depuis 8 ans. J'ai accompagné de très nombreux voyageurs français à travers le Rajasthan, le Gujarat, Madhya Pradesh et Bénares en toute sécurité.",
+        quote: "« Conduite prudente, ponctualité et attention de chaque instant pour nos voyageurs. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/09/Om-Chauffeur-en-Inde.jpg',
+        objectPosition: 'bottom center'
+      },
+      {
+        name: 'Monu',
+        role: 'Chauffeur Anglophone Spécialiste Himalayen (10+ Ans)',
+        category: 'Chauffeurs Privés',
+        specialty: 'Punjab, Himachal, Uttarakhand, Vallée du Spiti & Kinnaur',
+        desc: "Je suis Monu, chauffeur pour Jodhpur Voyage depuis 10 ans. Je suis le spécialiste des routes de montagne du Nord : Punjab, Himachal Pradesh, Uttarakhand, vallée du Spiti et Kinnaur.",
+        quote: "« Une parfaite maîtrise des routes de montagne pour des circuits hors des sentiers battus. »",
+        image: 'https://www.jodhpurvoyage.com/wp-content/uploads/2025/09/Monu-voyage-avec-chauffeur-en-Inde.jpg',
+        objectPosition: 'center 25%'
+      }
     ],
     contactCard: {
       title: 'Une Question ? Un Projet en Tête ?',
