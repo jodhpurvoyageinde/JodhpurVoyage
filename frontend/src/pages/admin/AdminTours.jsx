@@ -782,7 +782,9 @@ const AdminTours = () => {
                             }));
                           }
                         } catch (err) {
-                          alert('Error uploading slider images');
+                          console.error('Gallery upload error:', err);
+                          const msg = err.response?.data?.message || err.message || 'Error uploading slider images';
+                          alert(`Error uploading slider images: ${msg}`);
                         } finally {
                           setUploadingGallery(false);
                           if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';

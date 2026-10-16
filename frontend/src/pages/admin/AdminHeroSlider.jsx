@@ -163,7 +163,8 @@ const AdminHeroSlider = () => {
       loadSlides();
     } catch (err) {
       console.error('Save error:', err);
-      showToast(err.response?.data?.message || 'Erreur lors de l’enregistrement de la slide.', 'error');
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message || 'Erreur lors de l’enregistrement de la slide.';
+      showToast(errorMsg, 'error');
     } finally {
       setSaving(false);
     }

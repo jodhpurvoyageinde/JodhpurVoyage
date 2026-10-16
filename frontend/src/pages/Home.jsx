@@ -1000,9 +1000,9 @@ const Home = () => {
               style={{ textDecoration: 'none', display: 'block' }}
             >
               <img 
-                src="/images/image-4.jpg" 
+                src="/images/dest-gujarat.jpg" 
                 alt="Gujarat" 
-                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+                onError={(e) => { e.currentTarget.src = '/images/dest-gujarat.jpg'; }}
               />
               <div className="editorial-card-overlay">
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>

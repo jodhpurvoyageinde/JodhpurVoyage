@@ -30,6 +30,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 const app = express();
+app.enable('trust proxy');
 const PORT = process.env.PORT || 5000;
 const API_PREFIX = (process.env.API_PREFIX || '/api').replace(/\/+$/, '');
 

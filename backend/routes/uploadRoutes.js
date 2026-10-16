@@ -59,8 +59,25 @@ const upload = multer({
   }
 });
 
+// Middleware to catch Multer errors gracefully
+const multerWrapper = (middleware) => (req, res, next) => {
+  middleware(req, res, (err) => {
+    if (err) {
+      console.error('Multer upload middleware error:', err);
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ success: false, message: 'Fichier trop volumineux. La taille maximale est de 12 Mo.' });
+        }
+        return res.status(400).json({ success: false, message: `Erreur upload (${err.code}): ${err.message}` });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'Format ou fichier invalide.' });
+    }
+    next();
+  });
+};
+
 // POST /api/upload - Upload image from local machine (Cloudinary with local fallback)
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', multerWrapper(upload.single('image')), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Aucun fichier image sélectionné.' });
@@ -112,7 +129,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 // POST /api/upload/multiple - Upload multiple images at once
-router.post('/multiple', upload.array('images', 30), async (req, res) => {
+router.post('/multiple', multerWrapper(upload.array('images', 30)), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'Aucun fichier image sélectionné.' });

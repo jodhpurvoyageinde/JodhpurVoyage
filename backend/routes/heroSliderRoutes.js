@@ -9,10 +9,24 @@ const router = express.Router();
 // Helper to ensure MongoDB has initial slides if collection is empty
 const ensureMongoInitialized = async () => {
   if (!isMongoConnected()) return;
-  const count = await HeroSlider.countDocuments();
-  if (count === 0) {
-    await HeroSlider.insertMany(defaultHeroSlidesData);
-    console.log('🌟 HeroSlider collection auto-seeded with 14 default slides.');
+  try {
+    const indexes = await HeroSlider.collection.indexes();
+    if (indexes && indexes.some((idx) => idx.name === 'key_1')) {
+      await HeroSlider.collection.dropIndex('key_1');
+      console.log('🧹 Supprimé l’ancien index obsolète key_1 sur herosliders.');
+    }
+  } catch (idxErr) {
+    // Ignore index inspection error if collection is newly created
+  }
+
+  try {
+    const count = await HeroSlider.countDocuments();
+    if (count === 0) {
+      await HeroSlider.insertMany(defaultHeroSlidesData);
+      console.log('🌟 HeroSlider collection auto-seeded with 14 default slides.');
+    }
+  } catch (seedErr) {
+    console.error('Non-critical: error auto-seeding hero slides:', seedErr.message);
   }
 };
 
@@ -90,38 +104,55 @@ router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const { image, badge, badgeIcon, title, titleHighlight, description, order, isActive } = req.body;
 
-    if (!image || !title) {
+    const trimmedImage = String(image || '').trim();
+    const trimmedTitle = String(title || '').trim();
+
+    if (!trimmedImage || !trimmedTitle) {
       return res.status(400).json({ success: false, message: 'L’image et le titre sont obligatoires.' });
     }
 
+    const parsedOrder = Number(order);
     const newSlideData = {
-      image: image.trim(),
-      badge: (badge || '').trim(),
-      badgeIcon: (badgeIcon || 'fa-star').trim(),
-      title: title.trim(),
-      titleHighlight: (titleHighlight || '').trim(),
-      description: (description || '').trim(),
-      order: typeof order === 'number' ? order : 999,
+      image: trimmedImage,
+      badge: String(badge || '').trim(),
+      badgeIcon: String(badgeIcon || 'fa-star').trim(),
+      title: trimmedTitle,
+      titleHighlight: String(titleHighlight || '').trim(),
+      description: String(description || '').trim(),
+      order: !isNaN(parsedOrder) ? parsedOrder : 999,
       isActive: isActive !== undefined ? Boolean(isActive) : true
     };
 
     if (isMongoConnected()) {
-      // Determine auto order if needed
-      if (newSlideData.order === 999) {
-        const count = await HeroSlider.countDocuments();
-        newSlideData.order = count;
+      try {
+        await ensureMongoInitialized();
+
+        // Determine auto order if needed
+        if (newSlideData.order === 999) {
+          const count = await HeroSlider.countDocuments();
+          newSlideData.order = count;
+        }
+        const createdSlide = await HeroSlider.create(newSlideData);
+
+        // Keep in-memory store in sync
+        if (!memoryStore.heroSliders) memoryStore.heroSliders = [];
+        memoryStore.heroSliders.push(createdSlide.toObject());
+
+        return res.status(201).json({
+          success: true,
+          message: 'Slide créée avec succès',
+          data: createdSlide
+        });
+      } catch (mongoErr) {
+        console.error('Mongo error creating hero slide:', mongoErr);
+        if (mongoErr.name === 'ValidationError' || mongoErr.code === 11000) {
+          return res.status(400).json({
+            success: false,
+            message: mongoErr.message || 'Erreur de validation de la slide',
+            error: mongoErr.message
+          });
+        }
       }
-      const createdSlide = await HeroSlider.create(newSlideData);
-
-      // Keep in-memory store in sync
-      if (!memoryStore.heroSliders) memoryStore.heroSliders = [];
-      memoryStore.heroSliders.push(createdSlide.toObject());
-
-      return res.status(201).json({
-        success: true,
-        message: 'Slide créée avec succès',
-        data: createdSlide
-      });
     }
 
     // In-memory fallback

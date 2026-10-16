@@ -91,11 +91,7 @@ export const createSeoConfig = (data) => API.post('/seo', data);
 export const uploadImage = (file) => {
   const formData = new FormData();
   formData.append('image', file);
-  return API.post('/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
+  return API.post('/upload', formData);
 };
 
 export const uploadMultipleImages = async (files) => {
@@ -108,12 +104,8 @@ export const uploadMultipleImages = async (files) => {
     fileArray.forEach((file) => {
       formData.append('images', file);
     });
-    const res = await API.post('/upload/multiple', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    if (res.data && res.data.urls) {
+    const res = await API.post('/upload/multiple', formData);
+    if (res.data && res.data.urls && res.data.urls.length > 0) {
       return res;
     }
   } catch (err) {
@@ -122,11 +114,21 @@ export const uploadMultipleImages = async (files) => {
 
   // Graceful fallback to sequential individual uploads
   const uploadedUrls = [];
+  let lastError = null;
   for (const file of fileArray) {
-    const singleRes = await uploadImage(file);
-    if (singleRes.data && singleRes.data.url) {
-      uploadedUrls.push(singleRes.data.url);
+    try {
+      const singleRes = await uploadImage(file);
+      if (singleRes.data && singleRes.data.url) {
+        uploadedUrls.push(singleRes.data.url);
+      }
+    } catch (e) {
+      lastError = e;
+      console.warn('Individual upload failed for', file.name, e);
     }
+  }
+
+  if (uploadedUrls.length === 0 && lastError) {
+    throw lastError;
   }
 
   return {
