@@ -335,7 +335,36 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [dynamicDestinations, setDynamicDestinations] = useState([]);
-  const [dynamicHeroSlides, setDynamicHeroSlides] = useState([]);
+  
+  // Initialize dynamicHeroSlides from localStorage cache to prevent flash of old/fallback slides on refresh
+  const [dynamicHeroSlides, setDynamicHeroSlides] = useState(() => {
+    try {
+      const cached = localStorage.getItem('cached_hero_slides');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      // ignore JSON parse error
+    }
+    return [];
+  });
+
+  const [heroLoading, setHeroLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem('cached_hero_slides');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return false;
+        }
+      }
+    } catch (e) {}
+    return true;
+  });
+
   const [recentBlogs, setRecentBlogs] = useState([]);
 
   // Fetch dynamic tour packages, destinations, hero slides and recent blogs from backend
@@ -365,11 +394,24 @@ const Home = () => {
       .then((res) => {
         if (!isMounted) return;
         const slidesList = res.data?.data || (Array.isArray(res.data) ? res.data : []);
-        if (slidesList && slidesList.length > 0) {
+        if (Array.isArray(slidesList) && slidesList.length > 0) {
           setDynamicHeroSlides(slidesList);
+          try {
+            localStorage.setItem('cached_hero_slides', JSON.stringify(slidesList));
+          } catch (e) {}
+        } else if (Array.isArray(slidesList) && slidesList.length === 0) {
+          setDynamicHeroSlides([]);
+          try {
+            localStorage.removeItem('cached_hero_slides');
+          } catch (e) {}
         }
       })
-      .catch((err) => console.error('Erreur chargement slides hero dynamiques:', err));
+      .catch((err) => {
+        console.error('Erreur chargement slides hero dynamiques:', err);
+      })
+      .finally(() => {
+        if (isMounted) setHeroLoading(false);
+      });
 
     fetchBlogs()
       .then((res) => {
@@ -386,7 +428,10 @@ const Home = () => {
     };
   }, []);
 
-  const activeHeroSlides = dynamicHeroSlides.length > 0 ? dynamicHeroSlides : heroSlidesData;
+  // Use dynamic slides if available; do not show old static slides while loading
+  const activeHeroSlides = dynamicHeroSlides.length > 0
+    ? dynamicHeroSlides
+    : (heroLoading ? [] : heroSlidesData);
 
   const featuredDynamicTours = dynamicTours.filter((tour) => tour.featured === true && tour.published !== false);
 
@@ -423,12 +468,19 @@ const Home = () => {
 
   // Hero auto-slider
   useEffect(() => {
-    if (activeHeroSlides.length === 0) return;
+    if (activeHeroSlides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % activeHeroSlides.length);
     }, 6000);
     return () => clearInterval(timer);
   }, [activeHeroSlides.length]);
+
+  // Keep currentSlide within valid bounds if activeHeroSlides length changes
+  useEffect(() => {
+    if (activeHeroSlides.length > 0 && currentSlide >= activeHeroSlides.length) {
+      setCurrentSlide(0);
+    }
+  }, [activeHeroSlides.length, currentSlide]);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -585,30 +637,54 @@ const Home = () => {
           ========================================================================= */}
       <section className="hero-slider-section">
         <div className="hero-slider-wrapper">
-          {activeHeroSlides.map((slide, index) => (
-            <div
-              key={slide._id || index}
-              className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
-            >
-              <img 
-                src={slide.image} 
-                alt={slide.title} 
-                className="hero-slide-bg" 
-                onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
-              />
-              <div className="hero-slide-overlay"></div>
-              <div className="container hero-slide-content">
-                {slide.badge && (
-                  <span className="hero-badge">
-                    <i className={`fas ${slide.badgeIcon || 'fa-star'}`}></i> {slide.badge}
-                  </span>
-                )}
-                <h1 className="hero-title">
-                  {slide.title} {slide.titleHighlight && <span>{slide.titleHighlight}</span>}
-                </h1>
-                {slide.description && <p className="hero-description">{slide.description}</p>}
+          {activeHeroSlides.length > 0 ? (
+            activeHeroSlides.map((slide, index) => (
+              <div
+                key={slide._id || index}
+                className={`hero-slide ${index === currentSlide ? 'active' : ''}`}
+              >
+                <img 
+                  src={slide.image} 
+                  alt={slide.title} 
+                  className="hero-slide-bg" 
+                  onError={(e) => { e.currentTarget.src = '/images/dest-rajasthan.jpg'; }}
+                />
+                <div className="hero-slide-overlay"></div>
+                <div className="container hero-slide-content">
+                  {slide.badge && (
+                    <span className="hero-badge">
+                      <i className={`fas ${slide.badgeIcon || 'fa-star'}`}></i> {slide.badge}
+                    </span>
+                  )}
+                  <h1 className="hero-title">
+                    {slide.title} {slide.titleHighlight && <span>{slide.titleHighlight}</span>}
+                  </h1>
+                  {slide.description && <p className="hero-description">{slide.description}</p>}
 
-                {/* Hero Search Box */}
+                  {/* Hero Search Box */}
+                  <form onSubmit={handleSearchSubmit} className="hero-search-box-container hero-inspired-search">
+                    <div className="inspired-search-bar">
+                      <i className="fas fa-search search-icon"></i>
+                      <input
+                        type="text"
+                        className="hero-search-input"
+                        placeholder="Laissez-vous inspirer (ex: Rajasthan, Taj Mahal, Népal...)"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        autoComplete="off"
+                      />
+                      <button type="submit" className="inspired-search-btn">
+                        <span>Rechercher</span> <i className="fas fa-arrow-right"></i>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="hero-slide active" style={{ opacity: 1, visibility: 'visible' }}>
+              <div className="hero-slide-overlay" style={{ background: 'linear-gradient(135deg, #101828 0%, #1d2939 100%)' }}></div>
+              <div className="container hero-slide-content">
                 <form onSubmit={handleSearchSubmit} className="hero-search-box-container hero-inspired-search">
                   <div className="inspired-search-bar">
                     <i className="fas fa-search search-icon"></i>
@@ -624,31 +700,32 @@ const Home = () => {
                       <span>Rechercher</span> <i className="fas fa-arrow-right"></i>
                     </button>
                   </div>
-
                 </form>
               </div>
             </div>
-          ))}
+          )}
         </div>
 
         {/* Slider Controls */}
-        <div className="hero-controls">
-          <button className="hero-arrow hero-prev" onClick={handlePrevSlide} aria-label="Slide précédent">
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <div className="hero-dots">
-            {activeHeroSlides.map((_, idx) => (
-              <span
-                key={idx}
-                className={`hero-dot ${idx === currentSlide ? 'active' : ''}`}
-                onClick={() => setCurrentSlide(idx)}
-              ></span>
-            ))}
+        {activeHeroSlides.length > 1 && (
+          <div className="hero-controls">
+            <button className="hero-arrow hero-prev" onClick={handlePrevSlide} aria-label="Slide précédent">
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <div className="hero-dots">
+              {activeHeroSlides.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`hero-dot ${idx === currentSlide ? 'active' : ''}`}
+                  onClick={() => setCurrentSlide(idx)}
+                ></span>
+              ))}
+            </div>
+            <button className="hero-arrow hero-next" onClick={handleNextSlide} aria-label="Slide suivant">
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
-          <button className="hero-arrow hero-next" onClick={handleNextSlide} aria-label="Slide suivant">
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
+        )}
       </section>
 
       {/* =========================================================================

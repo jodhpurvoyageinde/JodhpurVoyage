@@ -100,12 +100,20 @@ const TourImageSlider = ({ tour }) => {
     }
   }, [images.length, currentIndex]);
 
-  // Scroll active thumbnail into view
+  // Scroll active thumbnail horizontally inside the thumbnails container only (without affecting window scroll)
   useEffect(() => {
-    if (thumbnailsContainerRef.current) {
-      const activeThumb = thumbnailsContainerRef.current.children[currentIndex];
-      if (activeThumb && typeof activeThumb.scrollIntoView === 'function') {
-        activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    const container = thumbnailsContainerRef.current;
+    if (container) {
+      const activeThumb = container.children[currentIndex];
+      if (activeThumb) {
+        const containerRect = container.getBoundingClientRect();
+        const thumbRect = activeThumb.getBoundingClientRect();
+        const relativeLeft = thumbRect.left - containerRect.left + container.scrollLeft;
+        const targetScrollLeft = relativeLeft - (container.clientWidth / 2) + (thumbRect.width / 2);
+        container.scrollTo({
+          left: Math.max(0, targetScrollLeft),
+          behavior: 'smooth'
+        });
       }
     }
   }, [currentIndex]);

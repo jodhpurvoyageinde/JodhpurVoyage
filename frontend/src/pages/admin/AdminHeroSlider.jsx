@@ -71,6 +71,10 @@ const AdminHeroSlider = () => {
       const res = await fetchAdminHeroSlides();
       const list = res.data?.data || (Array.isArray(res.data) ? res.data : []);
       setSlides(list);
+      try {
+        const activeOnly = list.filter((s) => s.isActive !== false);
+        localStorage.setItem('cached_hero_slides', JSON.stringify(activeOnly));
+      } catch (e) {}
       if (selectedPreviewIndex >= list.length) {
         setSelectedPreviewIndex(0);
       }
@@ -169,9 +173,12 @@ const AdminHeroSlider = () => {
   const handleToggleActive = async (slide) => {
     const newStatus = slide.isActive === false ? true : false;
     try {
-      setSlides((prev) =>
-        prev.map((s) => (s._id === slide._id ? { ...s, isActive: newStatus } : s))
-      );
+      const updatedSlides = slides.map((s) => (s._id === slide._id ? { ...s, isActive: newStatus } : s));
+      setSlides(updatedSlides);
+      try {
+        const activeOnly = updatedSlides.filter((s) => s.isActive !== false);
+        localStorage.setItem('cached_hero_slides', JSON.stringify(activeOnly));
+      } catch (e) {}
       await updateHeroSlide(slide._id, { isActive: newStatus });
       showToast(newStatus ? 'Slide activée' : 'Slide désactivée', 'info');
     } catch (err) {
