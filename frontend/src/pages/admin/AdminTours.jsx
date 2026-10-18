@@ -89,17 +89,63 @@ const AdminTours = () => {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const galleryFileInputRef = useRef(null);
 
-  const loadTours = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('all');
+  const [selectedFilterStatus, setSelectedFilterStatus] = useState('all');
+  const ITEMS_PER_PAGE = 10;
+
+  const loadTours = (page = currentPage, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
     setLoading(true);
-    fetchAdminTours()
+    fetchAdminTours({
+      page,
+      limit: ITEMS_PER_PAGE,
+      search: (search || '').trim(),
+      category: category !== 'all' ? category : undefined,
+      status: status !== 'all' ? status : undefined
+    })
       .then((res) => {
-        setTours(res.data);
+        if (res.data && res.data.tours) {
+          setTours(res.data.tours);
+          setTotalRecords(res.data.total !== undefined ? res.data.total : res.data.tours.length);
+          setTotalPages(res.data.totalPages || 1);
+          setCurrentPage(res.data.page || page);
+        } else {
+          const list = Array.isArray(res.data) ? res.data : [];
+          setTours(list);
+          setTotalRecords(list.length);
+          setTotalPages(Math.ceil(list.length / ITEMS_PER_PAGE) || 1);
+        }
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+      setCurrentPage(newPage);
+      loadTours(newPage, searchTerm, selectedFilterCategory, selectedFilterStatus);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
   };
 
   const loadDestinations = () => {
@@ -379,18 +425,26 @@ const AdminTours = () => {
     });
   };
 
-  const filteredTours = tours.filter((t) => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    const matchCities = Array.isArray(t.cities) && t.cities.some(c => (c.name || '').toLowerCase().includes(term));
-    return (
-      t.title?.toLowerCase().includes(term) ||
-      t.category?.toLowerCase().includes(term) ||
-      t.region?.toLowerCase().includes(term) ||
-      t.location?.toLowerCase().includes(term) ||
-      matchCities
-    );
-  });
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    setCurrentPage(1);
+    loadTours(1, val, selectedFilterCategory, selectedFilterStatus);
+  };
+
+  const handleCategoryFilterChange = (e) => {
+    const val = e.target.value;
+    setSelectedFilterCategory(val);
+    setCurrentPage(1);
+    loadTours(1, searchTerm, val, selectedFilterStatus);
+  };
+
+  const handleStatusFilterChange = (e) => {
+    const val = e.target.value;
+    setSelectedFilterStatus(val);
+    setCurrentPage(1);
+    loadTours(1, searchTerm, selectedFilterCategory, val);
+  };
 
   return (
     <AdminLayout 
@@ -398,27 +452,60 @@ const AdminTours = () => {
       subtitle="Manage published tour packages, linked destination categories, and connected city tags."
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ position: 'relative', width: '280px' }}>
-          <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }}></i>
-          <input 
-            type="text" 
-            className="form-control" 
-            placeholder="Search tour, category, city..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ paddingLeft: '34px', fontSize: '0.88rem', height: '38px', borderRadius: '8px' }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', flex: '1 1 320px' }}>
+          <div style={{ position: 'relative', width: '260px' }}>
+            <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }}></i>
+            <input 
+              type="text" 
+              className="form-control" 
+              placeholder="Search tour, city..." 
+              value={searchTerm}
+              onChange={handleSearchChange}
+              style={{ paddingLeft: '34px', fontSize: '0.88rem', height: '38px', borderRadius: '8px' }}
+            />
+          </div>
+
+          <select
+            className="form-control"
+            value={selectedFilterCategory}
+            onChange={handleCategoryFilterChange}
+            style={{ width: '160px', height: '38px', fontSize: '0.85rem', borderRadius: '8px' }}
+          >
+            <option value="all">All Categories</option>
+            {combinedCategories.map(c => (
+              <option key={c.slug || c._id} value={c.slug}>{c.name}</option>
+            ))}
+          </select>
+
+          <select
+            className="form-control"
+            value={selectedFilterStatus}
+            onChange={handleStatusFilterChange}
+            style={{ width: '130px', height: '38px', fontSize: '0.85rem', borderRadius: '8px' }}
+          >
+            <option value="all">All Status</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <Link 
+            to="/admin/itinerary-slider" 
+            className="btn btn-outline" 
+            style={{ background: '#F0FDFA', color: '#0D9488', borderColor: '#99F6E4', display: 'flex', alignItems: 'center', gap: '6px' }}
+            title="Manage Itinerary Sliders across all tours"
+          >
+            <i className="fas fa-images"></i> Itinerary Sliders
+          </Link>
           <button 
             type="button" 
             className="btn" 
             onClick={handleUnfeatureAll}
-            style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FCA5A5' }}
+            style={{ background: '#FEE2E2', color: '#DC2626', border: '1px solid #FCA5A5', display: 'flex', alignItems: 'center', gap: '6px' }}
             title="Décocher tous les circuits de la page d'accueil"
           >
-            <i className="fas fa-eye-slash"></i> Retirer Tous de l'Accueil
+            <i className="fas fa-eye-slash"></i> Retirer de l'Accueil
           </button>
           <button className="btn btn-primary" onClick={handleOpenCreate}>
             <i className="fas fa-plus"></i> Create New Tour
@@ -526,6 +613,53 @@ const AdminTours = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="admin-pagination-container">
+            <div className="admin-pagination-info">
+              Showing <strong>{totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalRecords)}</strong> of <strong>{totalRecords}</strong> tour packages
+            </div>
+
+            {totalPages > 1 && (
+              <div className="admin-pagination-controls">
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  title="Previous Page"
+                >
+                  <i className="fas fa-chevron-left"></i> Previous
+                </button>
+
+                {getPageNumbers().map((p, idx) => {
+                  if (p === '...') {
+                    return <span key={`ellipsis-${idx}`} className="admin-page-ellipsis">•••</span>;
+                  }
+                  return (
+                    <button
+                      key={`page-${p}`}
+                      type="button"
+                      className={`admin-page-btn ${currentPage === p ? 'active' : ''}`}
+                      onClick={() => handlePageChange(p)}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  title="Next Page"
+                >
+                  Next <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

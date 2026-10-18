@@ -43,11 +43,30 @@ const CustomUrlResolver = () => {
           const item = customRes.data;
 
           if (item.targetUrl) {
-            const cleanTarget = item.targetUrl.trim().toLowerCase();
+            let cleanTarget = item.targetUrl.trim().toLowerCase();
+            const normalizedCurrent = path.toLowerCase().trim();
 
-            // Handle 301 / 302 Redirects
-            if (item.redirectType === 301 || item.redirectType === 302 || item.targetUrl.startsWith('http')) {
+            // Ignore '#' targets or self-links without redirect loops
+            if (cleanTarget === '#' || cleanTarget.startsWith('#')) {
+              if (isMounted) setResolvedType('home');
+              return;
+            }
+
+            // External URLs
+            if (item.targetUrl.startsWith('http://') || item.targetUrl.startsWith('https://')) {
               window.location.replace(item.targetUrl);
+              return;
+            }
+
+            // Package category redirect /destination/{slug} -> /category/{slug}
+            if (cleanTarget.startsWith('/destination/') && !cleanTarget.startsWith('/destinations/')) {
+              cleanTarget = cleanTarget.replace('/destination/', '/category/');
+              item.targetUrl = item.targetUrl.replace(/\/destination\//i, '/category/');
+            }
+
+            // Handle 301 / 302 Redirects without self-looping
+            if (cleanTarget !== normalizedCurrent && (item.redirectType === 301 || item.redirectType === 302)) {
+              navigate(item.targetUrl, { replace: true });
               return;
             }
 

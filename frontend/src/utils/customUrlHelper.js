@@ -19,12 +19,24 @@ export const loadCustomUrlMappings = async () => {
  */
 export const getCustomPath = (targetPath) => {
   if (!targetPath) return '';
+  const trimmed = targetPath.trim();
+  if (trimmed === '#' || trimmed.startsWith('#')) return trimmed;
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('mailto:') ||
+    trimmed.startsWith('tel:') ||
+    trimmed.startsWith('javascript:')
+  ) {
+    return trimmed;
+  }
+
   const [path, hash] = targetPath.split('#');
   const hashSuffix = hash ? `#${hash}` : '';
 
   if (!cachedCustomUrls || cachedCustomUrls.length === 0) return targetPath;
 
-  const normalizedTarget = path.toLowerCase().trim();
+  const normalizedTarget = (path || '').toLowerCase().trim();
   const match = cachedCustomUrls.find(
     (item) => item.active !== false && item.targetUrl && item.targetUrl.toLowerCase().trim() === normalizedTarget
   );

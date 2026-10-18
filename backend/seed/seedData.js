@@ -436,24 +436,6 @@ export const destinationsData = [
     ],
     featured: false,
     published: true
-  },
-  {
-    name: 'Goa & Côte Tropicale',
-    slug: 'goa',
-    region: 'inde-du-sud',
-    tagline: 'Plages Dorées, Églises Baroques et Douceur de Vivre',
-    shortDescription: 'Une escale ensoleillée et apaisante alliant plages paradisiaques de la mer d’Arabie, églises de Vieux-Goa classées UNESCO, demeures indo-portugaises et plantations d’épices.',
-    fullDescription: 'Perle de la côte ouest indienne, Goa séduit par la beauté de son littoral, son ambiance chaleureuse et son métissage culturel indo-portugais.',
-    bestTimeToVisit: 'De novembre à avril',
-    image: '/images/dest-goa.jpg',
-    gallery: ['/images/dest-goa.jpg'],
-    highlights: [
-      'Basilique du Bon Jésus et cathédrale Sainte-Catherine (UNESCO)',
-      'Plages préservées d’Agonda et Palolem bordées de cocotiers',
-      'Croisière au coucher du soleil sur la rivière Mandovi'
-    ],
-    featured: true,
-    published: true
   }
 ];
 

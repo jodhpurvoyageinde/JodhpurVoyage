@@ -46,7 +46,7 @@ const customUrlSchema = new mongoose.Schema(
 
 // Normalize customPath before saving (e.g. ensure leading slash if omitted)
 customUrlSchema.pre('save', function (next) {
-  if (this.customPath && !this.customPath.startsWith('/')) {
+  if (this.customPath && !this.customPath.startsWith('/') && !this.customPath.startsWith('http') && this.customPath !== '#') {
     this.customPath = '/' + this.customPath;
   }
   next();

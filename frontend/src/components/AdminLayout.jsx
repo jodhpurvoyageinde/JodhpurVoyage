@@ -31,14 +31,9 @@ const AdminLayout = ({ children, title, subtitle }) => {
     navigate('/admin/login');
   };
 
-  const isTeamPage = location.pathname === '/admin/pages' && new URLSearchParams(location.search).get('page') === 'notre-equipe';
-
   const isActive = (path) => {
     if (path === '/admin/dashboard') {
       return location.pathname === '/admin' || location.pathname === '/admin/dashboard';
-    }
-    if (path === '/admin/pages') {
-      return location.pathname === '/admin/pages' && !isTeamPage;
     }
     return location.pathname.startsWith(path);
   };
@@ -98,12 +93,6 @@ const AdminLayout = ({ children, title, subtitle }) => {
               <span>Hero Slider (Accueil)</span>
             </Link>
           </li>
-          <li className={`admin-nav-item ${isActive('/admin/itinerary-slider') ? 'active' : ''}`}>
-            <Link to="/admin/itinerary-slider">
-              <i className="fas fa-images"></i>
-              <span>Itinerary Sliders</span>
-            </Link>
-          </li>
           <li className={`admin-nav-item ${isActive('/admin/destinations') ? 'active' : ''}`}>
             <Link to="/admin/destinations">
               <i className="fas fa-map-marked-alt"></i>
@@ -126,12 +115,6 @@ const AdminLayout = ({ children, title, subtitle }) => {
             <Link to="/admin/pages">
               <i className="fas fa-palette"></i>
               <span>Pages & Sections CMS</span>
-            </Link>
-          </li>
-          <li className={`admin-nav-item ${isTeamPage ? 'active' : ''}`}>
-            <Link to="/admin/pages?page=notre-equipe&tab=team">
-              <i className="fas fa-users"></i>
-              <span>Notre Équipe (Team)</span>
             </Link>
           </li>
           <li className={`admin-nav-item ${isActive('/admin/seo') ? 'active' : ''}`}>

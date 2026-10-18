@@ -9,8 +9,6 @@ const PAGE_GROUPS = [
     icon: 'fas fa-users',
     pages: [
       { key: 'qui-sommes-nous', title: 'About Us', url: '/qui-sommes-nous', image: '/images/image-12.jpg' },
-      { key: 'notre-valeur-ajoutee', title: 'Our Added Value', url: '/notre-valeur-ajoutee', image: '/images/image-9.jpg' },
-      { key: 'notre-engagement-responsable', title: 'Our Sustainable Commitment', url: '/notre-engagement-responsable', image: '/images/image-6.jpg' },
       { key: 'notre-equipe', title: 'Our Team', url: '/notre-equipe', image: '/images/image-8.jpg' }
     ]
   },
@@ -18,25 +16,7 @@ const PAGE_GROUPS = [
     groupTitle: 'Menu "Inspiration"',
     icon: 'fas fa-lightbulb',
     pages: [
-      { key: 'circuit-accompagne', title: 'Guided Tour', url: '/circuit-accompagne', image: '/images/image-9.jpg' },
-      { key: 'culture-et-safari', title: 'Culture & Safari', url: '/culture-et-safari', image: '/images/image-6.jpg' },
-      { key: 'plus-de-10-personnes', title: '10+ Travelers (Groups)', url: '/plus-de-10-personnes', image: '/images/slide4-300x176.jpg' },
-      { key: 'inspirations', title: 'All Inspirations', url: '/inspirations', image: '/images/slide8-300x176.jpg' }
-    ]
-  },
-  {
-    groupTitle: 'Menu "Practical Info"',
-    icon: 'fas fa-info-circle',
-    pages: [
-      { key: 'visa-inde-nepal', title: "Visa for India & Nepal", url: '/visa-inde-nepal', image: '/images/image-6.jpg' },
-      { key: 'quand-partir', title: 'When to Travel', url: '/quand-partir', image: '/images/image-12.jpg' },
-      { key: 'climat-meteo', title: 'Climate & Weather', url: '/climat-meteo', image: '/images/image-9.jpg' },
-      { key: 'sante-vaccins', title: 'Health & Vaccines', url: '/sante-vaccins', image: '/images/image-6.jpg' },
-      { key: 'monnaie-change', title: 'Currency & Exchange (Rupee)', url: '/monnaie-change', image: '/images/image-12.jpg' },
-      { key: 'transports-chauffeur', title: 'Transport & Private Driver', url: '/transports-chauffeur', image: '/images/image-9.jpg' },
-      { key: 'conseils-pratiques', title: 'Practical Tips & Etiquette', url: '/conseils-pratiques', image: '/images/image-12.jpg' },
-      { key: 'faq', title: 'Frequently Asked Questions', url: '/faq', image: '/images/image-6.jpg' },
-      { key: 'infos-pratiques', title: 'Practical Info (Overview)', url: '/infos-pratiques', image: '/images/image-6.jpg' }
+      { key: 'culture-et-safari', title: 'Culture & Safari', url: '/culture-et-safari', image: '/images/image-6.jpg' }
     ]
   }
 ];

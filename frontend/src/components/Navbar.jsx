@@ -154,7 +154,7 @@ const DEFAULT_MEGA_CONFIG = {
     items: [
       { title: 'Voyage sur mesure', link: '/voyage-sur-mesure', image: '/images/image-12.jpg', order: 1 },
       { title: 'Circuit accompagné', link: '/circuit-accompagne', image: '/images/image-9.jpg', order: 2 },
-      { title: 'Culture & Safari', link: '/culture-et-safari', image: '/images/image-6.jpg', order: 3 },
+      { title: 'Culture & Safari', link: '#', image: '/images/image-6.jpg', order: 3 },
       { title: '+ de 10 personnes', link: '/plus-de-10-personnes', image: '/images/slide4-300x176.jpg', order: 4 },
       { title: 'Toutes les inspirations', link: '/inspirations', image: '/images/slide8-300x176.jpg', order: 5 }
     ]
@@ -201,31 +201,31 @@ const Navbar = () => {
             key: 'nord',
             title: 'Inde du Nord',
             icon: 'fas fa-gopuram',
-            subcategories: [...DEFAULT_DESTINATION_GROUPS[0].subcategories]
+            subcategories: []
           },
           sud: {
             key: 'sud',
             title: 'Inde du Sud',
             icon: 'fas fa-tree',
-            subcategories: [...DEFAULT_DESTINATION_GROUPS[1].subcategories]
+            subcategories: []
           },
           ouest: {
             key: 'ouest',
             title: "Inde de l'Est & de l'Ouest",
             icon: 'fas fa-compass',
-            subcategories: [...DEFAULT_DESTINATION_GROUPS[2].subcategories]
+            subcategories: []
           },
           nepal: {
             key: 'nepal',
             title: 'Népal',
             icon: 'fas fa-mountain',
-            subcategories: [...DEFAULT_DESTINATION_GROUPS[3].subcategories]
+            subcategories: []
           },
           bhoutan: {
             key: 'bhoutan',
             title: 'Bhoutan',
             icon: 'fas fa-place-of-worship',
-            subcategories: [...DEFAULT_DESTINATION_GROUPS[4].subcategories]
+            subcategories: []
           }
         };
 
@@ -425,7 +425,15 @@ const Navbar = () => {
     }
     setHoveredMega(null);
     closeMobileMenu();
-    if (!targetUrl) return;
+
+    if (!targetUrl || targetUrl === '#' || targetUrl.trim() === '#') {
+      if (e && e.preventDefault) e.preventDefault();
+      return;
+    }
+
+    if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+      return;
+    }
 
     let resolvedTarget = targetUrl;
     if (targetUrl === '/notre-valeur-ajoutee' || targetUrl === '/notre-valeur-ajoutee.html') {
@@ -743,14 +751,62 @@ const Navbar = () => {
                     {inspirationMenu.headerText || 'LE VOYAGE SELON'} <span>{inspirationMenu.headerHighlight || 'VOS ENVIES'}</span>
                   </div>
                   <div className="mega-inspirations-grid">
-                    {(inspirationMenu.items || []).map((item, idx) => (
-                      <Link key={idx} to={getCustomPath(item.link || '/voyage-sur-mesure')} className="mega-inspiration-card" onClick={(e) => handleMegaItemClick(e, item.link)}>
-                        <div className="inspiration-img-wrap">
-                          <img src={item.image || '/images/image-12.jpg'} alt={item.title} onError={(e) => { e.target.src = '/images/slide4-300x176.jpg'; }} />
-                        </div>
-                        <span className="inspiration-card-title">{item.title}</span>
-                      </Link>
-                    ))}
+                    {(inspirationMenu.items || []).map((item, idx) => {
+                      const rawLink = item.link || '/voyage-sur-mesure';
+                      const isHash = rawLink === '#' || rawLink.trim() === '#';
+                      const isExternal = rawLink.startsWith('http://') || rawLink.startsWith('https://');
+
+                      if (isHash) {
+                        return (
+                          <a
+                            key={idx}
+                            href="#"
+                            className="mega-inspiration-card"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleMegaItemClick(e, '#');
+                            }}
+                          >
+                            <div className="inspiration-img-wrap">
+                              <img src={item.image || '/images/image-12.jpg'} alt={item.title} onError={(e) => { e.target.src = '/images/slide4-300x176.jpg'; }} />
+                            </div>
+                            <span className="inspiration-card-title">{item.title}</span>
+                          </a>
+                        );
+                      }
+
+                      if (isExternal) {
+                        return (
+                          <a
+                            key={idx}
+                            href={rawLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mega-inspiration-card"
+                            onClick={(e) => handleMegaItemClick(e, rawLink)}
+                          >
+                            <div className="inspiration-img-wrap">
+                              <img src={item.image || '/images/image-12.jpg'} alt={item.title} onError={(e) => { e.target.src = '/images/slide4-300x176.jpg'; }} />
+                            </div>
+                            <span className="inspiration-card-title">{item.title}</span>
+                          </a>
+                        );
+                      }
+
+                      return (
+                        <Link
+                          key={idx}
+                          to={getCustomPath(rawLink)}
+                          className="mega-inspiration-card"
+                          onClick={(e) => handleMegaItemClick(e, rawLink)}
+                        >
+                          <div className="inspiration-img-wrap">
+                            <img src={item.image || '/images/image-12.jpg'} alt={item.title} onError={(e) => { e.target.src = '/images/slide4-300x176.jpg'; }} />
+                          </div>
+                          <span className="inspiration-card-title">{item.title}</span>
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

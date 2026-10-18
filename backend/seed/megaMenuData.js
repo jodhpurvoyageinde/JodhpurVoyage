@@ -128,7 +128,7 @@ export const defaultMegaMenuData = {
       },
       {
         title: 'Culture & Safari',
-        link: '/culture-et-safari',
+        link: '#',
         image: '/images/image-6.jpg',
         order: 3
       },

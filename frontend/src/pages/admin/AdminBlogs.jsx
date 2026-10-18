@@ -29,11 +29,30 @@ const AdminBlogs = () => {
 
   const [formData, setFormData] = useState(initialForm);
 
-  const loadBlogs = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const ITEMS_PER_PAGE = 10;
+
+  const loadBlogs = (page = currentPage, search = searchTerm) => {
     setLoading(true);
-    fetchAdminBlogs()
+    fetchAdminBlogs({
+      page,
+      limit: ITEMS_PER_PAGE,
+      search: (search || '').trim()
+    })
       .then((res) => {
-        setBlogs(res.data);
+        if (res.data && res.data.blogs) {
+          setBlogs(res.data.blogs);
+          setTotalRecords(res.data.total !== undefined ? res.data.total : res.data.blogs.length);
+          setTotalPages(res.data.totalPages || 1);
+          setCurrentPage(res.data.page || page);
+        } else {
+          const list = Array.isArray(res.data) ? res.data : [];
+          setBlogs(list);
+          setTotalRecords(list.length);
+          setTotalPages(Math.ceil(list.length / ITEMS_PER_PAGE) || 1);
+        }
         setLoading(false);
       })
       .catch((err) => {
@@ -42,8 +61,31 @@ const AdminBlogs = () => {
       });
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+      setCurrentPage(newPage);
+      loadBlogs(newPage, searchTerm);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   useEffect(() => {
-    loadBlogs();
+    loadBlogs(1, searchTerm);
   }, []);
 
   const handleOpenCreate = () => {
@@ -96,14 +138,12 @@ const AdminBlogs = () => {
     }
   };
 
-  const filteredBlogs = blogs.filter((b) => {
-    if (!searchTerm) return true;
-    const term = searchTerm.toLowerCase();
-    return (
-      b.title?.toLowerCase().includes(term) ||
-      b.category?.toLowerCase().includes(term)
-    );
-  });
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchTerm(val);
+    setCurrentPage(1);
+    loadBlogs(1, val);
+  };
 
   return (
     <AdminLayout 
@@ -118,7 +158,7 @@ const AdminBlogs = () => {
             className="form-control" 
             placeholder="Search article..." 
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             style={{ paddingLeft: '34px', fontSize: '0.88rem', height: '38px', borderRadius: '8px' }}
           />
         </div>
@@ -133,7 +173,7 @@ const AdminBlogs = () => {
           <i className="fas fa-circle-notch fa-spin" style={{ fontSize: '2.5rem', color: 'var(--admin-primary)' }}></i>
           <p style={{ marginTop: '16px', color: 'var(--admin-text-muted)' }}>Loading articles...</p>
         </div>
-      ) : filteredBlogs.length === 0 ? (
+      ) : blogs.length === 0 ? (
         <div className="admin-table-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
           <i className="fas fa-newspaper" style={{ fontSize: '3rem', color: '#CBD5E1', marginBottom: '16px', display: 'block' }}></i>
           <h3 style={{ color: 'var(--admin-text-main)', margin: '0 0 8px' }}>No articles published</h3>
@@ -156,7 +196,7 @@ const AdminBlogs = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredBlogs.map((b) => (
+                {blogs.map((b) => (
                   <tr key={b._id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -201,6 +241,53 @@ const AdminBlogs = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="admin-pagination-container">
+            <div className="admin-pagination-info">
+              Showing <strong>{totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalRecords)}</strong> of <strong>{totalRecords}</strong> articles
+            </div>
+
+            {totalPages > 1 && (
+              <div className="admin-pagination-controls">
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  title="Previous Page"
+                >
+                  <i className="fas fa-chevron-left"></i> Previous
+                </button>
+
+                {getPageNumbers().map((p, idx) => {
+                  if (p === '...') {
+                    return <span key={`ellipsis-${idx}`} className="admin-page-ellipsis">•••</span>;
+                  }
+                  return (
+                    <button
+                      key={`page-${p}`}
+                      type="button"
+                      className={`admin-page-btn ${currentPage === p ? 'active' : ''}`}
+                      onClick={() => handlePageChange(p)}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  title="Next Page"
+                >
+                  Next <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

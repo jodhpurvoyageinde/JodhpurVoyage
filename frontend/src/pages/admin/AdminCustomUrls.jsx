@@ -519,12 +519,12 @@ const AdminCustomUrls = () => {
                     type="text"
                     className="form-control"
                     name="targetUrl"
-                    placeholder="ex: /destinations ou /tours/circuit-rajasthan-10-jours"
+                    placeholder="ex: /category/rajasthan, https://... ou #"
                     value={formData.targetUrl}
                     onChange={handleChange}
                     required
                   />
-                  <small style={{ fontSize: '0.75rem', color: '#64748B' }}>Chemin exact vers le composant ou la ressource interne</small>
+                  <small style={{ fontSize: '0.75rem', color: '#64748B' }}>Route interne (ex: /category/rajasthan), lien externe complet (https://...) ou '#'</small>
                 </div>
 
                 <div className="form-row-compact" style={{ marginBottom: '16px' }}>

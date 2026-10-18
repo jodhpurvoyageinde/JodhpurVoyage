@@ -21,13 +21,31 @@ const AdminReviews = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [formData, setFormData] = useState(DEFAULT_REVIEW_FORM);
-  const [submitting, setSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const ITEMS_PER_PAGE = 10;
 
-  const loadReviews = () => {
+  const loadReviews = (page = currentPage, status = filterStatus, search = searchQuery) => {
     setLoading(true);
-    fetchAdminReviews({ status: filterStatus })
+    fetchAdminReviews({
+      page,
+      limit: ITEMS_PER_PAGE,
+      status: status !== 'all' ? status : undefined,
+      search: (search || '').trim()
+    })
       .then((res) => {
-        setReviews(Array.isArray(res.data) ? res.data : (res.data?.reviews || []));
+        if (res.data && res.data.reviews) {
+          setReviews(res.data.reviews);
+          setTotalRecords(res.data.total !== undefined ? res.data.total : res.data.reviews.length);
+          setTotalPages(res.data.totalPages || 1);
+          setCurrentPage(res.data.page || page);
+        } else {
+          const list = Array.isArray(res.data) ? res.data : (res.data?.reviews || []);
+          setReviews(list);
+          setTotalRecords(list.length);
+          setTotalPages(Math.ceil(list.length / ITEMS_PER_PAGE) || 1);
+        }
         setLoading(false);
       })
       .catch((err) => {
@@ -36,9 +54,32 @@ const AdminReviews = () => {
       });
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+      setCurrentPage(newPage);
+      loadReviews(newPage, filterStatus, searchQuery);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   useEffect(() => {
-    loadReviews();
-  }, [filterStatus]);
+    loadReviews(1, filterStatus, searchQuery);
+  }, []);
 
   const handleOpenAdd = () => {
     setIsEditing(false);
@@ -118,15 +159,18 @@ const AdminReviews = () => {
     }
   };
 
-  // Filter reviews by search query locally
-  const filteredReviews = reviews.filter((r) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    const heading = (r.heading || r.title || r.tourTitle || '').toLowerCase();
-    const shortDesc = (r.shortDescription || r.excerpt || '').toLowerCase();
-    const longDesc = (r.longDescription || r.comment || '').toLowerCase();
-    return heading.includes(q) || shortDesc.includes(q) || longDesc.includes(q);
-  });
+  const handleFilterStatusChange = (status) => {
+    setFilterStatus(status);
+    setCurrentPage(1);
+    loadReviews(1, status, searchQuery);
+  };
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    setCurrentPage(1);
+    loadReviews(1, filterStatus, val);
+  };
 
   return (
     <AdminLayout 
@@ -136,18 +180,17 @@ const AdminReviews = () => {
       {/* Top Filter and Actions Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div className="admin-filter-bar" style={{ margin: 0 }}>
-          <button className={`admin-filter-chip ${filterStatus === 'all' ? 'active' : ''}`} onClick={() => setFilterStatus('all')}>
+          <button className={`admin-filter-chip ${filterStatus === 'all' ? 'active' : ''}`} onClick={() => handleFilterStatusChange('all')}>
             <i className="fas fa-list"></i>
-            <span>Tous les commentaires</span>
-            {filterStatus === 'all' && <span className="admin-filter-count">{reviews.length}</span>}
+            <span>Tous ({totalRecords})</span>
           </button>
-          <button className={`admin-filter-chip ${filterStatus === 'approved' ? 'active' : ''}`} onClick={() => setFilterStatus('approved')}>
+          <button className={`admin-filter-chip ${filterStatus === 'approved' ? 'active' : ''}`} onClick={() => handleFilterStatusChange('approved')}>
             <i className="fas fa-check-circle"></i>
-            <span>Publiés ({reviews.filter(r => r.status === 'approved').length})</span>
+            <span>Publiés</span>
           </button>
-          <button className={`admin-filter-chip ${filterStatus === 'rejected' ? 'active' : ''}`} onClick={() => setFilterStatus('rejected')}>
+          <button className={`admin-filter-chip ${filterStatus === 'rejected' ? 'active' : ''}`} onClick={() => handleFilterStatusChange('rejected')}>
             <i className="fas fa-eye-slash"></i>
-            <span>Masqués ({reviews.filter(r => r.status === 'rejected').length})</span>
+            <span>Masqués</span>
           </button>
         </div>
 
@@ -158,7 +201,7 @@ const AdminReviews = () => {
               type="text" 
               placeholder="Rechercher un commentaire..." 
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="form-control"
               style={{ paddingLeft: '34px', width: '250px', height: '38px', borderRadius: '8px' }}
             />
@@ -174,7 +217,7 @@ const AdminReviews = () => {
           <i className="fas fa-circle-notch fa-spin" style={{ fontSize: '2.5rem', color: 'var(--admin-primary)' }}></i>
           <p style={{ marginTop: '16px', color: 'var(--admin-text-muted)' }}>Chargement des commentaires...</p>
         </div>
-      ) : filteredReviews.length === 0 ? (
+      ) : reviews.length === 0 ? (
         <div className="admin-table-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
           <i className="fas fa-comments" style={{ fontSize: '3rem', color: '#CBD5E1', marginBottom: '16px', display: 'block' }}></i>
           <h3 style={{ color: 'var(--admin-text-main)', margin: '0 0 8px' }}>Aucun commentaire trouvé</h3>
@@ -198,7 +241,7 @@ const AdminReviews = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredReviews.map((r) => {
+                {reviews.map((r) => {
                   const rId = r._id || r.id;
                   const imgSrc = r.image || r.img || '/images/image-8.jpg';
                   const headingText = r.heading || r.title || r.tourTitle || 'Commentaire';
@@ -264,6 +307,53 @@ const AdminReviews = () => {
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="admin-pagination-container">
+            <div className="admin-pagination-info">
+              Showing <strong>{totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalRecords)}</strong> of <strong>{totalRecords}</strong> commentaires
+            </div>
+
+            {totalPages > 1 && (
+              <div className="admin-pagination-controls">
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  title="Previous Page"
+                >
+                  <i className="fas fa-chevron-left"></i> Previous
+                </button>
+
+                {getPageNumbers().map((p, idx) => {
+                  if (p === '...') {
+                    return <span key={`ellipsis-${idx}`} className="admin-page-ellipsis">•••</span>;
+                  }
+                  return (
+                    <button
+                      key={`page-${p}`}
+                      type="button"
+                      className={`admin-page-btn ${currentPage === p ? 'active' : ''}`}
+                      onClick={() => handlePageChange(p)}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  className="admin-page-btn admin-page-nav"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  title="Next Page"
+                >
+                  Next <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -12,6 +12,8 @@ if (!memoryStore.customUrls) {
 const normalizePath = (p) => {
   if (!p) return '/';
   let pathStr = p.trim().toLowerCase();
+  if (pathStr === '#' || pathStr.startsWith('#')) return '#';
+  if (pathStr.startsWith('http://') || pathStr.startsWith('https://')) return pathStr;
   if (!pathStr.startsWith('/')) {
     pathStr = '/' + pathStr;
   }

@@ -30,7 +30,7 @@ export const getAdminProfile = () => API.get('/auth/me');
 
 // Tours API
 export const fetchTours = (params) => API.get('/tours', { params });
-export const fetchAdminTours = () => API.get('/tours/admin/all');
+export const fetchAdminTours = (params) => API.get('/tours/admin/all', { params });
 export const fetchTourBySlug = (slug) => API.get(`/tours/${slug}`);
 export const createTour = (data) => API.post('/tours', data);
 export const updateTour = (id, data) => API.put(`/tours/${id}`, data);
@@ -71,7 +71,7 @@ export const deleteReview = (id) => API.delete(`/reviews/${id}`);
 
 // Blogs API
 export const fetchBlogs = (params) => API.get('/blogs', { params });
-export const fetchAdminBlogs = () => API.get('/blogs/admin/all');
+export const fetchAdminBlogs = (params) => API.get('/blogs/admin/all', { params });
 export const fetchBlogBySlug = (slug) => API.get(`/blogs/${slug}`);
 export const createBlog = (data) => API.post('/blogs', data);
 export const updateBlog = (id, data) => API.put(`/blogs/${id}`, data);

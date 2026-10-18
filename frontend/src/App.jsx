@@ -46,6 +46,12 @@ const TourRedirect = () => {
   return <Navigate to={`/${slug}`} replace />;
 };
 
+// Redirect legacy package category /destination/:category to /category/:category
+const PackageCategoryRedirect = () => {
+  const { category } = useParams();
+  return <Navigate to={`/category/${category}`} replace />;
+};
+
 const AppLayout = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -78,6 +84,8 @@ const AppLayout = () => {
           <Route path="/circuits.html" element={<Tours />} />
           <Route path="/category/:category" element={<Tours />} />
           <Route path="/category/inde-du-nord" element={<Tours />} />
+          <Route path="/destination/:category" element={<PackageCategoryRedirect />} />
+          <Route path="/destination/:category.html" element={<PackageCategoryRedirect />} />
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/destinations/:slug" element={<DestinationDetail />} />
           <Route path="/destination-rajasthan" element={<DestinationDetail />} />

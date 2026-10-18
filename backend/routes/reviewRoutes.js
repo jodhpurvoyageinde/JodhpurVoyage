@@ -173,10 +173,43 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/reviews/admin/all
+// GET /api/reviews/admin/all (All reviews for Admin Panel with Server-Side Pagination)
 router.get('/admin/all', protect, adminOnly, async (req, res) => {
   try {
-    const { status } = req.query;
+    const isAll = req.query.all === 'true' || req.query.all === true;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = isAll ? 0 : Math.max(1, parseInt(req.query.limit) || 10);
+    const search = req.query.search ? req.query.search.trim() : '';
+    const status = req.query.status && req.query.status !== 'all' ? req.query.status : '';
+    const sort = req.query.sort || 'newest';
+
+    const conditions = [];
+
+    if (status && status !== 'all') {
+      conditions.push({ status });
+    }
+
+    if (search) {
+      const sRegex = new RegExp(search, 'i');
+      conditions.push({
+        $or: [
+          { heading: sRegex },
+          { title: sRegex },
+          { authorName: sRegex },
+          { authorCity: sRegex },
+          { shortDescription: sRegex },
+          { longDescription: sRegex },
+          { comment: sRegex },
+          { excerpt: sRegex },
+          { tourTitle: sRegex }
+        ]
+      });
+    }
+
+    const query = conditions.length > 1 ? { $and: conditions } : (conditions.length === 1 ? conditions[0] : {});
+
+    let sortObj = { createdAt: -1 };
+    if (sort === 'oldest') sortObj = { createdAt: 1 };
 
     if (isMongoConnected()) {
       const countTotal = await Review.countDocuments();
@@ -184,10 +217,27 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
         await Review.insertMany(defaultReviewsData);
       }
 
-      let query = {};
-      if (status && status !== 'all') query.status = status;
-      const reviews = await Review.find(query).sort({ createdAt: -1 });
-      return res.json(reviews.map(normalizeReview));
+      const total = await Review.countDocuments(query);
+      if (isAll) {
+        const allReviews = await Review.find(query).sort(sortObj);
+        return res.json({
+          reviews: allReviews.map(normalizeReview),
+          total,
+          page: 1,
+          totalPages: 1,
+          limit: total
+        });
+      }
+
+      const skip = (page - 1) * limit;
+      const reviews = await Review.find(query).sort(sortObj).skip(skip).limit(limit);
+      return res.json({
+        reviews: reviews.map(normalizeReview),
+        total,
+        page,
+        totalPages: Math.ceil(total / limit) || 1,
+        limit
+      });
     }
 
     if (!memoryStore.reviews || memoryStore.reviews.length === 0) {
@@ -200,7 +250,37 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
 
     let list = [...memoryStore.reviews];
     if (status && status !== 'all') list = list.filter((r) => r.status === status);
-    res.json(list.map(normalizeReview));
+    if (search) {
+      const s = search.toLowerCase();
+      list = list.filter((r) =>
+        (r.authorName || '').toLowerCase().includes(s) ||
+        (r.heading || '').toLowerCase().includes(s) ||
+        (r.comment || '').toLowerCase().includes(s) ||
+        (r.shortDescription || '').toLowerCase().includes(s) ||
+        (r.longDescription || '').toLowerCase().includes(s)
+      );
+    }
+
+    const total = list.length;
+    if (isAll) {
+      return res.json({
+        reviews: list.map(normalizeReview),
+        total,
+        page: 1,
+        totalPages: 1,
+        limit: total
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const paged = list.slice(skip, skip + limit);
+    res.json({
+      reviews: paged.map(normalizeReview),
+      total,
+      page,
+      totalPages: Math.ceil(total / limit) || 1,
+      limit
+    });
   } catch (error) {
     res.status(500).json({ message: 'Erreur récupération avis' });
   }

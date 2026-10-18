@@ -322,14 +322,110 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/tours/admin/all (All tours for Admin Panel)
+// GET /api/tours/admin/all (All tours for Admin Panel with Server-Side Pagination)
 router.get('/admin/all', protect, adminOnly, async (req, res) => {
   try {
-    if (isMongoConnected()) {
-      const tours = await Tour.find().sort({ createdAt: -1 });
-      return res.json(tours.map(normalizeTour));
+    const isAll = req.query.all === 'true' || req.query.all === true;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = isAll ? 0 : Math.max(1, parseInt(req.query.limit) || 10);
+    const search = req.query.search ? req.query.search.trim() : '';
+    const category = req.query.category && req.query.category !== 'all' ? req.query.category.trim() : '';
+    const status = req.query.status && req.query.status !== 'all' ? req.query.status : '';
+    const sort = req.query.sort || 'newest';
+
+    const conditions = [];
+
+    if (status === 'published') conditions.push({ published: true });
+    else if (status === 'draft') conditions.push({ published: false });
+
+    if (category) {
+      const catRegex = new RegExp(category.replace(/-/g, ' '), 'i');
+      conditions.push({
+        $or: [
+          { category: catRegex },
+          { region: catRegex },
+          { 'cities.name': catRegex },
+          { 'cities.slug': new RegExp(category, 'i') }
+        ]
+      });
     }
-    res.json((memoryStore.tours || []).map(normalizeTour));
+
+    if (search) {
+      const sRegex = new RegExp(search, 'i');
+      conditions.push({
+        $or: [
+          { title: sRegex },
+          { subtitle: sRegex },
+          { overview: sRegex },
+          { location: sRegex },
+          { category: sRegex }
+        ]
+      });
+    }
+
+    const query = conditions.length > 1 ? { $and: conditions } : (conditions.length === 1 ? conditions[0] : {});
+
+    let sortObj = { createdAt: -1 };
+    if (sort === 'oldest') sortObj = { createdAt: 1 };
+    else if (sort === 'title_asc') sortObj = { title: 1 };
+    else if (sort === 'title_desc') sortObj = { title: -1 };
+
+    if (isMongoConnected()) {
+      const total = await Tour.countDocuments(query);
+      if (isAll) {
+        const allTours = await Tour.find(query).sort(sortObj);
+        return res.json({
+          tours: allTours.map(normalizeTour),
+          total,
+          page: 1,
+          totalPages: 1,
+          limit: total
+        });
+      }
+
+      const skip = (page - 1) * limit;
+      const tours = await Tour.find(query).sort(sortObj).skip(skip).limit(limit);
+      return res.json({
+        tours: tours.map(normalizeTour),
+        total,
+        page,
+        totalPages: Math.ceil(total / limit) || 1,
+        limit
+      });
+    }
+
+    let list = [...(memoryStore.tours || [])];
+    if (status === 'published') list = list.filter(t => t.published !== false);
+    else if (status === 'draft') list = list.filter(t => t.published === false);
+    if (category) {
+      const c = category.toLowerCase().replace(/-/g, ' ');
+      list = list.filter(t => (t.category || '').toLowerCase().includes(c) || (t.region || '').toLowerCase().includes(c));
+    }
+    if (search) {
+      const s = search.toLowerCase();
+      list = list.filter(t => (t.title || '').toLowerCase().includes(s) || (t.subtitle || '').toLowerCase().includes(s));
+    }
+
+    const total = list.length;
+    if (isAll) {
+      return res.json({
+        tours: list.map(normalizeTour),
+        total,
+        page: 1,
+        totalPages: 1,
+        limit: total
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const paged = list.slice(skip, skip + limit);
+    res.json({
+      tours: paged.map(normalizeTour),
+      total,
+      page,
+      totalPages: Math.ceil(total / limit) || 1,
+      limit
+    });
   } catch (error) {
     console.error('Erreur admin tours:', error);
     res.status(500).json({ message: 'Erreur récupération circuits' });

@@ -194,15 +194,104 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/blogs/admin/all
+// GET /api/blogs/admin/all (All blogs for Admin Panel with Server-Side Pagination)
 router.get('/admin/all', protect, adminOnly, async (req, res) => {
   try {
-    if (isMongoConnected()) {
-      const blogs = await BlogPost.find().sort({ createdAt: -1 });
-      return res.json(blogs.map(formatBlogPost));
+    const isAll = req.query.all === 'true' || req.query.all === true;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = isAll ? 0 : Math.max(1, parseInt(req.query.limit) || 10);
+    const search = req.query.search ? req.query.search.trim() : '';
+    const category = req.query.category && req.query.category !== 'all' ? req.query.category.trim() : '';
+    const sort = req.query.sort || 'newest';
+
+    const conditions = [];
+
+    if (category) {
+      const cRegex = new RegExp(category, 'i');
+      conditions.push({
+        $or: [
+          { category: cRegex },
+          { 'categories.name': cRegex },
+          { tags: cRegex }
+        ]
+      });
     }
-    res.json((memoryStore.blogs || []).map(formatBlogPost));
+
+    if (search) {
+      const sRegex = new RegExp(search, 'i');
+      conditions.push({
+        $or: [
+          { title: sRegex },
+          { excerpt: sRegex },
+          { content: sRegex },
+          { slug: sRegex }
+        ]
+      });
+    }
+
+    const query = conditions.length > 1 ? { $and: conditions } : (conditions.length === 1 ? conditions[0] : {});
+
+    let sortObj = { createdAt: -1 };
+    if (sort === 'oldest') sortObj = { createdAt: 1 };
+    else if (sort === 'title_asc') sortObj = { title: 1 };
+    else if (sort === 'title_desc') sortObj = { title: -1 };
+
+    if (isMongoConnected()) {
+      const total = await BlogPost.countDocuments(query);
+      if (isAll) {
+        const allBlogs = await BlogPost.find(query).sort(sortObj);
+        return res.json({
+          blogs: allBlogs.map(formatBlogPost),
+          total,
+          page: 1,
+          totalPages: 1,
+          limit: total
+        });
+      }
+
+      const skip = (page - 1) * limit;
+      const blogs = await BlogPost.find(query).sort(sortObj).skip(skip).limit(limit);
+      return res.json({
+        blogs: blogs.map(formatBlogPost),
+        total,
+        page,
+        totalPages: Math.ceil(total / limit) || 1,
+        limit
+      });
+    }
+
+    let list = [...(memoryStore.blogs || [])];
+    if (category) {
+      const c = category.toLowerCase();
+      list = list.filter(b => (b.category || '').toLowerCase().includes(c));
+    }
+    if (search) {
+      const s = search.toLowerCase();
+      list = list.filter(b => (b.title || '').toLowerCase().includes(s) || (b.excerpt || '').toLowerCase().includes(s));
+    }
+
+    const total = list.length;
+    if (isAll) {
+      return res.json({
+        blogs: list.map(formatBlogPost),
+        total,
+        page: 1,
+        totalPages: 1,
+        limit: total
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const paged = list.slice(skip, skip + limit);
+    res.json({
+      blogs: paged.map(formatBlogPost),
+      total,
+      page,
+      totalPages: Math.ceil(total / limit) || 1,
+      limit
+    });
   } catch (error) {
+    console.error('Erreur blogs admin:', error);
     res.status(500).json({ message: 'Erreur récupération articles admin' });
   }
 });
