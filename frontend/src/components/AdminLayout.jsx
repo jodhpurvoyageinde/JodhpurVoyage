@@ -146,7 +146,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
         </ul>
 
         <div className="admin-sidebar-footer">
-          <Link to="/" target="_blank" className="btn btn-outline btn-sm btn-full" style={{ borderColor: 'rgba(255,255,255,0.2)', color: '#F8FAFC' }}>
+          <Link to="/" target="_blank" className="btn btn-sm btn-full admin-sidebar-public-btn">
             <i className="fas fa-external-link-alt"></i> View Public Website
           </Link>
           <button onClick={handleLogout} className="btn btn-sm btn-full" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#FCA5A5', border: '1px solid rgba(239, 68, 68, 0.3)' }}>

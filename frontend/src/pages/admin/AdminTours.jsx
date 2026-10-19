@@ -6,7 +6,6 @@ import RichTextEditor from '../../components/RichTextEditor';
 import { 
   fetchAdminTours, 
   fetchAdminDestinations, 
-  fetchDestinationCategories, 
   createTour, 
   updateTour, 
   deleteTour, 
@@ -42,7 +41,6 @@ const DEFAULT_DESTINATIONS_PRESETS = [
 const AdminTours = () => {
   const [tours, setTours] = useState([]);
   const [destinationsList, setDestinationsList] = useState([]);
-  const [categoriesList, setCategoriesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingTour, setEditingTour] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -158,93 +156,67 @@ const AdminTours = () => {
       .catch((err) => console.error('Erreur chargement destinations admin:', err));
   };
 
-  const loadCategories = () => {
-    fetchDestinationCategories()
-      .then((res) => {
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          setCategoriesList(res.data);
-        }
-      })
-      .catch((err) => console.error('Erreur chargement catégories admin:', err));
-  };
-
   useEffect(() => {
     loadTours();
     loadDestinations();
-    loadCategories();
   }, []);
 
-  // Build combined list of all destinations added in system for tagging
-  const allDestinationsMap = [...DEFAULT_DESTINATIONS_PRESETS];
-  destinationsList.forEach((d) => {
-    if (d.name && !allDestinationsMap.some(item => item.name.toLowerCase() === d.name.toLowerCase())) {
-      allDestinationsMap.push({
-        _id: d._id,
-        name: d.name,
-        slug: d.slug || d.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
-        region: d.region || 'inde-du-nord'
-      });
-    }
-  });
-
-  // Build unified, de-duplicated list of all destination categories & created destinations for dropdown
+  // Source destinations directly from the Destination Panel (/admin/destinations)
   const combinedCategories = [];
   const seenCatNames = new Set();
 
-  // 1. Add all destinations created by admin in Destinations & Regions
-  (destinationsList || []).forEach((d) => {
-    const rawName = (d.name || '').trim();
-    const key = rawName.toLowerCase();
-    if (key && !seenCatNames.has(key)) {
-      seenCatNames.add(key);
-      combinedCategories.push({
-        _id: d._id,
-        name: rawName,
-        slug: d.slug || key.replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
-        region: d.region
-      });
-    }
-  });
-
-  // 2. Add categories from categoriesList
-  (categoriesList || []).forEach((cat) => {
-    const rawName = (cat.name || '').trim();
-    const key = rawName.toLowerCase();
-    if (key && !seenCatNames.has(key)) {
-      seenCatNames.add(key);
-      combinedCategories.push({
-        _id: cat._id,
-        name: rawName,
-        slug: cat.slug || key.replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
-        region: cat.region
-      });
-    }
-  });
-
-  // 3. Add default presets
-  DEFAULT_DESTINATIONS_PRESETS.forEach((preset) => {
-    const key = preset.name.toLowerCase();
-    if (!seenCatNames.has(key)) {
-      seenCatNames.add(key);
-      combinedCategories.push({
-        _id: preset.slug,
-        name: preset.name,
-        slug: preset.slug,
-        region: preset.region
-      });
-    }
-  });
+  if (Array.isArray(destinationsList) && destinationsList.length > 0) {
+    destinationsList.forEach((d) => {
+      const rawName = (d.name || '').trim();
+      const key = rawName.toLowerCase();
+      if (key && !seenCatNames.has(key)) {
+        seenCatNames.add(key);
+        combinedCategories.push({
+          _id: d._id,
+          name: rawName,
+          slug: d.slug || key.replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+          region: d.region
+        });
+      }
+    });
+  } else {
+    // Fallback only if database destinations list has not loaded yet
+    DEFAULT_DESTINATIONS_PRESETS.forEach((preset) => {
+      const key = preset.name.toLowerCase();
+      if (!seenCatNames.has(key)) {
+        seenCatNames.add(key);
+        combinedCategories.push({
+          _id: preset.slug,
+          name: preset.name,
+          slug: preset.slug,
+          region: preset.region
+        });
+      }
+    });
+  }
 
   // Sort alphabetically so admin can easily find any destination
   combinedCategories.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
 
+  // Build combined list of all destinations for city tags (sourced from Destination Panel)
+  const allDestinationsMap = (Array.isArray(destinationsList) && destinationsList.length > 0)
+    ? destinationsList.map((d) => ({
+        _id: d._id,
+        name: d.name,
+        slug: d.slug || d.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-'),
+        region: d.region || 'inde-du-nord'
+      }))
+    : DEFAULT_DESTINATIONS_PRESETS;
+
   const handleOpenCreate = () => {
+    loadDestinations();
     setEditingTour(null);
     setFormData(initialForm);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (tour) => {
+    loadDestinations();
     setEditingTour(tour);
     const title = tour.title || 'Circuit';
     const loc = tour.location || tour.region || 'Inde';
@@ -445,6 +417,8 @@ const AdminTours = () => {
     setCurrentPage(1);
     loadTours(1, searchTerm, selectedFilterCategory, val);
   };
+
+  const filteredTours = Array.isArray(tours) ? tours : [];
 
   return (
     <AdminLayout 
