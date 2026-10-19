@@ -90,6 +90,8 @@ const AppLayout = () => {
           <Route path="/destinations/:slug" element={<DestinationDetail />} />
           <Route path="/destination-rajasthan" element={<DestinationDetail />} />
           <Route path="/voyage-sur-mesure" element={<VoyageSurMesure />} />
+          <Route path="/custom-trip" element={<VoyageSurMesure />} />
+          <Route path="/custom-trip.html" element={<VoyageSurMesure />} />
           <Route path="/commentaires" element={<Commentaires />} />
           <Route path="/commentaire/:slug" element={<CommentaireDetail />} />
           <Route path="/commentaires/:slug" element={<CommentaireDetail />} />

@@ -41,6 +41,16 @@ export const getCustomPath = (targetPath) => {
     (item) => item.active !== false && item.targetUrl && item.targetUrl.toLowerCase().trim() === normalizedTarget
   );
 
-  const resolved = match ? match.customPath : path;
-  return resolved + hashSuffix;
+  if (!match || !match.customPath) return targetPath;
+
+  const resolved = match.customPath.toLowerCase().trim();
+
+  // Prevent cross-contamination: non-contact target resolving to contact customPath
+  const isTargetContact = normalizedTarget.includes('contact');
+  const isResolvedContact = resolved.includes('contact');
+  if (!isTargetContact && isResolvedContact) {
+    return path + hashSuffix;
+  }
+
+  return match.customPath + hashSuffix;
 };

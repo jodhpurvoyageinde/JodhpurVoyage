@@ -453,7 +453,7 @@ const AdminCustomUrls = () => {
                     <optgroup label="📍 Pages Principales du Site">
                       <option value="/destinations|custom">📍 Page Liste des Destinations (/destinations)</option>
                       <option value="/tours|custom">📍 Page Liste des Circuits / Tours (/tours)</option>
-                      <option value="/custom-trip|custom">📍 Page Demande Voyage sur Mesure (/custom-trip)</option>
+                      <option value="/voyage-sur-mesure|custom">📍 Page Voyage sur Mesure (/voyage-sur-mesure)</option>
                       <option value="/contact|custom">📍 Page Contact (/contact)</option>
                       <option value="/blog|custom">📍 Page Articles & Blog (/blog)</option>
                     </optgroup>
