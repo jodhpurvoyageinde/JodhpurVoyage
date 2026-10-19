@@ -59,6 +59,8 @@ const registerRoutes = (prefix) => {
   app.use(`${prefix}/auth`, authRoutes);
   app.use(`${prefix}/tours`, tourRoutes);
   app.use(`${prefix}/destinations`, destinationRoutes);
+  app.use(`${prefix}/category`, destinationRoutes);
+  app.use(`${prefix}/categories`, destinationRoutes);
   app.use(`${prefix}/bookings`, bookingRoutes);
   app.use(`${prefix}/contacts`, contactRoutes);
   app.use(`${prefix}/reviews`, reviewRoutes);

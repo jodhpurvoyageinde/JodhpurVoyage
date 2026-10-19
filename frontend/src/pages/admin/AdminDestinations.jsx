@@ -27,6 +27,7 @@ const PRESET_DESTINATIONS = [
 
   // South India
   { name: 'Kerala', region: 'inde-du-sud', image: '/images/dest-kerala.jpg', tagline: 'Lagunes des Backwaters et collines de thé' },
+  { name: 'Chennai', region: 'inde-du-sud', image: '/images/dest-karnataka.jpg', tagline: 'Porte d\'entrée du Tamil Nadu et héritage dravidien' },
   { name: 'Tamil Nadu', region: 'inde-du-sud', image: '/images/dest-karnataka.jpg', tagline: 'Temples dravidiens et Pondichéry' },
   { name: 'Karnataka', region: 'inde-du-sud', image: '/images/image-6.jpg', tagline: 'Ruines de Hampi et Palais de Mysore' },
   { name: 'Goa', region: 'inde-du-sud', image: '/images/dest-goa.jpg', tagline: 'Plages sous les cocotiers et églises portugaises' },

@@ -58,10 +58,10 @@ const CustomUrlResolver = () => {
               return;
             }
 
-            // Package category redirect /destination/{slug} -> /category/{slug}
-            if (cleanTarget.startsWith('/destination/') && !cleanTarget.startsWith('/destinations/')) {
-              cleanTarget = cleanTarget.replace('/destination/', '/category/');
-              item.targetUrl = item.targetUrl.replace(/\/destination\//i, '/category/');
+            // Package category or destination redirect /destination/{slug} or /destinations/{slug} -> /category/{slug}
+            if (cleanTarget.startsWith('/destination/') || cleanTarget.startsWith('/destinations/')) {
+              cleanTarget = cleanTarget.replace(/^\/destinations?\//i, '/category/');
+              item.targetUrl = item.targetUrl.replace(/^\/destinations?\//i, '/category/');
             }
 
             // Handle 301 / 302 Redirects without self-looping
@@ -134,7 +134,7 @@ const CustomUrlResolver = () => {
               return;
             }
             if (item.targetType === 'destination') {
-              const slugPart = item.targetUrl.replace(/^\/destinations\//, '').replace(/^\//, '');
+              const slugPart = item.targetUrl.replace(/^\/(destinations|category)\//, '').replace(/^\//, '');
               const s = slugPart || item.targetId || path.replace(/^\//, '');
               try {
                 const destRes = await fetchDestinationBySlug(s);

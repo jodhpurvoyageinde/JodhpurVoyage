@@ -794,7 +794,7 @@ const VoyageSurMesure = () => {
               <p className="region-card-text">
                 Le Rajasthan est le second État le plus touristique de l'Inde. Découvrez les splendeurs du Rajasthan, ses puissantes forteresses et ses palais de maharajas.
               </p>
-              <Link to="/destinations/rajasthan" className="region-card-link">
+              <Link to="/category/rajasthan" className="region-card-link">
                 Découvrir les circuits <i className="fas fa-arrow-right"></i>
               </Link>
             </div>

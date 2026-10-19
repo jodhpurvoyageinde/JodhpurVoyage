@@ -52,6 +52,12 @@ const PackageCategoryRedirect = () => {
   return <Navigate to={`/category/${category}`} replace />;
 };
 
+// Redirect legacy /destinations/:slug to /category/:slug
+const DestinationRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={`/category/${slug}`} replace />;
+};
+
 const AppLayout = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -82,13 +88,14 @@ const AppLayout = () => {
           <Route path="/tours/:slug" element={<TourRedirect />} />
           <Route path="/circuits" element={<Tours />} />
           <Route path="/circuits.html" element={<Tours />} />
-          <Route path="/category/:category" element={<Tours />} />
-          <Route path="/category/inde-du-nord" element={<Tours />} />
+          <Route path="/category/:slug" element={<DestinationDetail />} />
+          <Route path="/category/:slug/*" element={<DestinationDetail />} />
           <Route path="/destination/:category" element={<PackageCategoryRedirect />} />
           <Route path="/destination/:category.html" element={<PackageCategoryRedirect />} />
           <Route path="/destinations" element={<Destinations />} />
-          <Route path="/destinations/:slug" element={<DestinationDetail />} />
-          <Route path="/destination-rajasthan" element={<DestinationDetail />} />
+          <Route path="/destinations/:slug" element={<DestinationRedirect />} />
+          <Route path="/destinations/:slug/*" element={<DestinationRedirect />} />
+          <Route path="/destination-rajasthan" element={<DestinationDetail overrideSlug="rajasthan" />} />
           <Route path="/voyage-sur-mesure" element={<VoyageSurMesure />} />
           <Route path="/custom-trip" element={<VoyageSurMesure />} />
           <Route path="/custom-trip.html" element={<VoyageSurMesure />} />

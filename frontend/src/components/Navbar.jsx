@@ -9,13 +9,13 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Nord',
     icon: 'fas fa-gopuram',
     subcategories: [
-      { name: 'Rajasthan', path: '/destinations/rajasthan', searchKey: 'rajasthan' },
-      { name: 'Delhi & Agra (Taj Mahal)', path: '/destinations/delhi-agra', searchKey: 'delhi-agra' },
-      { name: 'Varanasi (Bénarès)', path: '/destinations/varanasi', searchKey: 'varanasi' },
-      { name: 'Amritsar & Punjab', path: '/destinations/amritsar-punjab', searchKey: 'amritsar-punjab' },
-      { name: 'Dharamsala & Himachal', path: '/destinations/dharamsala-himachal', searchKey: 'dharamsala-himachal' },
-      { name: 'Rishikesh & Uttarakhand', path: '/destinations/rishikesh-uttarakhand', searchKey: 'rishikesh-uttarakhand' },
-      { name: 'Ladakh (Petit Tibet)', path: '/destinations/ladakh', searchKey: 'ladakh' }
+      { name: 'Rajasthan', path: '/category/rajasthan', searchKey: 'rajasthan' },
+      { name: 'Delhi & Agra (Taj Mahal)', path: '/category/delhi-agra', searchKey: 'delhi-agra' },
+      { name: 'Varanasi (Bénarès)', path: '/category/varanasi', searchKey: 'varanasi' },
+      { name: 'Amritsar & Punjab', path: '/category/amritsar-punjab', searchKey: 'amritsar-punjab' },
+      { name: 'Dharamsala & Himachal', path: '/category/dharamsala-himachal', searchKey: 'dharamsala-himachal' },
+      { name: 'Rishikesh & Uttarakhand', path: '/category/rishikesh-uttarakhand', searchKey: 'rishikesh-uttarakhand' },
+      { name: 'Ladakh (Petit Tibet)', path: '/category/ladakh', searchKey: 'ladakh' }
     ]
   },
   {
@@ -23,11 +23,11 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Sud',
     icon: 'fas fa-tree',
     subcategories: [
-      { name: 'Kerala & Backwaters', path: '/destinations/kerala', searchKey: 'kerala' },
-      { name: 'Tamil Nadu & Temples', path: '/destinations/tamil-nadu', searchKey: 'tamil-nadu' },
-      { name: 'Karnataka & Hampi', path: '/destinations/karnataka', searchKey: 'karnataka' },
-      { name: 'Goa & Côte Tropicale', path: '/destinations/goa', searchKey: 'goa' },
-      { name: 'Orissa & Konark', path: '/destinations/orissa', searchKey: 'orissa' }
+      { name: 'Kerala & Backwaters', path: '/category/kerala', searchKey: 'kerala' },
+      { name: 'Tamil Nadu & Temples', path: '/category/tamil-nadu', searchKey: 'tamil-nadu' },
+      { name: 'Karnataka & Hampi', path: '/category/karnataka', searchKey: 'karnataka' },
+      { name: 'Goa & Côte Tropicale', path: '/category/goa', searchKey: 'goa' },
+      { name: 'Orissa & Konark', path: '/category/orissa', searchKey: 'orissa' }
     ]
   },
   {
@@ -35,7 +35,7 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: "Inde de l'Est & de l'Ouest",
     icon: 'fas fa-compass',
     subcategories: [
-      { name: 'Gujarat', path: '/destinations/gujarat', searchKey: 'gujarat' }
+      { name: 'Gujarat', path: '/category/gujarat', searchKey: 'gujarat' }
     ]
   },
   {
@@ -43,7 +43,7 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Népal',
     icon: 'fas fa-mountain',
     subcategories: [
-      { name: 'Népal', path: '/destinations/nepal', searchKey: 'nepal' }
+      { name: 'Népal', path: '/category/nepal', searchKey: 'nepal' }
     ]
   },
   {
@@ -51,7 +51,7 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Bhoutan',
     icon: 'fas fa-place-of-worship',
     subcategories: [
-      { name: 'Bhoutan', path: '/destinations/bhoutan', searchKey: 'bhoutan' }
+      { name: 'Bhoutan', path: '/category/bhoutan', searchKey: 'bhoutan' }
     ]
   }
 ];
@@ -96,10 +96,10 @@ const DEFAULT_MEGA_CONFIG = {
     description: 'Exprimez vos envies et nous concevrons un itinéraire unique, adapté à vos dates, votre rythme et votre budget.',
     links: [
       { label: 'Créer votre voyage', path: '/voyage-sur-mesure', icon: 'fas fa-magic' },
-      { label: 'Rajasthan sur mesure', path: '/destinations/rajasthan', icon: 'fas fa-crown' },
+      { label: 'Rajasthan sur mesure', path: '/category/rajasthan', icon: 'fas fa-crown' },
       { label: 'Inde du Nord', path: '/destinations', icon: 'fas fa-compass' },
-      { label: 'Inde du Sud', path: '/destinations/kerala', icon: 'fas fa-water' },
-      { label: 'Népal', path: '/destinations/nepal', icon: 'fas fa-hiking' },
+      { label: 'Inde du Sud', path: '/category/kerala', icon: 'fas fa-water' },
+      { label: 'Népal', path: '/category/nepal', icon: 'fas fa-hiking' },
       { label: 'Voyage aventure', path: '/tours', icon: 'fas fa-route' },
       { label: 'Voyage culturel', path: '/tours', icon: 'fas fa-landmark' }
     ],
@@ -278,7 +278,7 @@ const Navbar = () => {
           else if (reg === 'inde-du-sud' || reg === 'sud' || reg === 'kerala' || reg === 'karnataka' || reg === 'goa' || reg === 'orissa') colKey = 'sud';
           else colKey = 'nord';
 
-          const path = d.customUrl || `/destinations/${d.slug}`;
+          const path = d.customUrl || `/category/${d.slug}`;
 
           const existingIdx = groupMap[colKey].subcategories.findIndex(
             (s) => s.name.toLowerCase() === name.toLowerCase() || s.path === path

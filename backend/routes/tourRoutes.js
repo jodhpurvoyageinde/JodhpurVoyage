@@ -157,7 +157,7 @@ router.get('/', async (req, res) => {
           catPattern = 'kerala';
         } else if (catNorm === 'karnataka') {
           catPattern = 'karnataka';
-        } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil') {
+        } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil' || catNorm === 'chennai' || catNorm === 'madras') {
           catPattern = 'tamil|chennai|madras';
         } else if (catNorm === 'delhi-agra' || catNorm === 'delhi' || catNorm === 'agra') {
           catPattern = 'delhi|agra';

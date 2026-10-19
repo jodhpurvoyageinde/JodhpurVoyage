@@ -461,8 +461,8 @@ const AdminCustomUrls = () => {
                     {availableDestinations.length > 0 && (
                       <optgroup label="🏙️ Destinations Individuelles">
                         {availableDestinations.map((d) => (
-                          <option key={d._id || d.slug} value={`/destinations/${d.slug}|destination`}>
-                            🏙️ {d.name || d.title} (/destinations/{d.slug})
+                          <option key={d._id || d.slug} value={`/category/${d.slug}|destination`}>
+                            🏙️ {d.name || d.title} (/category/{d.slug})
                           </option>
                         ))}
                       </optgroup>

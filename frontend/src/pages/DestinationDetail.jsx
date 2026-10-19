@@ -199,6 +199,24 @@ const defaultDestinationsMap = {
     ],
     region: 'inde-du-sud'
   },
+  chennai: {
+    name: 'Chennai',
+    slug: 'chennai',
+    heroTitle: 'Voyage à Chennai',
+    h1Title: 'Chennai & Tamil Nadu : Cité Métropolitaine & Portes du Sud',
+    tagline: 'Porte d\'entrée du Tamil Nadu, temples dravidiens, plages de Marina et héritage colonial',
+    image: '/images/dest-karnataka.jpg',
+    satisfaction: '98% de satisfaction (64 avis)',
+    shortDescription: "Capitale vibrante du Tamil Nadu, Chennai (anciennement Madras) est la porte d’entrée incontournable de l’Inde du Sud. Découvrez la longue plage de Marina Beach, la basilique Saint-Thomas, le temple de Kapaleeshwarar et un riche patrimoine culturel et gastronomique.",
+    fullDescription: "Traversée du Sud de l'Inde de Chennai à la côte est à Cochin à la côte ouest. Au programme : les temples pyramidaux et colorés du Sud, l'ancien comptoir français de Pondichéry, l'ashram Aurobindo, le Parc national de Periyar et les eaux des backwaters d'Alleppey.",
+    highlights: [
+      { icon: 'fa-gopuram', title: 'Temple de Kapaleeshwarar', desc: 'Magnifique sanctuaire dravidien dédié à Shiva avec ses gopurams sculptés multicolores.' },
+      { icon: 'fa-umbrella-beach', title: 'Marina Beach', desc: 'Une des plus longues plages urbaines au monde vibrant au coucher du soleil.' },
+      { icon: 'fa-church', title: 'Basilique Saint-Thomas', desc: 'Édifice néo-gothique érigé sur le tombeau de l\'apôtre Thomas.' },
+      { icon: 'fa-monument', title: 'Fort St. George & Musées', desc: 'Première forteresse britannique en Inde, témoin de l\'histoire coloniale.' }
+    ],
+    region: 'inde-du-sud'
+  },
   karnataka: {
     name: 'Karnataka & Hampi',
     slug: 'karnataka',
@@ -323,13 +341,15 @@ const slugAliases = {
   'chitwan': 'nepal',
   'paro': 'bhoutan',
   'punakha': 'bhoutan',
-  'thimphu': 'bhoutan'
+  'thimphu': 'bhoutan',
+  'madras': 'chennai'
 };
 
 const DestinationDetail = ({ overrideSlug }) => {
-  const { slug: paramSlug } = useParams();
-  const rawSlug = overrideSlug || paramSlug || 'rajasthan';
-  const currentSlug = slugAliases[rawSlug.toLowerCase()] || rawSlug;
+  const { slug: paramSlug, category: paramCat } = useParams();
+  const rawSlug = overrideSlug || paramSlug || paramCat || 'rajasthan';
+  const cleanRaw = typeof rawSlug === 'string' ? rawSlug.trim().replace(/^\/+|\/+$/g, '') : rawSlug;
+  const currentSlug = slugAliases[cleanRaw?.toLowerCase()] || cleanRaw;
 
   const [destInfo, setDestInfo] = useState(null);
   const [packages, setPackages] = useState(defaultPackages);
@@ -494,7 +514,7 @@ const DestinationDetail = ({ overrideSlug }) => {
         ogTitle={activeDest.seoTitle || activeDest.metaTitle || `Voyage au ${activeDest.name} — Circuits & Séjours sur Mesure | Jodhpur Voyage`}
         ogDescription={activeDest.seoDescription || activeDest.metaDescription || activeDest.shortDescription}
         ogImage={activeDest.image || '/images/dest-rajasthan.jpg'}
-        canonicalUrl={`https://jodhpurvoyage.com/destinations/${activeDest.slug || currentSlug}`}
+        canonicalUrl={`https://jodhpurvoyage.com/category/${activeDest.slug || currentSlug}`}
       />
 
       {/* =========================================================================

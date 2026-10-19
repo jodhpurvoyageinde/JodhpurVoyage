@@ -12,7 +12,7 @@ const allDestinationsData = [
     image: '/images/dest-rajasthan.jpg',
     excerpt: 'Cités royales, désert du Thar, forteresses imprenables, palais des Mille et Une Nuits et havelis du Shekhawati.',
     btnText: 'Explorer le Rajasthan',
-    link: '/destinations/rajasthan'
+    link: '/category/rajasthan'
   },
   // 2. Delhi & Agra
   {
@@ -22,7 +22,7 @@ const allDestinationsData = [
     image: '/images/dest-tajmahal.jpg',
     excerpt: 'De la capitale millénaire aux ruelles de Chandni Chowk jusqu\'à la féerie immaculée du Taj Mahal et du Fort Rouge.',
     btnText: 'Découvrir Delhi & Agra',
-    link: '/destinations/delhi-agra'
+    link: '/category/delhi-agra'
   },
   // 3. Varanasi & Gange
   {
@@ -32,7 +32,7 @@ const allDestinationsData = [
     image: '/images/dest-varanasi.jpg',
     excerpt: 'La capitale spirituelle de l\'Inde, les rituels sacrés sur les Ghats du Gange, les cérémonies Aarti et Sarnath.',
     btnText: 'Découvrir Varanasi',
-    link: '/destinations/varanasi'
+    link: '/category/varanasi'
   },
   // 4. Amritsar & Punjab
   {
@@ -42,7 +42,7 @@ const allDestinationsData = [
     image: '/images/dest-jodhpur.jpg',
     excerpt: 'Le Temple d\'Or scintillant, la ferveur et l\'hospitalité légendaire du peuple Sikh, et la cérémonie de la frontière de Wagah.',
     btnText: 'Découvrir le Punjab',
-    link: '/destinations/amritsar-punjab'
+    link: '/category/amritsar-punjab'
   },
   // 5. Dharamsala & Himachal Pradesh
   {
@@ -52,7 +52,7 @@ const allDestinationsData = [
     image: '/images/dest-himachal.jpg',
     excerpt: 'Résidence du Dalaï-Lama au pied de l\'Himalaya, vallées verdoyantes de Kangra, Shimla et routes d\'altitude de Manali.',
     btnText: 'Découvrir l\'Himachal',
-    link: '/destinations/dharamsala-himachal'
+    link: '/category/dharamsala-himachal'
   },
   // 6. Rishikesh & Haridwar
   {
@@ -62,7 +62,7 @@ const allDestinationsData = [
     image: '/images/image-12.jpg',
     excerpt: 'Capitale mondiale du Yoga, ashrams légendaires et eaux pures du Gange sauvage aux portes de l\'Himalaya.',
     btnText: 'Découvrir Rishikesh',
-    link: '/destinations/rishikesh-uttarakhand'
+    link: '/category/rishikesh-uttarakhand'
   },
   // 7. Ladakh & Zanskar
   {
@@ -72,7 +72,7 @@ const allDestinationsData = [
     image: '/images/dest-ladakh.jpg',
     excerpt: 'Paysages lunaires, monastères bouddhistes de Thiksey et Hemis, lac Pangong turquoise et cols à plus de 5 000 m.',
     btnText: 'Découvrir le Ladakh',
-    link: '/destinations/ladakh'
+    link: '/category/ladakh'
   },
   // 8. Kerala
   {
@@ -82,7 +82,7 @@ const allDestinationsData = [
     image: '/images/dest-kerala.jpg',
     excerpt: 'Croisières en Houseboat traditionnel sur les canaux tropicaux d\'Alleppey, collines de thé de Munnar et Ayurveda.',
     btnText: 'Découvrir le Kerala',
-    link: '/destinations/kerala'
+    link: '/category/kerala'
   },
   // 9. Tamil Nadu
   {
@@ -92,7 +92,7 @@ const allDestinationsData = [
     image: '/images/dest-karnataka.jpg',
     excerpt: 'Gopurams sculptés de Madurai et Tanjore, anciens comptoirs français de Pondichéry et sanctuaires de Mahabalipuram.',
     btnText: 'Découvrir le Tamil Nadu',
-    link: '/destinations/tamil-nadu'
+    link: '/category/tamil-nadu'
   },
   // 10. Karnataka
   {
@@ -102,7 +102,7 @@ const allDestinationsData = [
     image: '/images/image-6.jpg',
     excerpt: 'Les ruines grandioses de l\'empire de Vijayanagara à Hampi (UNESCO), les temples de Belur et le faste des Maharajas à Mysore.',
     btnText: 'Découvrir le Karnataka',
-    link: '/destinations/karnataka'
+    link: '/category/karnataka'
   },
   // 11. Gujarat
   {
@@ -112,7 +112,7 @@ const allDestinationsData = [
     image: '/images/dest-gujarat.jpg',
     excerpt: 'Le désert de sel blanc du Grand Rann de Kutch, artisanat textile des tribus, temples jaïns de Palitana et lions d\'Asie.',
     btnText: 'Découvrir le Gujarat',
-    link: '/destinations/gujarat'
+    link: '/category/gujarat'
   },
   // 12. Goa
   {
@@ -122,7 +122,7 @@ const allDestinationsData = [
     image: '/images/dest-goa.jpg',
     excerpt: 'Plages bordées de cocotiers, architecture coloniale portugaise, églises classées UNESCO et douceur de vivre au bord de l\'Océan.',
     btnText: 'Découvrir Goa',
-    link: '/destinations/goa'
+    link: '/category/goa'
   },
   // 13. Orissa
   {
@@ -132,7 +132,7 @@ const allDestinationsData = [
     image: '/images/dest-orissa.jpg',
     excerpt: 'Le colossal char de pierre du Temple du Soleil de Konark, les sanctuaires de Puri et les marchés tribaux authentiques.',
     btnText: 'Découvrir l\'Orissa',
-    link: '/destinations/orissa'
+    link: '/category/orissa'
   },
   // 14. Centre de l'Inde & Madhya Pradesh
   {
@@ -142,7 +142,7 @@ const allDestinationsData = [
     image: '/images/image-8.jpg',
     excerpt: 'Les temples aux sculptures érotiques de Khajuraho (UNESCO), les palais oubliés d\'Orccha et les safaris tigres du Bengale.',
     btnText: 'Découvrir le Madhya Pradesh',
-    link: '/destinations/madhya-pradesh'
+    link: '/category/madhya-pradesh'
   },
   // 15. Darjeeling & Sikkim
   {
@@ -152,7 +152,7 @@ const allDestinationsData = [
     image: '/images/slide8-300x176.jpg',
     excerpt: 'Plantations de thé d\'exception, train à vapeur historique, monastères bouddhistes et vue majestueuse sur le Kanchenjunga.',
     btnText: 'Découvrir Darjeeling',
-    link: '/destinations/darjeeling-sikkim'
+    link: '/category/darjeeling-sikkim'
   },
   // 16. Népal
   {
@@ -162,7 +162,7 @@ const allDestinationsData = [
     image: '/images/dest-nepal.jpg',
     excerpt: 'La vallée sacrée de Katmandou, la cité médiévale de Bhaktapur, les lacs de Pokhara et les safaris rhinocéros de Chitwan.',
     btnText: 'Découvrir le Népal',
-    link: '/destinations/nepal'
+    link: '/category/nepal'
   },
   // 17. Bhoutan
   {
@@ -172,7 +172,7 @@ const allDestinationsData = [
     image: '/images/jaipur-travel.jpg',
     excerpt: 'Le monastère suspendu du Nid du Tigre (Taktshang), les forteresses Dzongs de Paro et Punakha, et le pays du Bonheur National Brut.',
     btnText: 'Découvrir le Bhoutan',
-    link: '/destinations/bhoutan'
+    link: '/category/bhoutan'
   }
 ];
 
@@ -226,7 +226,7 @@ const Destinations = () => {
               image: d.image || '/images/dest-rajasthan.jpg',
               excerpt: d.shortDescription || d.tagline || d.excerpt || '',
               btnText: `Découvrir ${d.name || d.title}`,
-              link: d.customUrl || `/destinations/${d.slug}`
+              link: d.customUrl || `/category/${d.slug}`
             };
           });
           setDynamicDestinations(mapped);

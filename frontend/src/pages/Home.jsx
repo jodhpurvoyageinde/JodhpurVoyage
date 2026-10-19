@@ -134,18 +134,18 @@ const heroSlidesData = [
 ];
 
 const destinationCarouselData = [
-  { name: 'Rajasthan', image: '/images/dest-rajasthan.jpg', link: '/destinations/rajasthan' },
-  { name: 'Gujarat', image: '/images/dest-gujarat.jpg', link: '/destinations/gujarat' },
+  { name: 'Rajasthan', image: '/images/dest-rajasthan.jpg', link: '/category/rajasthan' },
+  { name: 'Gujarat', image: '/images/dest-gujarat.jpg', link: '/category/gujarat' },
   { name: 'Karnataka', image: '/images/dest-karnataka.jpg', link: '/tours?search=Karnataka' },
-  { name: 'Népal', image: '/images/dest-nepal.jpg', link: '/destinations/nepal' },
+  { name: 'Népal', image: '/images/dest-nepal.jpg', link: '/category/nepal' },
   { name: 'Orissa', image: '/images/dest-orissa.jpg', link: '/tours?search=Orissa' },
-  { name: 'Ladakh', image: '/images/dest-ladakh.jpg', link: '/destinations/ladakh' },
-  { name: 'Varanasi', image: '/images/dest-varanasi.jpg', link: '/destinations/varanasi' },
-  { name: 'Kerala', image: '/images/dest-kerala.jpg', link: '/destinations/kerala' },
+  { name: 'Ladakh', image: '/images/dest-ladakh.jpg', link: '/category/ladakh' },
+  { name: 'Varanasi', image: '/images/dest-varanasi.jpg', link: '/category/varanasi' },
+  { name: 'Kerala', image: '/images/dest-kerala.jpg', link: '/category/kerala' },
   { name: 'Taj Mahal & Agra', image: '/images/dest-tajmahal.jpg', link: '/tours?search=Agra' },
   { name: 'Himachal Pradesh', image: '/images/dest-himachal.jpg', link: '/tours?search=Himachal' },
-  { name: 'Goa', image: '/images/dest-goa.jpg', link: '/tours?search=Goa' },
-  { name: 'Jodhpur', image: '/images/dest-jodhpur.jpg', link: '/destinations/rajasthan' },
+  { name: 'Goa', image: '/images/dest-goa.jpg', link: '/category/goa' },
+  { name: 'Jodhpur', image: '/images/dest-jodhpur.jpg', link: '/category/rajasthan' },
   { name: 'Amritsar & Punjab', image: '/images/image-8.jpg', link: '/tours?search=Amritsar' },
   { name: 'Bhoutan & Punakha', image: '/images/jaipur-travel.jpg', link: '/tours?region=bhoutan' },
   { name: 'Tamil Nadu', image: '/images/image-12.jpg', link: '/tours?search=Tamil' },
@@ -248,21 +248,21 @@ const regionCardsData = [
     category: 'sud',
     title: 'Inde du Sud',
     image: '/images/dest-kerala.jpg',
-    link: '/destinations/kerala',
+    link: '/category/kerala',
     desc: 'Traversée du Sud de l\'Inde de Chennai à Cochin. Au programme : les temples pyramidaux et colorés, l\'ancien comptoir français de Pondichéry...'
   },
   {
     category: 'rajasthan',
     title: 'Rajasthan',
     image: '/images/dest-rajasthan.jpg',
-    link: '/destinations/rajasthan',
+    link: '/category/rajasthan',
     desc: 'Le Rajasthan est le second État le plus touristique de l\'Inde. Découvrez les splendeurs du Rajasthan, ses puissantes forteresses et ses palais.'
   },
   {
     category: 'nord',
     title: 'Gujarat',
     image: '/images/dest-gujarat.jpg',
-    link: '/destinations/gujarat',
+    link: '/category/gujarat',
     desc: 'Séjour au Rajasthan et Gujarat, Voyage au Gujarat, Circuit au Gujarat, Vacances Gujarat, Circuit des villages Gujarat.'
   },
   {
@@ -276,7 +276,7 @@ const regionCardsData = [
     category: 'ladakh',
     title: 'Ladakh',
     image: '/images/dest-ladakh.jpg',
-    link: '/destinations/ladakh',
+    link: '/category/ladakh',
     desc: 'Ancien royaume bouddhiste situé sur les hauteurs de l\'Himalaya offrant quelques-uns des paysages les plus impressionnants de l\'Inde.'
   }
 ];
@@ -455,7 +455,7 @@ const Home = () => {
     ? dynamicDestinations.map((d) => ({
         name: d.name || d.title,
         image: d.image || '/images/dest-rajasthan.jpg',
-        link: d.customUrl || `/destinations/${d.slug}`
+        link: d.customUrl || `/category/${d.slug}`
       }))
     : destinationCarouselData;
 
@@ -616,7 +616,7 @@ const Home = () => {
           category,
           title: d.name || d.title,
           image: d.image || '/images/dest-rajasthan.jpg',
-          link: d.customUrl || `/destinations/${slug}`,
+          link: d.customUrl || `/category/${slug}`,
           desc: d.shortDescription || d.tagline || d.excerpt || 'Découvrez cette magnifique destination avec Jodhpur Voyage.'
         };
       })
