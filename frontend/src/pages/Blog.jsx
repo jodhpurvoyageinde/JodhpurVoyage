@@ -224,7 +224,6 @@ const Blog = () => {
                         alt={post.title} 
                         onError={(e) => { e.currentTarget.src = "/images/dest-rajasthan.jpg"; }}
                       />
-                      <span className="tour-card-badge">{post.category || 'Article'}</span>
                     </Link>
                     <div className="tour-card-body">
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
