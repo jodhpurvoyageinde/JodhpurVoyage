@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { fetchPageContent } from '../services/api';
+import { fetchPageContent, fetchTours } from '../services/api';
 
 const DynamicPage = ({ defaultPageKey }) => {
   const { slug } = useParams();
@@ -13,6 +13,7 @@ const DynamicPage = ({ defaultPageKey }) => {
 
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cultureSafariTours, setCultureSafariTours] = useState([]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -30,6 +31,16 @@ const DynamicPage = ({ defaultPageKey }) => {
       .finally(() => {
         setLoading(false);
       });
+
+    // If on Culture & Safari page, load all tours tagged for Culture & Safari
+    if (pageKey === 'culture-et-safari') {
+      fetchTours({ cultureSafari: true })
+        .then((res) => {
+          const list = Array.isArray(res.data) ? res.data : [];
+          setCultureSafariTours(list);
+        })
+        .catch((err) => console.error('Error fetching Culture & Safari tours:', err));
+    }
   }, [pageKey]);
 
   if (loading && !pageData) {
@@ -207,6 +218,58 @@ const DynamicPage = ({ defaultPageKey }) => {
                 </div>
               </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
+          CULTURE & SAFARI TOURS GRID
+          ========================================================================= */}
+      {pageKey === 'culture-et-safari' && cultureSafariTours.length > 0 && (
+        <section className="section-padding bg-cream" id="circuits-safari">
+          <div className="container">
+            <div className="section-header text-center">
+              <span className="section-subtitle">Circuits Sélectionnés</span>
+              <h2 className="section-title">Nos Voyages Culture & Safari</h2>
+              <p className="section-description">
+                Découvrez nos itinéraires combinant les merveilles culturelles et l’observation de la faune sauvage en véhicule privatif.
+              </p>
+            </div>
+
+            <div className="tours-grid">
+              {cultureSafariTours.map((tour, idx) => (
+                <div key={tour._id || tour.slug || idx} className="tour-card">
+                  <Link to={`/${tour.slug}`} className="tour-card-image-wrap" title="Voir l'itinéraire du voyage">
+                    <img src={tour.image || tour.coverImage || '/images/image-6.jpg'} alt={tour.title} onError={(e) => { e.target.src = '/images/image-6.jpg'; }} />
+                    <span className="tour-card-badge">{tour.badge || 'Culture & Safari'}</span>
+                    {tour.duration && (
+                      <div className="tour-card-duration">
+                        <i className="far fa-clock"></i> {tour.duration}
+                      </div>
+                    )}
+                  </Link>
+                  <div className="tour-card-body">
+                    <div className="tour-card-location">
+                      <i className="fas fa-map-marker-alt"></i> {tour.location || tour.category || 'Inde'}
+                    </div>
+                    <h3 className="tour-card-title">
+                      <Link to={`/${tour.slug}`}>{tour.title}</Link>
+                    </h3>
+                    <p className="tour-card-excerpt">
+                      {tour.subtitle || tour.excerpt || (tour.overview ? tour.overview.slice(0, 110) + '...' : '')}
+                    </p>
+                    <div className="tour-card-footer mt-auto">
+                      <Link to={`/${tour.slug}`} className="btn btn-sm btn-outline">
+                        Voir l'itinéraire
+                      </Link>
+                      <Link to={`/voyage-sur-mesure?tour=${encodeURIComponent(tour.title)}`} className="btn btn-sm btn-primary">
+                        <i className="fas fa-paper-plane"></i> Devis Gratuit
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}

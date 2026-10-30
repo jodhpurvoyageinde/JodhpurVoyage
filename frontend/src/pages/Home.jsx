@@ -154,31 +154,13 @@ const destinationCarouselData = [
 
 const popularToursData = [
   {
-    title: 'Séjour au Rajasthan et Bénarès – Le Rajasthan et la rivière Gange',
-    duration: '17 Jours / 16 Nuits',
-    image: '/images/dest-rajasthan.jpg',
-    location: 'Rajasthan & Rivière Gange',
-    badge: 'Populaire',
-    excerpt: 'Un voyage magique alliant la féerie des palais des Maharajas et la spiritualité profonde des cérémonies du Gange à Varanasi.',
-    slug: 'sejour-au-rajasthan-et-benares'
-  },
-  {
     title: 'Voyage Inde du Nord – Amritsar, Dharamsala et Cachemire',
     duration: '18 Jours / 17 Nuits',
     image: '/images/dest-himachal.jpg',
     location: 'Amritsar, Dharamsala, Srinagar',
     badge: 'Incontournable',
     excerpt: 'Spiritualité sikhe, hauts plateaux de l\'Himalaya et lacs romantiques du Cachemire sur un Houseboat traditionnel.',
-    slug: 'voyage-inde-du-nord-amritsar-dharamsala-cachemire'
-  },
-  {
-    title: 'Circuit dans la Vallée de Spiti et du Kinnaur',
-    duration: '18 Jours / 17 Nuits',
-    image: '/images/dest-ladakh.jpg',
-    location: 'Himalaya & Spiti Valley',
-    badge: 'Hors Sentiers',
-    excerpt: 'Route secrète de haute altitude, monastères millénaires et paysages lunaires de l\'Himalaya.',
-    slug: 'circuit-vallee-de-spiti-et-kinnaur'
+    slug: 'voyage-inde-du-nord-amritsar-dhramsala-et-cachemire'
   },
   {
     title: 'Voyage spirituel en Inde : Delhi, Amritsar, Dharamsala et Rishikesh',
@@ -187,7 +169,7 @@ const popularToursData = [
     location: 'Delhi, Amritsar, Dharamsala, Rishikesh',
     badge: 'Spirituel',
     excerpt: 'Une immersion spirituelle unique au Temple d\'Or d\'Amritsar, dans la résidence du Dalaï-Lama et la capitale mondiale du yoga.',
-    slug: 'voyage-spirituel-en-inde'
+    slug: 'voyage-spirituel-en-inde-delhi-amritsar-dharamsala-et-rishikesh'
   },
   {
     title: 'Séjour en Inde : Les Havélis et Palais du Rajasthan',
@@ -196,7 +178,7 @@ const popularToursData = [
     location: 'Shekhawati, Jaisalmer, Udaipur',
     badge: 'Classique',
     excerpt: 'Le voyage idéal pour découvrir tous les trésors emblématiques du Rajasthan : havelis peints, citadelles désertiques et palais.',
-    slug: 'sejour-en-inde-havelis-et-palais-du-rajasthan'
+    slug: 'sejour-inde-havelis-du-rajasthan'
   },
   {
     title: 'Grand Tour du Gujarat & Désert de Sel',
@@ -868,7 +850,7 @@ const Home = () => {
           <div className="welcome-collage-wrap">
             <div className="welcome-collage">
               <div className="collage-main-frame">
-                <img src="/images/image-12.jpg" alt="Rajasthan Architecture" className="collage-img-main" />
+                <img src="/images/jodhpur-fort-blue-city.jpg" alt="Mehrangarh Fort & Blue City Jodhpur" className="collage-img-main" />
                 <div className="collage-img-overlay"></div>
               </div>
 

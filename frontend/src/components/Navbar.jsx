@@ -9,13 +9,14 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Nord',
     icon: 'fas fa-gopuram',
     subcategories: [
+      { name: 'Agra', path: '/category/delhi-agra', searchKey: 'agra' },
+      { name: 'Amritsar', path: '/category/amritsar-punjab', searchKey: 'amritsar' },
+      { name: 'Bénarès', path: '/category/varanasi', searchKey: 'benares' },
+      { name: 'Delhi', path: '/category/delhi-agra', searchKey: 'delhi' },
+      { name: 'Himachal Pradesh', path: '/category/dharamsala-himachal', searchKey: 'himachal-pradesh' },
+      { name: 'Ladakh', path: '/category/ladakh', searchKey: 'ladakh' },
       { name: 'Rajasthan', path: '/category/rajasthan', searchKey: 'rajasthan' },
-      { name: 'Delhi & Agra (Taj Mahal)', path: '/category/delhi-agra', searchKey: 'delhi-agra' },
-      { name: 'Varanasi (Bénarès)', path: '/category/varanasi', searchKey: 'varanasi' },
-      { name: 'Amritsar & Punjab', path: '/category/amritsar-punjab', searchKey: 'amritsar-punjab' },
-      { name: 'Dharamsala & Himachal', path: '/category/dharamsala-himachal', searchKey: 'dharamsala-himachal' },
-      { name: 'Rishikesh & Uttarakhand', path: '/category/rishikesh-uttarakhand', searchKey: 'rishikesh-uttarakhand' },
-      { name: 'Ladakh (Petit Tibet)', path: '/category/ladakh', searchKey: 'ladakh' }
+      { name: 'Rishikesh', path: '/category/rishikesh-uttarakhand', searchKey: 'rishikesh' }
     ]
   },
   {
@@ -23,11 +24,14 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Sud',
     icon: 'fas fa-tree',
     subcategories: [
-      { name: 'Kerala & Backwaters', path: '/category/kerala', searchKey: 'kerala' },
-      { name: 'Tamil Nadu & Temples', path: '/category/tamil-nadu', searchKey: 'tamil-nadu' },
-      { name: 'Karnataka & Hampi', path: '/category/karnataka', searchKey: 'karnataka' },
-      { name: 'Goa & Côte Tropicale', path: '/category/goa', searchKey: 'goa' },
-      { name: 'Orissa & Konark', path: '/category/orissa', searchKey: 'orissa' }
+      { name: 'Chennai', path: '/category/chennai', searchKey: 'chennai' },
+      { name: 'Goa', path: '/category/goa', searchKey: 'goa' },
+      { name: 'Karnataka', path: '/category/karnataka', searchKey: 'karnataka' },
+      { name: 'Kerala', path: '/category/kerala', searchKey: 'kerala' },
+      { name: 'Tamil Nadu', path: '/category/tamil-nadu', searchKey: 'tamil-nadu' },
+      { name: 'Bombay', path: '/category/bombay', searchKey: 'bombay' },
+      { name: 'Madras', path: '/category/madras', searchKey: 'madras' },
+      { name: 'Orissa', path: '/category/orissa', searchKey: 'orissa' }
     ]
   },
   {
@@ -35,7 +39,9 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: "Inde de l'Est & de l'Ouest",
     icon: 'fas fa-compass',
     subcategories: [
-      { name: 'Gujarat', path: '/category/gujarat', searchKey: 'gujarat' }
+      { name: 'Gujarat', path: '/category/gujarat', searchKey: 'gujarat' },
+      { name: 'Madhya Pradesh', path: '/category/madhya-pradesh', searchKey: 'madhya-pradesh' },
+      { name: 'Darjeeling & Sikkim', path: '/category/darjeeling-sikkim', searchKey: 'darjeeling-sikkim' }
     ]
   },
   {
@@ -51,7 +57,9 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Bhoutan',
     icon: 'fas fa-place-of-worship',
     subcategories: [
-      { name: 'Bhoutan', path: '/category/bhoutan', searchKey: 'bhoutan' }
+      { name: 'Punakha', path: '/category/punakha', searchKey: 'punakha' },
+      { name: 'Paro', path: '/category/paro', searchKey: 'paro' },
+      { name: 'Thimphu', path: '/category/thimphu', searchKey: 'thimphu' }
     ]
   }
 ];
@@ -154,7 +162,7 @@ const DEFAULT_MEGA_CONFIG = {
     items: [
       { title: 'Voyage sur mesure', link: '/voyage-sur-mesure', image: '/images/image-12.jpg', order: 1 },
       { title: 'Circuit accompagné', link: '/circuit-accompagne', image: '/images/image-9.jpg', order: 2 },
-      { title: 'Culture & Safari', link: '#', image: '/images/image-6.jpg', order: 3 },
+      { title: 'Culture & Safari', link: '/culture-et-safari', image: '/images/image-6.jpg', order: 3 },
       { title: '+ de 10 personnes', link: '/plus-de-10-personnes', image: '/images/slide4-300x176.jpg', order: 4 },
       { title: 'Toutes les inspirations', link: '/inspirations', image: '/images/slide8-300x176.jpg', order: 5 }
     ]
@@ -245,20 +253,51 @@ const Navbar = () => {
           'thimphu royale'
         ];
 
+        const NAME_NORMALIZATION = {
+          'delhi & taj mahal d\'agra': 'Delhi',
+          'varanasi & bénarès': 'Bénarès',
+          'varanasi & benares': 'Bénarès',
+          'amritsar & le punjab': 'Amritsar',
+          'dharamsala & himachal pradesh': 'Himachal Pradesh',
+          'rishikesh & haridwar (uttarakhand)': 'Rishikesh',
+          'ladakh & spiti - le petit tibet': 'Ladakh',
+          'ladakh & spiti – le petit tibet': 'Ladakh',
+          'kerala & inde du sud': 'Kerala',
+          'tamil nadu & temples dravidiens': 'Tamil Nadu',
+          'karnataka & palais de mysore': 'Karnataka',
+          'gujarat & désert de kutch': 'Gujarat',
+          'gujarat & desert de kutch': 'Gujarat',
+          'goa & côte tropicale': 'Goa',
+          'goa & cote tropicale': 'Goa',
+          'orissa / odisha & temple du soleil': 'Orissa',
+          'centre de l\'inde & madhya pradesh': 'Madhya Pradesh',
+          'taj mahal & agra': 'Agra'
+        };
+
+        const SUBMENU_ORDER = {
+          nord: ['Agra', 'Amritsar', 'Bénarès', 'Delhi', 'Himachal Pradesh', 'Ladakh', 'Rajasthan', 'Rishikesh'],
+          sud: ['Chennai', 'Goa', 'Karnataka', 'Kerala', 'Tamil Nadu', 'Bombay', 'Madras', 'Orissa'],
+          ouest: ['Gujarat', 'Madhya Pradesh', 'Darjeeling & Sikkim'],
+          nepal: ['Népal'],
+          bhoutan: ['Punakha', 'Paro', 'Thimphu']
+        };
+
         list.forEach((d) => {
           if (d.published === false) return;
           let name = d.name || d.title || '';
-          const nameLower = name.trim().toLowerCase();
+          const rawLower = name.trim().toLowerCase();
 
           // Exclude requested deleted submenus
-          if (EXCLUDED_NAMES.some(ex => nameLower === ex || nameLower.startsWith(ex))) {
+          if (EXCLUDED_NAMES.some(ex => rawLower === ex || rawLower.startsWith(ex))) {
             return;
           }
 
-          // Normalize 'Bhoutan – Royaume du Dragon' to clean 'Bhoutan'
-          if (nameLower.includes('bhoutan') && nameLower.includes('royaume du dragon')) {
-            name = 'Bhoutan';
+          // Apply normalization if legacy compound name
+          if (NAME_NORMALIZATION[rawLower]) {
+            name = NAME_NORMALIZATION[rawLower];
           }
+
+          const nameLower = name.trim().toLowerCase();
 
           const reg = (d.region || 'inde-du-nord').toLowerCase();
 
@@ -278,6 +317,11 @@ const Navbar = () => {
           else if (reg === 'inde-du-sud' || reg === 'sud' || reg === 'kerala' || reg === 'karnataka' || reg === 'goa' || reg === 'orissa') colKey = 'sud';
           else colKey = 'nord';
 
+          // In Bhoutan column, keep only the specific destinations (Punakha, Paro, Thimphu)
+          if (colKey === 'bhoutan' && nameLower === 'bhoutan') {
+            return;
+          }
+
           const path = d.customUrl || `/category/${d.slug}`;
 
           const existingIdx = groupMap[colKey].subcategories.findIndex(
@@ -288,6 +332,19 @@ const Navbar = () => {
           } else {
             groupMap[colKey].subcategories.push({ name, path });
           }
+        });
+
+        // Apply canonical ordering matching the second menu
+        Object.keys(groupMap).forEach(key => {
+          const orderList = SUBMENU_ORDER[key] || [];
+          groupMap[key].subcategories.sort((a, b) => {
+            const idxA = orderList.findIndex(o => o.toLowerCase() === a.name.toLowerCase());
+            const idxB = orderList.findIndex(o => o.toLowerCase() === b.name.toLowerCase());
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            return a.name.localeCompare(b.name, 'fr');
+          });
         });
 
         const dynamicGroups = Object.values(groupMap).filter((g) => g.subcategories.length > 0);

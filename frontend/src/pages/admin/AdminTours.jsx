@@ -79,6 +79,7 @@ const AdminTours = () => {
     metaKeywords: '',
     metaDescription: '',
     featured: false,
+    cultureSafari: false,
     published: true
   };
 
@@ -245,6 +246,7 @@ const AdminTours = () => {
       subtitle: tour.subtitle || tour.excerpt || '',
       cities: initialCities,
       featured: Boolean(tour.featured === true),
+      cultureSafari: Boolean(tour.cultureSafari === true),
       published: tour.published !== false,
       seoTitle: tour.seoTitle || tour.metaTitle || '',
       metaTitle: tour.seoTitle || tour.metaTitle || '',
@@ -562,6 +564,11 @@ const AdminTours = () => {
                       {t.featured && (
                         <span className="admin-status-badge status-contacte" style={{ marginLeft: '4px' }}>
                           <i className="fas fa-star"></i> Featured
+                        </span>
+                      )}
+                      {t.cultureSafari && (
+                        <span className="admin-status-badge" style={{ marginLeft: '4px', background: '#FEF3C7', color: '#92400E', border: '1px solid #FCD34D' }}>
+                          <i className="fas fa-paw"></i> Culture & Safari
                         </span>
                       )}
                     </td>
@@ -1238,7 +1245,7 @@ const AdminTours = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '24px', padding: '12px 16px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: 0 }}>
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', padding: '12px 16px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: 0 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
                     <input type="checkbox" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })} />
                     <span>Published (Visible on website)</span>
@@ -1246,6 +1253,10 @@ const AdminTours = () => {
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
                     <input type="checkbox" checked={formData.featured} onChange={(e) => setFormData({ ...formData, featured: e.target.checked })} />
                     <span>Feature on Homepage</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600', color: '#B45309' }}>
+                    <input type="checkbox" checked={formData.cultureSafari || false} onChange={(e) => setFormData({ ...formData, cultureSafari: e.target.checked })} />
+                    <span>Culture & Safari (Show on Culture & Safari page)</span>
                   </label>
                 </div>
               </div>

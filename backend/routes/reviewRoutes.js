@@ -2,7 +2,6 @@ import express from 'express';
 import Review from '../models/Review.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
-import { defaultReviewsData } from '../seed/reviewsSeedData.js';
 
 const router = express.Router();
 
@@ -49,12 +48,6 @@ router.get('/', async (req, res) => {
     const { search, limit } = req.query;
 
     if (isMongoConnected()) {
-      // Auto-seed default reviews if collection is empty
-      const countTotal = await Review.countDocuments();
-      if (countTotal === 0 && defaultReviewsData.length > 0) {
-        await Review.insertMany(defaultReviewsData);
-      }
-
       let query = { status: { $ne: 'rejected' } };
       if (search) {
         query.$or = [
@@ -80,15 +73,7 @@ router.get('/', async (req, res) => {
       });
     }
 
-    if (!memoryStore.reviews || memoryStore.reviews.length === 0) {
-      memoryStore.reviews = defaultReviewsData.map((r, i) => ({
-        _id: `review_${i + 1}`,
-        ...r,
-        createdAt: new Date().toISOString()
-      }));
-    }
-
-    let list = memoryStore.reviews.filter((r) => r.status === 'approved' || r.status === 'Published');
+    let list = (memoryStore.reviews || []).filter((r) => r.status === 'approved' || r.status === 'Published');
     if (category && category !== 'all') list = list.filter((r) => r.category === category);
     if (search) {
       const s = search.toLowerCase();

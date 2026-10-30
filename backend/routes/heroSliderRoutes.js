@@ -1,12 +1,11 @@
 import express from 'express';
 import HeroSlider from '../models/HeroSlider.js';
-import { defaultHeroSlidesData } from '../seed/heroSliderSeedData.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 
 const router = express.Router();
 
-// Helper to ensure MongoDB has initial slides if collection is empty
+// Helper to ensure MongoDB indexes are clean
 const ensureMongoInitialized = async () => {
   if (!isMongoConnected()) return;
   try {
@@ -17,16 +16,6 @@ const ensureMongoInitialized = async () => {
     }
   } catch (idxErr) {
     // Ignore index inspection error if collection is newly created
-  }
-
-  try {
-    const count = await HeroSlider.countDocuments();
-    if (count === 0) {
-      await HeroSlider.insertMany(defaultHeroSlidesData);
-      console.log('🌟 HeroSlider collection auto-seeded with 14 default slides.');
-    }
-  } catch (seedErr) {
-    console.error('Non-critical: error auto-seeding hero slides:', seedErr.message);
   }
 };
 
@@ -310,36 +299,24 @@ router.post('/reorder', protect, adminOnly, async (req, res) => {
   }
 });
 
-// @desc    Reset hero slides to default seed slides
+// @desc    Reset hero slides to default
 // @route   POST /api/hero-slider/reset
 // @access  Private/Admin
 router.post('/reset', protect, adminOnly, async (req, res) => {
   try {
     if (isMongoConnected()) {
-      await HeroSlider.deleteMany();
-      await HeroSlider.insertMany(defaultHeroSlidesData);
-      const freshSlides = await HeroSlider.find().sort({ order: 1 });
-
-      memoryStore.heroSliders = freshSlides.map((s) => s.toObject());
+      const slides = await HeroSlider.find().sort({ order: 1 });
       return res.json({
         success: true,
-        message: 'Slides réinitialisées aux 14 valeurs par défaut avec succès',
-        data: freshSlides
+        message: 'Slides actuelles',
+        data: slides
       });
     }
 
-    // In-memory reset
-    memoryStore.heroSliders = defaultHeroSlidesData.map((slide, idx) => ({
-      _id: `slide_${idx + 1}`,
-      ...slide,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }));
-
     return res.json({
       success: true,
-      message: 'Slides réinitialisées aux 14 valeurs par défaut avec succès',
-      data: memoryStore.heroSliders
+      message: 'Slides actuelles',
+      data: memoryStore.heroSliders || []
     });
   } catch (err) {
     console.error('Error resetting hero slides:', err);

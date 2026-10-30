@@ -101,6 +101,7 @@ const normalizeTour = (tour) => {
     rating: doc.rating || 4.9,
     reviewCount: doc.reviewCount || 35,
     featured: Boolean(doc.featured === true),
+    cultureSafari: Boolean(doc.cultureSafari === true),
     published: doc.published !== false,
     image: doc.image || doc.coverImage || '/images/dest-rajasthan.jpg',
     gallery: Array.isArray(doc.gallery) && doc.gallery.length > 0 ? doc.gallery : [doc.image || '/images/dest-rajasthan.jpg'],
@@ -132,13 +133,17 @@ const normalizeTour = (tour) => {
 // GET /api/tours (fetches from Tour database / Tour model)
 router.get('/', async (req, res) => {
   try {
-    const { region, city, category, destination, search, limit, featured } = req.query;
+    const { region, city, category, destination, search, limit, featured, cultureSafari } = req.query;
 
     if (isMongoConnected()) {
       const conditions = [{ published: { $ne: false } }];
 
       if (featured !== undefined) {
         conditions.push({ featured: featured === 'true' || featured === true });
+      }
+
+      if (cultureSafari !== undefined) {
+        conditions.push({ cultureSafari: cultureSafari === 'true' || cultureSafari === true });
       }
 
       const targetCat = category || destination;

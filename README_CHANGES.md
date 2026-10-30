@@ -329,3 +329,82 @@ Make the **“Sur Devis Gratuit”** section sticky while scrolling through the 
      - Direct WhatsApp quick chat button with encoded tour context.
      - Primary **"Demander un Devis"** button opening the inquiry modal.
    - Designed with safe-area insets (`env(safe-area-inset-bottom)`), frosted-glass blur backdrop, gold accent border, and adjusted offset for floating WhatsApp / scroll-to-top buttons to avoid overlap.
+
+
+## 13. Mega-Menu Destination Standardization & Consistency
+
+### Business Requirement
+Fix destination mega-menu inconsistency where two conflicting menu versions were appearing (initial default placeholder vs dynamic database menu). Retained the second verified menu layout and standardized both fallback and dynamic states.
+
+### Standard Destination Structure (23 destinations across 5 regional columns):
+1. **Inde du Nord (8):** Agra, Amritsar, Bénarès, Delhi, Himachal Pradesh, Ladakh, Rajasthan, Rishikesh
+2. **Inde du Sud (8):** Chennai, Goa, Karnataka, Kerala, Tamil Nadu, Bombay, Madras, Orissa
+3. **Inde de l'Est & de l'Ouest (3):** Gujarat, Madhya Pradesh, Darjeeling & Sikkim
+4. **Népal (1):** Népal
+5. **Bhoutan (3):** Punakha, Paro, Thimphu
+
+### Implementation Details
+- **`frontend/src/components/Navbar.jsx`**:
+  - Updated `DEFAULT_DESTINATION_GROUPS` to exactly match the canonical 23-item menu list.
+  - Added `NAME_NORMALIZATION` mapping to ensure legacy or compound names from any data source are cleanly mapped to standardized titles.
+  - Added `SUBMENU_ORDER` sorting to guarantee consistent, alphabetical & regional column ordering across initial load, API fetch, and page transitions.
+  - Rebuilt production bundle (`frontend/dist`).
+
+
+## 14. Seed Files Removal for Production Readiness
+
+### Business Requirement
+Remove all development/mock seed files (`backend/seed/` directory) and decouple all backend routes from mock seed data dependencies for clean production readiness.
+
+### Implementation Details:
+1. **Removed Seed Directory & Scripts:**
+   - Deleted entire `backend/seed/` folder (`seedData.js`, `seed.js`, `seedReviews.js`, `megaMenuData.js`, `pagesSeedData.js`, `reviewsSeedData.js`, `heroSliderSeedData.js`, `seoData.js`).
+   - Removed `backend/scripts/syncTeamData.js`.
+   - Cleaned `seed` and `seed:reviews` scripts from [`backend/package.json`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/package.json).
+2. **Decoupled Backend Routes from Seed Dependencies:**
+   - [`backend/store.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/store.js): Removed all seed data imports, initializing empty in-memory collections.
+   - [`backend/routes/megaMenuRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/megaMenuRoutes.js): Removed `defaultMegaMenuData` import; all operations strictly query MongoDB.
+   - [`backend/routes/pageRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/pageRoutes.js): Removed `defaultPagesData` import; pages are served dynamically from MongoDB `pagecontents`.
+   - [`backend/routes/seoRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/seoRoutes.js): Removed `defaultSeoData` import; SEO metadata is served dynamically from MongoDB `seos`.
+   - [`backend/routes/heroSliderRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/heroSliderRoutes.js): Removed `defaultHeroSlidesData` import and auto-seeding logic.
+   - [`backend/routes/reviewRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/reviewRoutes.js): Removed `defaultReviewsData` import and auto-seeding logic.
+3. **Verification:**
+   - Verified that all backend modules, routes, and stores load cleanly with 0 errors.
+   - Verified frontend production build compiles cleanly (`npm run build`).
+
+
+## 15. Removal of Non-Existent Hardcoded Tour Slugs
+
+### Business Requirement
+Remove non-existent legacy hardcoded dummy package slugs (`joyaux-du-kerala-backwaters`, `sejour-au-rajasthan-et-benares`, `trek-voyage-ladakh-petit-tibet`, `circuit-vallee-de-spiti-et-kinnaur`) across all frontend pages and rely directly on live database tours.
+
+### Changes Made:
+1. **[`frontend/src/pages/DestinationDetail.jsx`](file:///c:/laragon/www/react/jodhpur_voyage_live/frontend/src/pages/DestinationDetail.jsx)**:
+   - Cleared `defaultPackages` dummy fallback array (`const defaultPackages = [];`).
+   - Conditioned tour packages section to render purely when matching database tours are retrieved (`packages && packages.length > 0`).
+2. **[`frontend/src/pages/Home.jsx`](file:///c:/laragon/www/react/jodhpur_voyage_live/frontend/src/pages/Home.jsx)**:
+   - Removed `sejour-au-rajasthan-et-benares` and `circuit-vallee-de-spiti-et-kinnaur` from `popularToursData`.
+   - Ensured fallback slugs strictly map to verified existing tours in the database.
+3. **Build & Verification:**
+   - Production Vite build ran cleanly (`dist/assets/index-UZyaS0Ty.js`).
+   - Verified 0 remaining occurrences of the 4 removed slugs in `frontend/src`.
+
+
+## 16. Culture & Safari Checkbox in Tour Management
+
+### Business Requirement
+Add a dedicated checkbox **"Culture & Safari"** in the Admin Tour Add/Edit dialog next to "Published" and "Feature on Homepage", enabling administrators to selectively showcase tours on the **Culture & Safari** page (`/culture-et-safari`).
+
+### Implementation Details:
+1. **Database Schema ([`backend/models/Tour.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/models/Tour.js)):**
+   - Added `cultureSafari: { type: Boolean, default: false }`.
+2. **Backend API ([`backend/routes/tourRoutes.js`](file:///c:/laragon/www/react/jodhpur_voyage_live/backend/routes/tourRoutes.js)):**
+   - Added support for query filter `GET /api/tours?cultureSafari=true`.
+   - Included `cultureSafari` in normalized tour objects, creation (`POST`), and updates (`PUT`).
+3. **Admin Management Panel ([`frontend/src/pages/admin/AdminTours.jsx`](file:///c:/laragon/www/react/jodhpur_voyage_live/frontend/src/pages/admin/AdminTours.jsx)):**
+   - Added **`☑ Culture & Safari (Show on Culture & Safari page)`** checkbox in the options bar alongside "Published" and "Feature on Homepage".
+   - Added status badge indicator `[🐾 Culture & Safari]` in the admin tours table for quick visibility.
+4. **Public Culture & Safari Page ([`frontend/src/pages/DynamicPage.jsx`](file:///c:/laragon/www/react/jodhpur_voyage_live/frontend/src/pages/DynamicPage.jsx)):**
+   - Automatically loads and displays a packages grid of all tours checked as `cultureSafari: true`.
+   - Linked Inspiration Mega Menu item `Culture & Safari` directly to `/culture-et-safari`.
+5. **No Code Pushed to Git:** Changes remain strictly local for user review as requested.

@@ -3,8 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { loginAdmin } from '../../services/api';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('admin@jodhpurvoyage.com');
-  const [password, setPassword] = useState('admin123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ const AdminLogin = () => {
                 required
                 className="form-control"
                 style={{ paddingLeft: '40px', height: '44px', borderRadius: '8px', border: '1px solid #CBD5E1' }}
-                placeholder="admin@jodhpurvoyage.com"
+                placeholder="admin@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -149,10 +149,6 @@ const AdminLogin = () => {
         </form>
 
         <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid #E2E8F0', textAlign: 'center', fontSize: '0.85rem', color: '#64748B' }}>
-          <div style={{ background: '#F8FAFC', padding: '10px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #E2E8F0' }}>
-            <div>Demo Credentials:</div>
-            <strong>admin@jodhpurvoyage.com</strong> / <strong>admin123456</strong>
-          </div>
           <Link to="/" style={{ color: '#0D9488', fontWeight: '600', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <i className="fas fa-arrow-left"></i> Return to Public Website
           </Link>

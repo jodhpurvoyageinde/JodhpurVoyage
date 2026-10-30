@@ -287,44 +287,7 @@ const defaultDestinationsMap = {
   }
 };
 
-const defaultPackages = [
-  {
-    title: 'Séjour au Rajasthan et Bénarès – Le Rajasthan et la rivière Gange',
-    duration: '17 Jours / 16 Nuits',
-    image: '/images/dest-rajasthan.jpg',
-    location: 'Rajasthan & Bénarès',
-    badge: 'Populaire',
-    excerpt: 'Un voyage d\'exception alliant la féerie des palais des Maharajas et la spiritualité sacrée de Varanasi sur les bords du Gange.',
-    slug: 'sejour-au-rajasthan-et-benares'
-  },
-  {
-    title: 'Trek & Voyage d\'Exception au Ladakh – Le Petit Tibet',
-    duration: '14 Jours / 13 Nuits',
-    image: '/images/dest-ladakh.jpg',
-    location: 'Leh, Pangong & Vallée de la Nubra',
-    badge: 'Himalaya',
-    excerpt: 'Une grande traversée de l\'Himalaya entre monastères bouddhistes perchés, lac Pangong Tso et franchissement du col Khardung La.',
-    slug: 'trek-voyage-ladakh-petit-tibet'
-  },
-  {
-    title: 'Voyage au Rajasthan Hors des Sentiers Battus',
-    duration: '15 Jours / 14 Nuits',
-    image: '/images/Voyage-Jaisalmer.jpg',
-    location: 'Villages & Forts Ruraux',
-    badge: 'Authentique',
-    excerpt: 'Immergez-vous dans la vraie vie rurale indienne, dormez dans des havelis de charme et découvrez des palais secrets.',
-    slug: 'voyage-au-rajasthan-hors-des-sentiers-battus'
-  },
-  {
-    title: 'Joyaux du Kerala & Backwaters sur Mesure',
-    duration: '12 Jours / 11 Nuits',
-    image: '/images/dest-kerala.jpg',
-    location: 'Cochin, Alleppey & Munnar',
-    badge: 'Nature & Ayurveda',
-    excerpt: 'Croisières en Houseboat privé sur les lagunes tranquilles, plantations de thé de Munnar et massages ayurvédiques.',
-    slug: 'joyaux-du-kerala-backwaters'
-  }
-];
+const defaultPackages = [];
 
 const slugAliases = {
   'delhi': 'delhi-agra',
@@ -674,54 +637,56 @@ const DestinationDetail = ({ overrideSlug }) => {
       {/* =========================================================================
           TOUR PACKAGES GRID
           ========================================================================= */}
-      <section id="circuits-section" className="section-padding bg-cream">
-        <div className="container">
-          <div className="section-header">
-            <span className="section-subtitle">Circuits & Offres Spéciales</span>
-            <h2 className="section-title">Nos Offres de Voyage au {activeDest.name}</h2>
-            <p className="section-description">
-              Sélectionnez un circuit privatif sur mesure et découvrez son itinéraire complet avec chauffeur privé.
-            </p>
-          </div>
+      {packages && packages.length > 0 && (
+        <section id="circuits-section" className="section-padding bg-cream">
+          <div className="container">
+            <div className="section-header">
+              <span className="section-subtitle">Circuits & Offres Spéciales</span>
+              <h2 className="section-title">Nos Offres de Voyage au {activeDest.name}</h2>
+              <p className="section-description">
+                Sélectionnez un circuit privatif sur mesure et découvrez son itinéraire complet avec chauffeur privé.
+              </p>
+            </div>
 
-          <div className="tours-grid">
-            {packages.map((pkg, idx) => (
-              <div key={pkg._id || pkg.slug || idx} className="tour-card">
-                <Link to={`/${pkg.slug}`} className="tour-card-image-wrap" title="Voir l'itinéraire du voyage">
-                  <img src={pkg.image || activeDest.image || '/images/dest-rajasthan.jpg'} alt={pkg.title} />
-                  <span className="tour-card-badge">{(pkg.badge && pkg.badge.trim().toLowerCase() === 'popular') ? 'Populaire' : (pkg.badge || 'Populaire')}</span>
-                  <div className="tour-card-duration">
-                    <i className="far fa-clock"></i> {pkg.duration}
-                  </div>
-                </Link>
-                <div className="tour-card-body">
-                  <div className="tour-card-location">
-                    <i className="fas fa-map-marker-alt"></i> {pkg.location || activeDest.name}
-                  </div>
-                  <h3 className="tour-card-title">
-                    <Link to={`/${pkg.slug}`}>{pkg.title}</Link>
-                  </h3>
-                  <p className="tour-card-excerpt">
-                    {pkg.excerpt || pkg.subtitle || (pkg.overview ? pkg.overview.slice(0, 110) + '...' : '')}
-                  </p>
-                  <div className="tour-card-footer mt-auto">
-                    <Link to={`/${pkg.slug}`} className="btn btn-sm btn-outline">
-                      Voir l'itinéraire
-                    </Link>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-primary"
-                      onClick={() => handleOpenBooking(pkg.title, pkg.duration)}
-                    >
-                      <i className="fas fa-paper-plane"></i> Devis / Réserver
-                    </button>
+            <div className="tours-grid">
+              {packages.map((pkg, idx) => (
+                <div key={pkg._id || pkg.slug || idx} className="tour-card">
+                  <Link to={`/${pkg.slug}`} className="tour-card-image-wrap" title="Voir l'itinéraire du voyage">
+                    <img src={pkg.image || activeDest.image || '/images/dest-rajasthan.jpg'} alt={pkg.title} />
+                    <span className="tour-card-badge">{(pkg.badge && pkg.badge.trim().toLowerCase() === 'popular') ? 'Populaire' : (pkg.badge || 'Populaire')}</span>
+                    <div className="tour-card-duration">
+                      <i className="far fa-clock"></i> {pkg.duration}
+                    </div>
+                  </Link>
+                  <div className="tour-card-body">
+                    <div className="tour-card-location">
+                      <i className="fas fa-map-marker-alt"></i> {pkg.location || activeDest.name}
+                    </div>
+                    <h3 className="tour-card-title">
+                      <Link to={`/${pkg.slug}`}>{pkg.title}</Link>
+                    </h3>
+                    <p className="tour-card-excerpt">
+                      {pkg.excerpt || pkg.subtitle || (pkg.overview ? pkg.overview.slice(0, 110) + '...' : '')}
+                    </p>
+                    <div className="tour-card-footer mt-auto">
+                      <Link to={`/${pkg.slug}`} className="btn btn-sm btn-outline">
+                        Voir l'itinéraire
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-primary"
+                        onClick={() => handleOpenBooking(pkg.title, pkg.duration)}
+                      >
+                        <i className="fas fa-paper-plane"></i> Devis / Réserver
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* =========================================================================
           CTA BANNER
