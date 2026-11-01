@@ -486,7 +486,9 @@ router.get('/:identifier', async (req, res) => {
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const tourData = { ...req.body };
-    if (!tourData.slug && tourData.title) {
+    if (tourData.slug) {
+      tourData.slug = createSlug(tourData.slug);
+    } else if (tourData.title) {
       tourData.slug = createSlug(tourData.title);
     }
 
@@ -568,6 +570,9 @@ router.post('/', protect, adminOnly, async (req, res) => {
     res.status(201).json(normalizeTour(newTour));
   } catch (error) {
     console.error('Erreur create tour:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'A tour with this slug already exists. Please choose a unique slug.' });
+    }
     res.status(400).json({ message: error.message || 'Erreur création circuit' });
   }
 });
@@ -578,6 +583,10 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     const { id } = req.params;
     const updateData = { ...req.body };
     delete updateData._id; // CRITICAL: Prevent MongoServerError for immutable _id
+
+    if (updateData.slug) {
+      updateData.slug = createSlug(updateData.slug);
+    }
 
     // Explicitly handle SEO / Meta tags
     const putSeoTitle = updateData.seoTitle !== undefined ? updateData.seoTitle : updateData.metaTitle;
@@ -661,6 +670,9 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
     res.json(normalizeTour(memoryStore.tours[idx]));
   } catch (error) {
     console.error('Erreur update tour:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'A tour with this slug already exists. Please choose a unique slug.' });
+    }
     res.status(400).json({ message: error.message || 'Erreur mise à jour' });
   }
 });

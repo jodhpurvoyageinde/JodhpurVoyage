@@ -38,6 +38,18 @@ const DEFAULT_DESTINATIONS_PRESETS = [
   { name: 'Thimphu (Bhutan)', region: 'bhoutan', slug: 'thimphu' }
 ];
 
+const slugify = (text) => {
+  return (text || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 const AdminTours = () => {
   const [tours, setTours] = useState([]);
   const [destinationsList, setDestinationsList] = useState([]);
@@ -47,6 +59,7 @@ const AdminTours = () => {
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [customCityInput, setCustomCityInput] = useState('');
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
 
   const initialForm = {
     title: '',
@@ -212,6 +225,7 @@ const AdminTours = () => {
   const handleOpenCreate = () => {
     loadDestinations();
     setEditingTour(null);
+    setIsSlugTouched(false);
     setFormData(initialForm);
     setIsModalOpen(true);
   };
@@ -219,6 +233,7 @@ const AdminTours = () => {
   const handleOpenEdit = (tour) => {
     loadDestinations();
     setEditingTour(tour);
+    setIsSlugTouched(true);
     const title = tour.title || 'Circuit';
     const loc = tour.location || tour.region || 'Inde';
     const dur = tour.duration || 'Plusieurs Jours';
@@ -346,6 +361,22 @@ const AdminTours = () => {
     setFormData((prev) => ({ ...prev, highlights: list }));
   };
 
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    if (!editingTour && !isSlugTouched) {
+      setFormData(prev => ({
+        ...prev,
+        title: newTitle,
+        slug: slugify(newTitle)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        title: newTitle
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -353,9 +384,11 @@ const AdminTours = () => {
       const sTitle = (formData.seoTitle || formData.metaTitle || '').trim();
       const sKeywords = (formData.seoKeywords || formData.metaKeywords || '').trim();
       const sDesc = (formData.seoDescription || formData.metaDescription || '').trim();
+      const finalSlug = (formData.slug || slugify(formData.title || '')).toLowerCase().trim().replace(/^-+|-+$/g, '');
 
       const payload = {
         ...formData,
+        slug: finalSlug,
         seoTitle: sTitle,
         metaTitle: sTitle,
         seoKeywords: sKeywords,
@@ -530,8 +563,9 @@ const AdminTours = () => {
                         />
                         <div>
                           <strong style={{ color: 'var(--admin-text-main)' }}>{t.title}</strong>
-                          <div style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)' }}>
-                            {t.subtitle ? t.subtitle.slice(0, 48) + '...' : ''}
+                          <div style={{ fontSize: '0.78rem', color: 'var(--admin-text-muted)', display: 'flex', gap: '6px', alignItems: 'center', marginTop: '2px' }}>
+                            <code style={{ background: '#F1F5F9', padding: '1px 5px', borderRadius: '4px', fontSize: '0.74rem', color: '#475569', border: '1px solid #E2E8F0' }}>/{t.slug}</code>
+                            {t.subtitle ? <span>• {t.subtitle.slice(0, 38)}...</span> : ''}
                           </div>
                         </div>
                       </div>
@@ -663,7 +697,91 @@ const AdminTours = () => {
               <div className="modal-body">
                 <div className="form-group" style={{ marginBottom: '14px' }}>
                   <label className="form-label" style={{ fontWeight: '600' }}>Tour Title *</label>
-                  <input type="text" required className="form-control" placeholder="e.g. Treasures of Rajasthan & Ganges Valley" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+                  <input 
+                    type="text" 
+                    required 
+                    className="form-control" 
+                    placeholder="e.g. Treasures of Rajasthan & Ganges Valley" 
+                    value={formData.title} 
+                    onChange={handleTitleChange} 
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ fontWeight: '600', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <i className="fas fa-link" style={{ color: 'var(--admin-primary)' }}></i>
+                      Slug (URL Key) *
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      style={{ 
+                        fontSize: '0.75rem', 
+                        padding: '2px 8px', 
+                        background: '#F1F5F9', 
+                        border: '1px solid #CBD5E1', 
+                        color: '#475569', 
+                        borderRadius: '4px',
+                        cursor: 'pointer' 
+                      }}
+                      onClick={() => {
+                        setIsSlugTouched(true);
+                        setFormData(prev => ({ ...prev, slug: slugify(prev.title) }));
+                      }}
+                      title="Generate slug automatically from Tour Title"
+                    >
+                      <i className="fas fa-magic" style={{ marginRight: '4px', color: 'var(--admin-primary)' }}></i>
+                      Auto-generate from Title
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ 
+                      background: '#F8FAFC', 
+                      border: '1.5px solid #CBD5E1', 
+                      borderRight: 'none', 
+                      padding: '8px 12px', 
+                      borderTopLeftRadius: '6px', 
+                      borderBottomLeftRadius: '6px', 
+                      color: '#64748B', 
+                      fontSize: '0.88rem',
+                      fontFamily: 'monospace',
+                      userSelect: 'none'
+                    }}>
+                      /
+                    </span>
+                    <input 
+                      type="text" 
+                      required 
+                      className="form-control" 
+                      placeholder="treasures-of-rajasthan-ganges-valley" 
+                      value={formData.slug || ''} 
+                      onChange={(e) => {
+                        setIsSlugTouched(true);
+                        const cleanVal = e.target.value
+                          .toLowerCase()
+                          .replace(/\s+/g, '-')
+                          .replace(/[^a-z0-9-_]/g, '');
+                        setFormData({ ...formData, slug: cleanVal });
+                      }}
+                      style={{ 
+                        borderTopLeftRadius: 0, 
+                        borderBottomLeftRadius: 0,
+                        fontFamily: 'monospace',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <small style={{ color: '#64748B', fontSize: '0.78rem' }}>
+                      Tour URL: <strong style={{ color: 'var(--admin-primary)', fontFamily: 'monospace' }}>/{formData.slug || 'circuit-slug'}</strong>
+                    </small>
+                    {editingTour && (
+                      <small style={{ color: '#F59E0B', fontSize: '0.75rem', fontStyle: 'italic' }}>
+                        <i className="fas fa-exclamation-triangle"></i> Changing slug will update public URL
+                      </small>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>

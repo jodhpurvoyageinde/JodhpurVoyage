@@ -61,6 +61,18 @@ const REGION_TABS = [
   { key: 'bhoutan', label: 'Bhutan', icon: 'fas fa-place-of-worship' }
 ];
 
+const slugify = (text) => {
+  return (text || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 const AdminDestinations = () => {
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +81,7 @@ const AdminDestinations = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSlugTouched, setIsSlugTouched] = useState(false);
 
   const initialForm = {
     name: '',
@@ -108,12 +121,14 @@ const AdminDestinations = () => {
 
   const handleOpenCreate = () => {
     setEditingDest(null);
+    setIsSlugTouched(false);
     setFormData(initialForm);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (dest) => {
     setEditingDest(dest);
+    setIsSlugTouched(true);
     setFormData({
       ...initialForm,
       ...dest,
@@ -125,10 +140,27 @@ const AdminDestinations = () => {
     setIsModalOpen(true);
   };
 
+  const handleNameChange = (e) => {
+    const newName = e.target.value;
+    if (!editingDest && !isSlugTouched) {
+      setFormData(prev => ({
+        ...prev,
+        name: newName,
+        slug: slugify(newName)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        name: newName
+      }));
+    }
+  };
+
   const handleApplyPreset = (preset) => {
     setFormData({
       ...formData,
       name: preset.name,
+      slug: preset.slug || slugify(preset.name),
       region: preset.region,
       image: preset.image,
       tagline: preset.tagline,
@@ -168,10 +200,15 @@ const AdminDestinations = () => {
     e.preventDefault();
     setSaving(true);
     try {
+      const finalSlug = (formData.slug || slugify(formData.name || '')).toLowerCase().trim().replace(/^-+|-+$/g, '');
+      const payload = {
+        ...formData,
+        slug: finalSlug
+      };
       if (editingDest) {
-        await updateDestination(editingDest._id, formData);
+        await updateDestination(editingDest._id, payload);
       } else {
-        await createDestination(formData);
+        await createDestination(payload);
       }
       setIsModalOpen(false);
       loadDestinations();
@@ -420,7 +457,7 @@ const AdminDestinations = () => {
                       className="form-control" 
                       placeholder="e.g. Rajasthan, Pokhara, Jodhpur..." 
                       value={formData.name} 
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                      onChange={handleNameChange} 
                     />
                   </div>
 
@@ -441,6 +478,83 @@ const AdminDestinations = () => {
                       <option value="bhoutan">Bhoutan (Thimphu, Paro, Punakha...)</option>
                       <option value="centre-est">Centre & Est (Madhya Pradesh, Orissa...)</option>
                     </select>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="form-label" style={{ fontWeight: '600', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <i className="fas fa-link" style={{ color: 'var(--admin-primary)' }}></i>
+                      Destination Slug (URL Key) *
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      style={{ 
+                        fontSize: '0.75rem', 
+                        padding: '2px 8px', 
+                        background: '#F1F5F9', 
+                        border: '1px solid #CBD5E1', 
+                        color: '#475569', 
+                        borderRadius: '4px',
+                        cursor: 'pointer' 
+                      }}
+                      onClick={() => {
+                        setIsSlugTouched(true);
+                        setFormData(prev => ({ ...prev, slug: slugify(prev.name) }));
+                      }}
+                      title="Generate slug automatically from Destination Name"
+                    >
+                      <i className="fas fa-magic" style={{ marginRight: '4px', color: 'var(--admin-primary)' }}></i>
+                      Auto-generate from Name
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ 
+                      background: '#F8FAFC', 
+                      border: '1.5px solid #CBD5E1', 
+                      borderRight: 'none', 
+                      padding: '8px 12px', 
+                      borderTopLeftRadius: '6px', 
+                      borderBottomLeftRadius: '6px', 
+                      color: '#64748B', 
+                      fontSize: '0.88rem',
+                      fontFamily: 'monospace',
+                      userSelect: 'none'
+                    }}>
+                      /category/
+                    </span>
+                    <input 
+                      type="text" 
+                      required 
+                      className="form-control" 
+                      placeholder="rajasthan" 
+                      value={formData.slug || ''} 
+                      onChange={(e) => {
+                        setIsSlugTouched(true);
+                        const cleanVal = e.target.value
+                          .toLowerCase()
+                          .replace(/\s+/g, '-')
+                          .replace(/[^a-z0-9-_]/g, '');
+                        setFormData({ ...formData, slug: cleanVal });
+                      }}
+                      style={{ 
+                        borderTopLeftRadius: 0, 
+                        borderBottomLeftRadius: 0,
+                        fontFamily: 'monospace',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <small style={{ color: '#64748B', fontSize: '0.78rem' }}>
+                      Page URL: <strong style={{ color: 'var(--admin-primary)', fontFamily: 'monospace' }}>/category/{formData.slug || 'destination-slug'}</strong>
+                    </small>
+                    {editingDest && (
+                      <small style={{ color: '#F59E0B', fontSize: '0.75rem', fontStyle: 'italic' }}>
+                        <i className="fas fa-exclamation-triangle"></i> Changing slug will update public URL
+                      </small>
+                    )}
                   </div>
                 </div>
 
