@@ -7,10 +7,16 @@ import { protect, adminOnly } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 const createSlug = (text) => {
-  return text
+  return (text || '')
+    .toString()
     .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 const DEST_IMAGE_FALLBACKS = {
@@ -217,7 +223,9 @@ router.get('/:identifier', async (req, res) => {
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const destData = { ...req.body };
-    if (!destData.slug && destData.name) {
+    if (destData.slug) {
+      destData.slug = createSlug(destData.slug);
+    } else if (destData.name) {
       destData.slug = createSlug(destData.name);
     }
 
@@ -263,6 +271,10 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData._id;
+
+    if (updateData.slug) {
+      updateData.slug = createSlug(updateData.slug);
+    }
 
     if (updateData.metaTitle && !updateData.seoTitle) updateData.seoTitle = updateData.metaTitle;
     if (updateData.metaKeywords && !updateData.seoKeywords) updateData.seoKeywords = updateData.metaKeywords;

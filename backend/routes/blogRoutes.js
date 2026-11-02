@@ -8,9 +8,15 @@ const router = express.Router();
 
 const createSlug = (text) => {
   return (text || '')
+    .toString()
     .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 const cleanHtml = (rawStr) => {
@@ -357,7 +363,9 @@ router.get('/:identifier', async (req, res) => {
 router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const blogData = { ...req.body };
-    if (!blogData.slug && blogData.title) {
+    if (blogData.slug) {
+      blogData.slug = createSlug(blogData.slug);
+    } else if (blogData.title) {
       blogData.slug = createSlug(blogData.title);
     }
 
@@ -402,6 +410,10 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const updateData = { ...req.body };
     delete updateData._id;
+
+    if (updateData.slug) {
+      updateData.slug = createSlug(updateData.slug);
+    }
 
     if (updateData.metaTitle && !updateData.seoTitle) updateData.seoTitle = updateData.metaTitle;
     if (updateData.metaKeywords && !updateData.seoKeywords) updateData.seoKeywords = updateData.metaKeywords;

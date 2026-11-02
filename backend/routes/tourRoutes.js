@@ -7,10 +7,14 @@ const router = express.Router();
 
 const createSlug = (text) => {
   return (text || '')
+    .toString()
     .toLowerCase()
-    .replace(/[^\w ]+/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/ +/g, '-')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
 };
 
@@ -47,19 +51,19 @@ const normalizeTour = (tour) => {
     cities = doc.cities.map(c => {
       if (typeof c === 'string') {
         const clean = stripHtmlTags(c).trim();
-        return { name: clean, slug: clean.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') };
+        return { name: clean, slug: createSlug(clean) };
       }
       return {
         cityId: c.cityId || c._id || '',
         name: stripHtmlTags(c.name || ''),
-        slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : '')
+        slug: c.slug ? createSlug(c.slug) : (c.name ? createSlug(c.name) : '')
       };
     }).filter(c => c.name);
   } else if (doc.cityName) {
     cities = [{
       cityId: doc.cityId || '',
       name: stripHtmlTags(doc.cityName),
-      slug: (doc.cityName || '').toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-')
+      slug: createSlug(doc.cityName)
     }];
   } else if (doc.location && typeof doc.location === 'string') {
     const parts = doc.location.split(',').map(s => s.trim()).filter(Boolean);
@@ -67,7 +71,7 @@ const normalizeTour = (tour) => {
       cities = parts.map(p => ({
         cityId: '',
         name: stripHtmlTags(p),
-        slug: p.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-')
+        slug: createSlug(p)
       }));
     }
   }
@@ -498,12 +502,12 @@ router.post('/', protect, adminOnly, async (req, res) => {
       formattedCities = tourData.cities.map(c => {
         if (typeof c === 'string') {
           const clean = stripHtmlTags(c).trim();
-          return { name: clean, slug: clean.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') };
+          return { name: clean, slug: createSlug(clean) };
         }
         return {
           cityId: c.cityId || c._id || '',
           name: stripHtmlTags(c.name || ''),
-          slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : '')
+          slug: c.slug ? createSlug(c.slug) : (c.name ? createSlug(c.name) : '')
         };
       }).filter(c => c.name);
     }
@@ -610,12 +614,12 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
       updateData.cities = updateData.cities.map(c => {
         if (typeof c === 'string') {
           const clean = stripHtmlTags(c).trim();
-          return { name: clean, slug: clean.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') };
+          return { name: clean, slug: createSlug(clean) };
         }
         return {
           cityId: c.cityId || c._id || '',
           name: stripHtmlTags(c.name || ''),
-          slug: c.slug || (c.name ? c.name.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-') : '')
+          slug: c.slug ? createSlug(c.slug) : (c.name ? createSlug(c.name) : '')
         };
       }).filter(c => c.name);
     }
