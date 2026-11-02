@@ -55,7 +55,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Col 3: Destinations */}
+        {/* Col 3: Destinations (Commented out)
         <div>
           <h4 className="footer-col-title">Destinations</h4>
           <ul className="footer-links">
@@ -68,6 +68,7 @@ const Footer = () => {
             <li><Link to="/destinations/nepal"><i className="fas fa-chevron-right"></i> Népal</Link></li>
           </ul>
         </div>
+        */}
 
         {/* Col 4: Contact */}
         <div>
