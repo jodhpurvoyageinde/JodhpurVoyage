@@ -143,6 +143,14 @@ const AdminLayout = ({ children, title, subtitle }) => {
               <span>Contact Messages</span>
             </Link>
           </li>
+
+          <p className="admin-nav-group-title">Settings & Security</p>
+          <li className={`admin-nav-item ${isActive('/admin/change-password') ? 'active' : ''}`}>
+            <Link to="/admin/change-password">
+              <i className="fas fa-key"></i>
+              <span>Change Password</span>
+            </Link>
+          </li>
         </ul>
 
         <div className="admin-sidebar-footer">
@@ -176,7 +184,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
             </Link>
 
             {/* User Profile */}
-            <div className="admin-user-profile">
+            <Link to="/admin/change-password" className="admin-user-profile" title="Change Password / Account Settings" style={{ textDecoration: 'none', cursor: 'pointer' }}>
               <div className="admin-user-details">
                 <div className="admin-user-name">{adminUser?.name || 'Administrator'}</div>
                 <div className="admin-user-role">{adminUser?.email || 'admin@jodhpurvoyage.com'}</div>
@@ -184,7 +192,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
               <div className="admin-user-avatar">
                 {adminUser?.name?.charAt(0) || 'A'}
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 

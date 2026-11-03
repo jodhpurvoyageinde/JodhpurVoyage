@@ -27,6 +27,7 @@ API.interceptors.request.use((config) => {
 // Auth API
 export const loginAdmin = (credentials) => API.post('/auth/login', credentials);
 export const getAdminProfile = () => API.get('/auth/me');
+export const changeAdminPassword = (data) => API.put('/auth/change-password', data);
 
 // Tours API
 export const fetchTours = (params) => API.get('/tours', { params });

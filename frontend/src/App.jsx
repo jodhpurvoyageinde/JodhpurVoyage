@@ -37,6 +37,7 @@ import AdminMegaMenu from './pages/admin/AdminMegaMenu';
 import AdminPages from './pages/admin/AdminPages';
 import AdminItinerarySlider from './pages/admin/AdminItinerarySlider';
 import AdminHeroSlider from './pages/admin/AdminHeroSlider';
+import AdminChangePassword from './pages/admin/AdminChangePassword';
 import CustomUrlResolver from './components/CustomUrlResolver';
 import FloatingActions from './components/FloatingActions';
 
@@ -192,6 +193,7 @@ const AppLayout = () => {
           <Route path="/admin/itinerary-sliders" element={<AdminItinerarySlider />} />
           <Route path="/admin/hero-slider" element={<AdminHeroSlider />} />
           <Route path="/admin/hero-sliders" element={<AdminHeroSlider />} />
+          <Route path="/admin/change-password" element={<AdminChangePassword />} />
           <Route path="/admin/team" element={<Navigate to="/admin/pages?page=notre-equipe&tab=team" replace />} />
           <Route path="/admin/equipe" element={<Navigate to="/admin/pages?page=notre-equipe&tab=team" replace />} />
 
