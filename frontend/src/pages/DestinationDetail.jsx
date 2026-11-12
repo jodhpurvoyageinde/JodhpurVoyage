@@ -322,6 +322,79 @@ const DestinationDetail = ({ overrideSlug }) => {
   const [selectedTour, setSelectedTour] = useState({ title: 'Voyage sur mesure', duration: '' });
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const filterToursForDestination = (tourList, targetSlug) => {
+    if (!Array.isArray(tourList) || tourList.length === 0) return [];
+    const clean = (targetSlug || '').toLowerCase().trim();
+    const cleanWithSpaces = clean.replace(/-/g, ' ');
+
+    return tourList.filter(t => {
+      const cat = (t.category || '').toLowerCase();
+      const reg = (t.region || '').toLowerCase();
+      const title = (t.title || '').toLowerCase();
+      const loc = (t.location || '').toLowerCase();
+      const cities = Array.isArray(t.cities) 
+        ? t.cities.map(c => (typeof c === 'string' ? c : c.name || c.slug || '').toLowerCase())
+        : [];
+      const allText = `${cat} ${reg} ${title} ${loc} ${cities.join(' ')}`;
+
+      if (clean === 'rajasthan') {
+        if ((cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal') || cat.includes('népal') || cat.includes('karnataka') || cat.includes('kerala')) && !title.includes('rajasthan')) {
+          return false;
+        }
+        return cat.includes('rajasthan') || title.includes('rajasthan') || loc.includes('rajasthan') || cities.some(c => c.includes('rajasthan') || c.includes('jaipur') || c.includes('jodhpur') || c.includes('udaipur') || c.includes('jaisalmer') || c.includes('bikaner'));
+      }
+
+      if (clean === 'madhya-pradesh' || clean === 'madhya') {
+        // Exclude tours belonging to other distinct regions unless they genuinely visit MP
+        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bhoutan')) &&
+            !allText.includes('madhya') && !allText.includes('khajuraho') && !allText.includes('orchha') && !allText.includes('gwalior') && !allText.includes('bandhavgarh') && !allText.includes('kanha')) {
+          return false;
+        }
+        return cat.includes('madhya') || title.includes('madhya') || loc.includes('madhya') || reg.includes('madhya') ||
+          allText.includes('khajuraho') || allText.includes('orchha') || allText.includes('gwalior') || allText.includes('bandhavgarh') || allText.includes('kanha') || allText.includes('bhopal') || allText.includes('ujjain') || allText.includes('sanchi') || allText.includes('jabalpur');
+      }
+
+      if (clean === 'ladakh') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('rajasthan') || cat.includes('karnataka')) && !allText.includes('ladakh') && !allText.includes('leh')) {
+          return false;
+        }
+        return cat.includes('ladakh') || title.includes('ladakh') || loc.includes('ladakh') || reg.includes('ladakh') || cities.some(c => c.includes('ladakh') || c.includes('leh'));
+      }
+
+      if (clean === 'gujarat') {
+        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal')) && !allText.includes('gujarat')) {
+          return false;
+        }
+        return cat.includes('gujarat') || title.includes('gujarat') || loc.includes('gujarat') || reg.includes('gujarat') || cities.some(c => c.includes('gujarat') || c.includes('ahmedabad') || c.includes('kutch') || c.includes('palitana') || c.includes('gir'));
+      }
+
+      if (clean === 'kerala') {
+        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && !allText.includes('kerala')) {
+          return false;
+        }
+        return cat.includes('kerala') || title.includes('kerala') || loc.includes('kerala') || reg.includes('kerala') || cities.some(c => c.includes('kerala') || c.includes('cochin') || c.includes('munnar') || c.includes('alleppey'));
+      }
+
+      if (clean === 'nepal') {
+        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat')) && !allText.includes('nepal') && !allText.includes('népal')) {
+          return false;
+        }
+        return cat.includes('nepal') || cat.includes('népal') || title.includes('nepal') || title.includes('népal') || loc.includes('nepal') || reg.includes('nepal') || cities.some(c => c.includes('nepal') || c.includes('kathmandu') || c.includes('pokhara'));
+      }
+
+      // Default matching for other destinations
+      const isMismatched = (cat.includes('ladakh') && !allText.includes(clean) && !allText.includes(cleanWithSpaces)) ||
+                           (cat.includes('kerala') && !allText.includes(clean) && !allText.includes(cleanWithSpaces));
+      if (isMismatched) return false;
+
+      return cat.includes(clean) || cat.includes(cleanWithSpaces) ||
+             title.includes(clean) || title.includes(cleanWithSpaces) ||
+             loc.includes(clean) || loc.includes(cleanWithSpaces) ||
+             reg.includes(clean) || reg.includes(cleanWithSpaces) ||
+             cities.some(c => c.includes(clean) || c.includes(cleanWithSpaces));
+    });
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     setLoading(true);
@@ -349,59 +422,30 @@ const DestinationDetail = ({ overrideSlug }) => {
     fetchTours({ category: currentSlug })
       .then((res) => {
         const tourList = Array.isArray(res.data) ? res.data : [];
-        if (tourList.length > 0) {
-          // Compare and ensure only matching category/destination tours are shown
-          const cleanSlug = currentSlug.toLowerCase().trim();
-          const filtered = tourList.filter(t => {
-            const cat = (t.category || '').toLowerCase();
-            const title = (t.title || '').toLowerCase();
-            const loc = (t.location || '').toLowerCase();
-            const cities = Array.isArray(t.cities) 
-              ? t.cities.map(c => (typeof c === 'string' ? c : c.name || c.slug || '').toLowerCase())
-              : [];
+        const filtered = filterToursForDestination(tourList, currentSlug);
 
-            if (cleanSlug === 'rajasthan') {
-              if (cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal') || cat.includes('népal') || cat.includes('karnataka') || cat.includes('kerala')) {
-                return false;
-              }
-              return cat.includes('rajasthan') || title.includes('rajasthan') || loc.includes('rajasthan') || cities.some(c => c.includes('rajasthan') || c.includes('jaipur') || c.includes('jodhpur') || c.includes('udaipur') || c.includes('jaisalmer') || c.includes('bikaner'));
-            }
-            if (cleanSlug === 'gujarat') {
-              return cat.includes('gujarat') || title.includes('gujarat') || loc.includes('gujarat') || cities.some(c => c.includes('gujarat') || c.includes('ahmedabad') || c.includes('kutch') || c.includes('palitana') || c.includes('gir'));
-            }
-            if (cleanSlug === 'ladakh') {
-              return cat.includes('ladakh') || title.includes('ladakh') || loc.includes('ladakh') || cities.some(c => c.includes('ladakh') || c.includes('leh'));
-            }
-            if (cleanSlug === 'kerala') {
-              return cat.includes('kerala') || title.includes('kerala') || loc.includes('kerala') || cities.some(c => c.includes('kerala') || c.includes('cochin') || c.includes('munnar') || c.includes('alleppey'));
-            }
-            if (cleanSlug === 'nepal') {
-              return cat.includes('nepal') || cat.includes('népal') || title.includes('nepal') || loc.includes('nepal') || cities.some(c => c.includes('nepal') || c.includes('kathmandu') || c.includes('pokhara'));
-            }
-
-            return cat.includes(cleanSlug) || title.includes(cleanSlug) || loc.includes(cleanSlug) || cities.some(c => c.includes(cleanSlug));
-          });
-
-          setPackages(filtered.length > 0 ? filtered : tourList);
+        if (filtered.length > 0) {
+          setPackages(filtered);
         } else {
           fetchTours({ region: currentSlug })
             .then((r2) => {
               const r2List = Array.isArray(r2.data) ? r2.data : [];
-              if (r2List.length > 0) {
-                setPackages(r2List);
+              const filteredR2 = filterToursForDestination(r2List, currentSlug);
+              if (filteredR2.length > 0) {
+                setPackages(filteredR2);
               } else {
                 const fallbackFiltered = defaultPackages.filter(p => 
                   p.location?.toLowerCase().includes(currentSlug.toLowerCase()) || 
                   p.title?.toLowerCase().includes(currentSlug.toLowerCase())
                 );
-                setPackages(fallbackFiltered.length > 0 ? fallbackFiltered : defaultPackages);
+                setPackages(fallbackFiltered);
               }
             })
-            .catch(() => setPackages(defaultPackages));
+            .catch(() => setPackages([]));
         }
       })
       .catch(() => {
-        setPackages(defaultPackages);
+        setPackages([]);
       });
 
     return () => window.removeEventListener('scroll', handleScroll);

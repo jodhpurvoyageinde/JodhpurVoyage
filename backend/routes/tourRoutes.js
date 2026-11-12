@@ -184,6 +184,8 @@ router.get('/', async (req, res) => {
           catPattern = 'himachal|dharamsala';
         } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand') {
           catPattern = 'rishikesh|uttarakhand|haridwar';
+        } else if (catNorm === 'madhya-pradesh' || catNorm === 'madhya') {
+          catPattern = 'madhya[\\s-]*pradesh|madhya|khajuraho|orchha|gwalior|bandhavgarh|kanha';
         } else {
           catPattern = targetCat.replace(/-/g, ' ');
         }
@@ -192,6 +194,9 @@ router.get('/', async (req, res) => {
         conditions.push({
           $or: [
             { category: catRegex },
+            { region: catRegex },
+            { location: catRegex },
+            { title: catRegex },
             { 'cities.name': catRegex },
             { 'cities.slug': new RegExp(catNorm, 'i') }
           ]
@@ -217,6 +222,8 @@ router.get('/', async (req, res) => {
           regPattern = '^rajasthan|rajasthan|jodhpur|jaipur|udaipur|jaisalmer';
         } else if (regNorm === 'gujarat') {
           regPattern = 'gujarat|kutch|palitana';
+        } else if (regNorm === 'madhya-pradesh' || regNorm === 'madhya') {
+          regPattern = 'madhya[\\s-]*pradesh|madhya|khajuraho|orchha|gwalior|bandhavgarh|kanha';
         } else {
           regPattern = region.replace(/-/g, ' ');
         }
@@ -226,7 +233,6 @@ router.get('/', async (req, res) => {
             { category: regRegex },
             { region: regRegex },
             { location: regRegex },
-            { highlights: regRegex },
             { title: regRegex }
           ]
         });
