@@ -64,6 +64,12 @@ const CustomUrlResolver = () => {
               item.targetUrl = item.targetUrl.replace(/^\/destinations?\//i, '/category/');
             }
 
+            // Normalize legacy /tours/{slug} -> /{slug} (since App.jsx redirects /tours/:slug to /:slug)
+            if (cleanTarget.startsWith('/tours/')) {
+              cleanTarget = cleanTarget.replace(/^\/tours\//i, '/');
+              item.targetUrl = item.targetUrl.replace(/^\/tours\//i, '/');
+            }
+
             // Handle 301 / 302 Redirects without self-looping
             if (cleanTarget !== normalizedCurrent && (item.redirectType === 301 || item.redirectType === 302)) {
               navigate(item.targetUrl, { replace: true });

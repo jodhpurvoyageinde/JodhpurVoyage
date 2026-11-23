@@ -382,16 +382,107 @@ const DestinationDetail = ({ overrideSlug }) => {
         return cat.includes('nepal') || cat.includes('népal') || title.includes('nepal') || title.includes('népal') || loc.includes('nepal') || reg.includes('nepal') || cities.some(c => c.includes('nepal') || c.includes('kathmandu') || c.includes('pokhara'));
       }
 
+      if (clean === 'amritsar-punjab' || clean === 'amritsar' || clean === 'punjab') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+            !allText.includes('amritsar') && !allText.includes('punjab') && !allText.includes('golden temple')) {
+          return false;
+        }
+        return cat.includes('amritsar') || cat.includes('punjab') ||
+               title.includes('amritsar') || title.includes('punjab') ||
+               loc.includes('amritsar') || loc.includes('punjab') ||
+               reg.includes('amritsar') || reg.includes('punjab') ||
+               cities.some(c => c.includes('amritsar') || c.includes('punjab'));
+      }
+
+      if (clean === 'delhi-agra' || clean === 'delhi' || clean === 'agra') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+            !allText.includes('delhi') && !allText.includes('agra') && !allText.includes('taj mahal')) {
+          return false;
+        }
+        return cat.includes('delhi') || cat.includes('agra') ||
+               title.includes('delhi') || title.includes('agra') ||
+               loc.includes('delhi') || loc.includes('agra') ||
+               reg.includes('delhi') || reg.includes('agra') ||
+               cities.some(c => c.includes('delhi') || c.includes('agra') || c.includes('taj'));
+      }
+
+      if (clean === 'dharamsala-himachal' || clean === 'dharamsala' || clean === 'himachal') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+            !allText.includes('dharamsala') && !allText.includes('himachal') && !allText.includes('manali') && !allText.includes('shimla')) {
+          return false;
+        }
+        return cat.includes('dharamsala') || cat.includes('himachal') ||
+               title.includes('dharamsala') || title.includes('himachal') ||
+               loc.includes('dharamsala') || loc.includes('himachal') ||
+               reg.includes('dharamsala') || reg.includes('himachal') ||
+               cities.some(c => c.includes('dharamsala') || c.includes('himachal') || c.includes('manali') || c.includes('shimla'));
+      }
+
+      if (clean === 'rishikesh-uttarakhand' || clean === 'rishikesh' || clean === 'uttarakhand') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+            !allText.includes('rishikesh') && !allText.includes('uttarakhand') && !allText.includes('haridwar')) {
+          return false;
+        }
+        return cat.includes('rishikesh') || cat.includes('uttarakhand') ||
+               title.includes('rishikesh') || title.includes('uttarakhand') ||
+               loc.includes('rishikesh') || loc.includes('uttarakhand') ||
+               reg.includes('rishikesh') || reg.includes('uttarakhand') ||
+               cities.some(c => c.includes('rishikesh') || c.includes('uttarakhand') || c.includes('haridwar'));
+      }
+
+      if (clean === 'varanasi' || clean === 'benares') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh')) && 
+            !allText.includes('varanasi') && !allText.includes('benares') && !allText.includes('bénarès') && !allText.includes('gange')) {
+          return false;
+        }
+        return cat.includes('varanasi') || cat.includes('benares') || cat.includes('bénarès') ||
+               title.includes('varanasi') || title.includes('benares') || title.includes('bénarès') ||
+               loc.includes('varanasi') || loc.includes('benares') || loc.includes('bénarès') ||
+               reg.includes('varanasi') || reg.includes('benares') ||
+               cities.some(c => c.includes('varanasi') || c.includes('benares') || c.includes('bénarès'));
+      }
+
+      if (clean === 'tamil-nadu' || clean === 'tamil' || clean === 'chennai') {
+        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && 
+            !allText.includes('tamil') && !allText.includes('chennai') && !allText.includes('madras')) {
+          return false;
+        }
+        return cat.includes('tamil') || cat.includes('chennai') || cat.includes('madras') ||
+               title.includes('tamil') || title.includes('chennai') || title.includes('madras') ||
+               loc.includes('tamil') || loc.includes('chennai') || loc.includes('madras') ||
+               reg.includes('tamil') || reg.includes('chennai') ||
+               cities.some(c => c.includes('tamil') || c.includes('chennai') || c.includes('madras'));
+      }
+
+      if (clean === 'karnataka') {
+        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && 
+            !allText.includes('karnataka') && !allText.includes('hampi') && !allText.includes('mysore')) {
+          return false;
+        }
+        return cat.includes('karnataka') || title.includes('karnataka') || loc.includes('karnataka') || reg.includes('karnataka') ||
+               cities.some(c => c.includes('karnataka') || c.includes('hampi') || c.includes('mysore'));
+      }
+
       // Default matching for other destinations
       const isMismatched = (cat.includes('ladakh') && !allText.includes(clean) && !allText.includes(cleanWithSpaces)) ||
                            (cat.includes('kerala') && !allText.includes(clean) && !allText.includes(cleanWithSpaces));
       if (isMismatched) return false;
 
-      return cat.includes(clean) || cat.includes(cleanWithSpaces) ||
-             title.includes(clean) || title.includes(cleanWithSpaces) ||
-             loc.includes(clean) || loc.includes(cleanWithSpaces) ||
-             reg.includes(clean) || reg.includes(cleanWithSpaces) ||
-             cities.some(c => c.includes(clean) || c.includes(cleanWithSpaces));
+      const matchesDirect = cat.includes(clean) || cat.includes(cleanWithSpaces) ||
+                            title.includes(clean) || title.includes(cleanWithSpaces) ||
+                            loc.includes(clean) || loc.includes(cleanWithSpaces) ||
+                            reg.includes(clean) || reg.includes(cleanWithSpaces) ||
+                            cities.some(c => c.includes(clean) || c.includes(cleanWithSpaces));
+
+      if (matchesDirect) return true;
+
+      // Check individual words for hyphenated slugs (e.g. "amritsar-punjab" -> "amritsar", "punjab")
+      const words = clean.split('-').filter(w => w.length >= 4);
+      if (words.length > 1) {
+        return words.some(w => cat.includes(w) || title.includes(w) || loc.includes(w) || reg.includes(w) || cities.some(c => c.includes(w)));
+      }
+
+      return false;
     });
   };
 
