@@ -894,7 +894,7 @@ const VoyageSurMesure = () => {
             <div className="why-us-card">
               <i className="fas fa-user-shield why-us-icon"></i>
               <h4 className="why-us-card-title">Agence Locale Directe</h4>
-              <p className="why-us-card-desc">Basée à Jodhpur, sans intermédiaire, pour le meilleur rapport qualité/prix.</p>
+              <p className="why-us-card-desc">Basée en Inde, sans intermédiaire, pour le meilleur rapport qualité/prix.</p>
             </div>
 
             <div className="why-us-card">
