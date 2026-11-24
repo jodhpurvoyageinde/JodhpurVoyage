@@ -38,7 +38,7 @@ const FloatingActions = () => {
 
       {/* Floating WhatsApp button */}
       <a
-        href="https://wa.me/919650698669"
+        href="https://wa.me/919650698869"
         target="_blank"
         rel="noopener noreferrer"
         className="floating-whatsapp"

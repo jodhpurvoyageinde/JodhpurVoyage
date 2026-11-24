@@ -79,7 +79,7 @@ const Footer = () => {
           </div>
           <div className="footer-contact-item">
             <i className="fas fa-phone-alt"></i>
-            <div><a href="tel:+919650698669" className="footer-contact-link">+91-96 50 69 86 69</a></div>
+            <div><a href="tel:+919650698869" className="footer-contact-link">+91-96 50 69 88 69</a></div>
           </div>
           <div className="footer-contact-item">
             <i className="fas fa-map-marker-alt"></i>

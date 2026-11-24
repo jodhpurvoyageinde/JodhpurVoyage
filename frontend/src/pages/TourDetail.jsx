@@ -26,6 +26,25 @@ const getCleanText = (str) => {
   return cleanHtml(str).replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
 };
 
+const translateInclusion = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  const s = str.trim();
+  if (/private.*vehicle.*chauffeur/i.test(s)) return 'Véhicule privé climatisé & chauffeur';
+  if (/charming.*hotels.*breakfast/i.test(s)) return 'Hébergements de charme & petits-déjeuners';
+  if (/24\/7.*assistance/i.test(s)) return 'Assistance francophone 24h/24';
+  if (/english.*guide/i.test(s)) return 'Guide francophone privé';
+  return s;
+};
+
+const translateExclusion = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  const s = str.trim();
+  if (/international.*flight/i.test(s)) return 'Vols internationaux';
+  if (/visa.*fee/i.test(s)) return 'Frais de visa électronique pour l\'Inde';
+  if (/personal.*expense|gratuities/i.test(s)) return 'Pourboires et dépenses personnelles';
+  return s;
+};
+
 const TourDetail = ({ overrideSlug, initialTour }) => {
   const { slug: paramSlug } = useParams();
   const slug = overrideSlug || paramSlug;
@@ -368,7 +387,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
                       tour.inclusions.map((inc, i) => (
                         <li key={i} style={{ display: 'flex', gap: '8px' }}>
                           <i className="fas fa-check" style={{ color: '#15803d', marginTop: '4px' }}></i>
-                          <span>{inc}</span>
+                          <span>{translateInclusion(inc)}</span>
                         </li>
                       ))
                     ) : (
@@ -390,7 +409,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
                       tour.exclusions.map((exc, i) => (
                         <li key={i} style={{ display: 'flex', gap: '8px' }}>
                           <i className="fas fa-times" style={{ color: '#b91c1c', marginTop: '4px' }}></i>
-                          <span>{exc}</span>
+                          <span>{translateExclusion(exc)}</span>
                         </li>
                       ))
                     ) : (
@@ -461,7 +480,7 @@ const TourDetail = ({ overrideSlug, initialTour }) => {
 
           <div className="tour-mobile-sticky-actions">
             <a
-              href={`https://wa.me/919650698669?text=${encodeURIComponent(`Bonjour, je souhaite un devis gratuit pour le circuit "${tour.title}".`)}`}
+              href={`https://wa.me/919650698869?text=${encodeURIComponent(`Bonjour, je souhaite un devis gratuit pour le circuit "${tour.title}".`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="tour-mobile-sticky-whatsapp"

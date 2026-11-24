@@ -4,61 +4,57 @@ import AdminImageUpload from '../../components/AdminImageUpload';
 import { fetchAdminDestinations, createDestination, updateDestination, deleteDestination } from '../../services/api';
 
 const PRESET_DESTINATIONS = [
-  // Rajasthan
-  { name: 'Rajasthan', region: 'rajasthan', image: '/images/dest-rajasthan.jpg', tagline: 'Terre des Maharajas et désert du Thar' },
-  { name: 'Jodhpur', region: 'rajasthan', image: '/images/dest-jodhpur.jpg', tagline: 'La Cité Bleue et la forteresse de Mehrangarh' },
-  { name: 'Jaipur', region: 'rajasthan', image: '/images/jaipur-travel.jpg', tagline: 'La Cité Rose et les palais d\'Ambre' },
-  { name: 'Udaipur', region: 'rajasthan', image: '/images/dest-rajasthan.jpg', tagline: 'La Cité des Lacs et la Venise de l\'Orient' },
-  { name: 'Jaisalmer', region: 'rajasthan', image: '/images/Voyage-Jaisalmer.jpg', tagline: 'La Cité Dorée aux portes du désert' },
-  { name: 'Pushkar', region: 'rajasthan', image: '/images/dest-rajasthan.jpg', tagline: 'Le lac sacré et la foire aux chameaux' },
-  { name: 'Bikaner', region: 'rajasthan', image: '/images/dest-rajasthan.jpg', tagline: 'Forteresse de Junagarh et havelis sculptées' },
-
-  // North India
+  // 1. Inde du Nord
+  { name: 'Rajasthan', region: 'inde-du-nord', image: '/images/dest-rajasthan.jpg', tagline: 'Terre des Maharajas et désert du Thar' },
+  { name: 'Jodhpur', region: 'inde-du-nord', image: '/images/dest-jodhpur.jpg', tagline: 'La Cité Bleue et la forteresse de Mehrangarh' },
+  { name: 'Jaipur', region: 'inde-du-nord', image: '/images/jaipur-travel.jpg', tagline: 'La Cité Rose et les palais d\'Ambre' },
+  { name: 'Udaipur', region: 'inde-du-nord', image: '/images/dest-rajasthan.jpg', tagline: 'La Cité des Lacs et la Venise de l\'Orient' },
+  { name: 'Jaisalmer', region: 'inde-du-nord', image: '/images/Voyage-Jaisalmer.jpg', tagline: 'La Cité Dorée aux portes du désert' },
+  { name: 'Pushkar', region: 'inde-du-nord', image: '/images/dest-rajasthan.jpg', tagline: 'Le lac sacré et la foire aux chameaux' },
+  { name: 'Bikaner', region: 'inde-du-nord', image: '/images/dest-rajasthan.jpg', tagline: 'Forteresse de Junagarh et havelis sculptées' },
   { name: 'Delhi', region: 'inde-du-nord', image: '/images/dest-tajmahal.jpg', tagline: 'Capitale historique et cœur culturel' },
-  { name: 'Agra (Taj Mahal)', region: 'inde-du-nord', image: '/images/dest-tajmahal.jpg', tagline: 'Le Taj Mahal et le Fort Rouge impérial' },
+  { name: 'Agra', region: 'inde-du-nord', image: '/images/dest-tajmahal.jpg', tagline: 'Le Taj Mahal et le Fort Rouge impérial' },
   { name: 'Varanasi', region: 'inde-du-nord', image: '/images/dest-varanasi.jpg', tagline: 'Ville sainte sur les rives du Gange' },
   { name: 'Amritsar', region: 'inde-du-nord', image: '/images/dest-jodhpur.jpg', tagline: 'Le Temple d\'Or et la spiritualité Sikh' },
+  { name: 'Himachal Pradesh', region: 'inde-du-nord', image: '/images/dest-himachal.jpg', tagline: 'Montagnes sacrées, vallées verdoyantes et sérénité' },
   { name: 'Dharamsala', region: 'inde-du-nord', image: '/images/dest-himachal.jpg', tagline: 'Résidence du Dalaï-Lama au pied de l\'Himalaya' },
   { name: 'Rishikesh', region: 'inde-du-nord', image: '/images/image-12.jpg', tagline: 'Capitale mondiale du Yoga et du Gange' },
+  { name: 'Ladakh', region: 'inde-du-nord', image: '/images/dest-ladakh.jpg', tagline: 'Monastères perchés et cols d\'altitude' },
 
-  // Ladakh & Himalaya
-  { name: 'Ladakh', region: 'ladakh', image: '/images/dest-ladakh.jpg', tagline: 'Monastères perchés et cols d\'altitude' },
-  { name: 'Spiti Valley', region: 'ladakh', image: '/images/dest-himachal.jpg', tagline: 'Vallées secrètes et monastères millénaires' },
-
-  // South India
+  // 2. Inde du Sud
   { name: 'Kerala', region: 'inde-du-sud', image: '/images/dest-kerala.jpg', tagline: 'Lagunes des Backwaters et collines de thé' },
   { name: 'Chennai', region: 'inde-du-sud', image: '/images/dest-karnataka.jpg', tagline: 'Porte d\'entrée du Tamil Nadu et héritage dravidien' },
   { name: 'Tamil Nadu', region: 'inde-du-sud', image: '/images/dest-karnataka.jpg', tagline: 'Temples dravidiens et Pondichéry' },
   { name: 'Karnataka', region: 'inde-du-sud', image: '/images/image-6.jpg', tagline: 'Ruines de Hampi et Palais de Mysore' },
   { name: 'Goa', region: 'inde-du-sud', image: '/images/dest-goa.jpg', tagline: 'Plages sous les cocotiers et églises portugaises' },
+  { name: 'Bombay', region: 'inde-du-sud', image: '/images/image-8.jpg', tagline: 'Mégalopole vibrante et joyaux coloniaux' },
+  { name: 'Madras', region: 'inde-du-sud', image: '/images/dest-karnataka.jpg', tagline: 'Plages dorées et culture du Sud' },
   { name: 'Orissa', region: 'inde-du-sud', image: '/images/dest-orissa.jpg', tagline: 'Temple du Soleil de Konark et sanctuaires' },
 
-  // Gujarat & West India (Inde de l'Ouest)
+  // 3. Inde de l'Est & de l'Ouest
   { name: 'Gujarat', region: 'inde-de-louest', image: '/images/dest-gujarat.jpg', tagline: 'Désert de sel de Kutch et lions d\'Asie' },
-  { name: 'Désert du Rann de Kutch', region: 'inde-de-louest', image: '/images/dest-gujarat.jpg', tagline: 'Immense étendue de sel et traditions artisanales' },
-  { name: 'Palitana', region: 'inde-de-louest', image: '/images/dest-gujarat.jpg', tagline: 'Cité sainte jaïn aux 900 temples sur la colline de Shatrunjaya' },
+  { name: 'Madhya Pradesh', region: 'inde-de-louest', image: '/images/dest-varanasi.jpg', tagline: 'Temples érotiques de Khajuraho et parcs à tigres' },
+  { name: 'Darjeeling & Sikkim', region: 'inde-de-louest', image: '/images/slide8-300x176.jpg', tagline: 'Plantations de thé et vue sur le Kanchenjunga' },
 
-  // Nepal
+  // 4. Népal
+  { name: 'Népal', region: 'nepal', image: '/images/dest-nepal.jpg', tagline: 'Cités médiévales et sommets de l\'Himalaya' },
   { name: 'Kathmandu', region: 'nepal', image: '/images/dest-nepal.jpg', tagline: 'Cités médiévales et stupas sacrées' },
   { name: 'Pokhara', region: 'nepal', image: '/images/dest-nepal.jpg', tagline: 'Lacs tranquilles au pied des Annapurnas' },
   { name: 'Chitwan', region: 'nepal', image: '/images/slide8-300x176.jpg', tagline: 'Jungle et safaris rhinocéros' },
 
-  // Bhutan
-  { name: 'Thimphu', region: 'bhoutan', image: '/images/jaipur-travel.jpg', tagline: 'Capitale préservée et forteresses Dzong' },
+  // 5. Bhoutan
+  { name: 'Punakha', region: 'bhoutan', image: '/images/Voyage-Jaisalmer.jpg', tagline: 'Majestueux Dzong de Punakha' },
   { name: 'Paro', region: 'bhoutan', image: '/images/image-9.jpg', tagline: 'Le monastère du Nid du Tigre' },
-  { name: 'Punakha', region: 'bhoutan', image: '/images/Voyage-Jaisalmer.jpg', tagline: 'Majestueux Dzong de Punakha' }
+  { name: 'Thimphu', region: 'bhoutan', image: '/images/jaipur-travel.jpg', tagline: 'Capitale préservée et forteresses Dzong' }
 ];
 
 const REGION_TABS = [
   { key: 'all', label: 'All Regions', icon: 'fas fa-globe-asia' },
-  { key: 'inde-du-nord', label: 'North India', icon: 'fas fa-gopuram' },
-  { key: 'rajasthan', label: 'Rajasthan', icon: 'fas fa-chess-king' },
-  { key: 'inde-du-sud', label: 'South India', icon: 'fas fa-tree' },
+  { key: 'inde-du-nord', label: 'Inde du Nord', icon: 'fas fa-gopuram' },
+  { key: 'inde-du-sud', label: 'Inde du Sud', icon: 'fas fa-tree' },
   { key: 'inde-de-louest', label: "Inde de l'Est & de l'Ouest", icon: 'fas fa-compass' },
-  { key: 'ladakh', label: 'Ladakh & Himalaya', icon: 'fas fa-mountain' },
-  { key: 'gujarat', label: 'Gujarat', icon: 'fas fa-sun' },
-  { key: 'nepal', label: 'Nepal', icon: 'fas fa-hiking' },
-  { key: 'bhoutan', label: 'Bhutan', icon: 'fas fa-place-of-worship' }
+  { key: 'nepal', label: 'Népal', icon: 'fas fa-mountain' },
+  { key: 'bhoutan', label: 'Bhoutan', icon: 'fas fa-place-of-worship' }
 ];
 
 const slugify = (text) => {
@@ -220,14 +216,15 @@ const AdminDestinations = () => {
   };
 
   const filteredDestinations = destinations.filter((dest) => {
+    const reg = (dest.region || '').toLowerCase();
     const matchesRegion =
       activeTab === 'all' ||
-      dest.region === activeTab ||
-      (activeTab === 'inde-du-nord' && (dest.region === 'inde-du-nord' || dest.region === 'ladakh')) ||
-      (activeTab === 'inde-du-sud' && (dest.region === 'inde-du-sud')) ||
-      (activeTab === 'inde-de-louest' && (dest.region === 'inde-de-louest' || dest.region === 'inde-du-ouest' || dest.region === 'ouest' || dest.region === 'gujarat')) ||
-      (activeTab === 'nepal' && dest.region === 'nepal') ||
-      (activeTab === 'bhoutan' && dest.region === 'bhoutan');
+      reg === activeTab ||
+      (activeTab === 'inde-du-nord' && (reg === 'inde-du-nord' || reg === 'rajasthan' || reg === 'ladakh' || reg === 'nord')) ||
+      (activeTab === 'inde-du-sud' && (reg === 'inde-du-sud' || reg === 'sud' || reg === 'kerala' || reg === 'karnataka' || reg === 'goa' || reg === 'orissa')) ||
+      (activeTab === 'inde-de-louest' && (reg === 'inde-de-louest' || reg === 'inde-du-ouest' || reg === 'ouest' || reg === 'gujarat' || reg === 'centre-est' || reg.includes('est') || reg.includes('ouest'))) ||
+      (activeTab === 'nepal' && (reg === 'nepal' || reg.includes('nepal'))) ||
+      (activeTab === 'bhoutan' && (reg === 'bhoutan' || reg.includes('bhoutan')));
 
     const matchesSearch =
       !searchTerm ||
@@ -239,25 +236,23 @@ const AdminDestinations = () => {
   });
 
   const getRegionBadge = (region) => {
-    switch (region) {
-      case 'inde-du-nord':
-      case 'ladakh':
-        return <span className="admin-status-badge status-en-attente"><i className="fas fa-gopuram"></i> North India</span>;
-      case 'inde-du-sud':
-        return <span className="admin-status-badge status-confirme"><i className="fas fa-tree"></i> South India</span>;
-      case 'inde-de-louest':
-      case 'inde-du-ouest':
-      case 'ouest':
-        return <span className="admin-status-badge" style={{ background: '#ECFDF5', color: '#065F46' }}><i className="fas fa-compass"></i> West India</span>;
-      case 'gujarat':
-        return <span className="admin-status-badge" style={{ background: '#FEF3C7', color: '#92400E' }}><i className="fas fa-compass"></i> Gujarat (West)</span>;
-      case 'nepal':
-        return <span className="admin-status-badge" style={{ background: '#E0E7FF', color: '#3730A3' }}><i className="fas fa-mountain"></i> Nepal</span>;
-      case 'bhoutan':
-        return <span className="admin-status-badge" style={{ background: '#FEF3C7', color: '#92400E' }}><i className="fas fa-place-of-worship"></i> Bhutan</span>;
-      default:
-        return <span className="admin-status-badge">{region}</span>;
+    const r = (region || '').toLowerCase();
+    if (r === 'inde-du-nord' || r === 'rajasthan' || r === 'ladakh' || r === 'nord') {
+      return <span className="admin-status-badge status-en-attente"><i className="fas fa-gopuram"></i> Inde du Nord</span>;
     }
+    if (r === 'inde-du-sud' || r === 'sud' || r === 'kerala' || r === 'karnataka' || r === 'goa' || r === 'orissa') {
+      return <span className="admin-status-badge status-confirme"><i className="fas fa-tree"></i> Inde du Sud</span>;
+    }
+    if (r === 'inde-de-louest' || r === 'inde-du-ouest' || r === 'ouest' || r === 'gujarat' || r === 'centre-est' || r.includes('est') || r.includes('ouest')) {
+      return <span className="admin-status-badge" style={{ background: '#ECFDF5', color: '#065F46' }}><i className="fas fa-compass"></i> Inde de l'Est & de l'Ouest</span>;
+    }
+    if (r === 'nepal' || r.includes('nepal')) {
+      return <span className="admin-status-badge" style={{ background: '#E0E7FF', color: '#3730A3' }}><i className="fas fa-mountain"></i> Népal</span>;
+    }
+    if (r === 'bhoutan' || r.includes('bhoutan')) {
+      return <span className="admin-status-badge" style={{ background: '#FEF3C7', color: '#92400E' }}><i className="fas fa-place-of-worship"></i> Bhoutan</span>;
+    }
+    return <span className="admin-status-badge">{region}</span>;
   };
 
   return (
@@ -468,15 +463,11 @@ const AdminDestinations = () => {
                       value={formData.region} 
                       onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                     >
-                      <option value="inde-du-nord">Inde du Nord (Delhi, Agra, Varanasi, Amritsar, Rishikesh...)</option>
-                      <option value="rajasthan">Rajasthan (Jodhpur, Jaipur, Udaipur, Jaisalmer...)</option>
-                      <option value="inde-du-sud">Inde du Sud (Kerala, Tamil Nadu, Karnataka, Goa...)</option>
-                      <option value="inde-de-louest">Inde de l'Est & de l'Ouest (Gujarat, Darjeeling, Sikkim...)</option>
-                      <option value="ladakh">Himalaya & Ladakh (Leh, Spiti, Dharamsala, Sikkim...)</option>
-                      <option value="gujarat">Gujarat (Rann de Kutch, Ahmedabad, Palitana...)</option>
-                      <option value="nepal">Népal (Katmandou, Chitwan, Pokhara...)</option>
-                      <option value="bhoutan">Bhoutan (Thimphu, Paro, Punakha...)</option>
-                      <option value="centre-est">Centre & Est (Madhya Pradesh, Orissa...)</option>
+                      <option value="inde-du-nord">1. Inde du Nord (Agra, Amritsar, Bénarès, Delhi, Himachal, Ladakh, Rajasthan...)</option>
+                      <option value="inde-du-sud">2. Inde du Sud (Chennai, Goa, Karnataka, Kerala, Tamil Nadu, Bombay, Madras...)</option>
+                      <option value="inde-de-louest">3. Inde de l'Est & de l'Ouest (Gujarat, Madhya Pradesh, Darjeeling & Sikkim...)</option>
+                      <option value="nepal">4. Népal</option>
+                      <option value="bhoutan">5. Bhoutan (Punakha, Paro, Thimphu...)</option>
                     </select>
                   </div>
                 </div>

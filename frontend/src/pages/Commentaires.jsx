@@ -374,7 +374,7 @@ const Commentaires = () => {
       </section>
 
       {/* Floating WhatsApp */}
-      <a href="https://wa.me/919650698669" target="_blank" rel="noopener noreferrer" className="floating-whatsapp" aria-label="Contactez-nous sur WhatsApp">
+      <a href="https://wa.me/919650698869" target="_blank" rel="noopener noreferrer" className="floating-whatsapp" aria-label="Contactez-nous sur WhatsApp">
         <i className="fab fa-whatsapp"></i>
         <span className="whatsapp-tooltip">Contactez-nous sur WhatsApp</span>
       </a>

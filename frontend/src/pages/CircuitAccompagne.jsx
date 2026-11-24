@@ -640,7 +640,7 @@ Demande de Devis Sur Mesure & Circuit Accompagné
               <Link to="/" className="btn btn-primary">
                 Retourner à l'accueil
               </Link>
-              <a href="https://wa.me/919650698669" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ borderColor: '#25D366', color: '#25D366' }}>
+              <a href="https://wa.me/919650698869" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ borderColor: '#25D366', color: '#25D366' }}>
                 <i className="fab fa-whatsapp"></i> Échanger sur WhatsApp
               </a>
             </div>

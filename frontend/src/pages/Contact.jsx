@@ -130,7 +130,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <strong className="contact-info-title">Téléphone & WhatsApp</strong>
-                    <p><a href="tel:+919650698669" className="contact-info-link">+91-96 50 69 86 69</a></p>
+                    <p><a href="tel:+919650698869" className="contact-info-link">+91-96 50 69 88 69</a></p>
                   </div>
                 </div>
 
@@ -267,7 +267,7 @@ const Contact = () => {
       </section>
 
       {/* Floating Widgets */}
-      <a href="https://wa.me/919650698669" target="_blank" rel="noopener noreferrer" className="floating-whatsapp" aria-label="Contactez-nous sur WhatsApp">
+      <a href="https://wa.me/919650698869" target="_blank" rel="noopener noreferrer" className="floating-whatsapp" aria-label="Contactez-nous sur WhatsApp">
         <i className="fab fa-whatsapp"></i>
         <span className="whatsapp-tooltip">Contactez-nous sur WhatsApp</span>
       </a>

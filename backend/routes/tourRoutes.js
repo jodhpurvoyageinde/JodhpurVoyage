@@ -35,6 +35,67 @@ const stripHtmlTags = (rawStr) => {
     .trim();
 };
 
+const translateInclusion = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  const s = str.trim();
+  if (/private.*vehicle.*chauffeur/i.test(s)) return 'Véhicule privé climatisé & chauffeur';
+  if (/charming.*hotels.*breakfast/i.test(s)) return 'Hébergements de charme & petits-déjeuners';
+  if (/24\/7.*assistance/i.test(s)) return 'Assistance francophone 24h/24';
+  if (/english.*guide/i.test(s)) return 'Guide francophone privé';
+  return s;
+};
+
+const translateExclusion = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  const s = str.trim();
+  if (/international.*flight/i.test(s)) return 'Vols internationaux';
+  if (/visa.*fee/i.test(s)) return 'Frais de visa électronique pour l\'Inde';
+  if (/personal.*expense|gratuities/i.test(s)) return 'Pourboires et dépenses personnelles';
+  return s;
+};
+
+const buildCategoryRegex = (category) => {
+  if (!category || category === 'all') return null;
+  const catNorm = category.trim().toLowerCase().replace(/_/g, '-');
+  let pattern;
+  if (catNorm === 'rajasthan') {
+    pattern = '^rajasthan|rajasthan';
+  } else if (catNorm === 'gujarat') {
+    pattern = 'gujarat';
+  } else if (catNorm === 'ladakh') {
+    pattern = 'ladakh';
+  } else if (catNorm === 'nepal') {
+    pattern = 'n[ée]pal|katmandou|kathmandu';
+  } else if (catNorm === 'kerala') {
+    pattern = 'kerala';
+  } else if (catNorm === 'karnataka') {
+    pattern = 'karnataka';
+  } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil' || catNorm === 'chennai' || catNorm === 'madras') {
+    pattern = 'tamil|chennai|madras';
+  } else if (catNorm === 'delhi-agra' || catNorm === 'delhi' || catNorm === 'agra') {
+    pattern = 'delhi|agra';
+  } else if (catNorm === 'varanasi' || catNorm === 'benares') {
+    pattern = 'varanasi|b[ée]nar[èe]s';
+  } else if (catNorm === 'amritsar-punjab' || catNorm === 'amritsar' || catNorm === 'punjab') {
+    pattern = 'amritsar|punjab';
+  } else if (catNorm === 'goa') {
+    pattern = 'goa';
+  } else if (catNorm === 'orissa') {
+    pattern = 'orissa';
+  } else if (catNorm === 'bhoutan') {
+    pattern = 'bhoutan';
+  } else if (catNorm === 'himachal' || catNorm === 'himachal-pradesh' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal' || catNorm === 'spiti' || catNorm === 'kinnaur' || catNorm === 'shimla' || catNorm === 'manali') {
+    pattern = 'himachal[\\s-]*pradesh|himachal|dharamsala|spiti|kinnaur|shimla|manali';
+  } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand' || catNorm === 'uttarakhand') {
+    pattern = 'rishikesh|uttarakhand|haridwar';
+  } else if (catNorm === 'madhya-pradesh' || catNorm === 'madhya') {
+    pattern = 'madhya[\\s-]*pradesh|madhya|khajuraho|orchha|gwalior|bandhavgarh|kanha';
+  } else {
+    pattern = category.replace(/-/g, ' ');
+  }
+  return { pattern, catNorm };
+};
+
 const normalizeTour = (tour) => {
   if (!tour) return null;
   const doc = tour && tour.toObject ? tour.toObject() : tour;
@@ -112,16 +173,20 @@ const normalizeTour = (tour) => {
     overview: cleanOverview,
     highlights: validHighlights,
     itinerary: Array.isArray(doc.itinerary) ? doc.itinerary : [],
-    inclusions: Array.isArray(doc.inclusions) ? doc.inclusions : [
-      'Chauffeur privé & véhicule climatisé',
-      'Guides locaux francophones',
-      'Hébergements de charme'
-    ],
-    exclusions: Array.isArray(doc.exclusions) ? doc.exclusions : [
-      'Vols internationaux',
-      'Frais de visa',
-      'Dépenses personnelles'
-    ],
+    inclusions: (Array.isArray(doc.inclusions) && doc.inclusions.length > 0)
+      ? doc.inclusions.map(translateInclusion)
+      : [
+        'Véhicule privé climatisé & chauffeur',
+        'Hébergements de charme & petits-déjeuners',
+        'Assistance francophone 24h/24'
+      ],
+    exclusions: (Array.isArray(doc.exclusions) && doc.exclusions.length > 0)
+      ? doc.exclusions.map(translateExclusion)
+      : [
+        'Vols internationaux',
+        'Frais de visa électronique pour l\'Inde',
+        'Pourboires et dépenses personnelles'
+      ],
     faq: Array.isArray(doc.faq) ? doc.faq : [],
     seoTitle: doc.seoTitle || doc.metaTitle || (doc.duration ? `${cleanTitle} | Circuit ${doc.duration} | Jodhpur Voyage` : `${cleanTitle} — Circuit Privé | Jodhpur Voyage`),
     seoKeywords: doc.seoKeywords || doc.metaKeywords || `${cleanTitle.toLowerCase()}, circuit ${doc.category?.toLowerCase() || 'inde'}, voyage sur mesure, chauffeur prive inde`,
@@ -152,55 +217,20 @@ router.get('/', async (req, res) => {
 
       const targetCat = category || destination;
       if (targetCat && targetCat !== 'all') {
-        const catNorm = targetCat.trim().toLowerCase().replace(/_/g, '-');
-        let catPattern;
-        if (catNorm === 'rajasthan') {
-          catPattern = '^rajasthan|rajasthan';
-        } else if (catNorm === 'gujarat') {
-          catPattern = 'gujarat';
-        } else if (catNorm === 'ladakh') {
-          catPattern = 'ladakh';
-        } else if (catNorm === 'nepal') {
-          catPattern = 'n[ée]pal|katmandou|kathmandu';
-        } else if (catNorm === 'kerala') {
-          catPattern = 'kerala';
-        } else if (catNorm === 'karnataka') {
-          catPattern = 'karnataka';
-        } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil' || catNorm === 'chennai' || catNorm === 'madras') {
-          catPattern = 'tamil|chennai|madras';
-        } else if (catNorm === 'delhi-agra' || catNorm === 'delhi' || catNorm === 'agra') {
-          catPattern = 'delhi|agra';
-        } else if (catNorm === 'varanasi' || catNorm === 'benares') {
-          catPattern = 'varanasi|b[ée]nar[èe]s';
-        } else if (catNorm === 'amritsar-punjab' || catNorm === 'amritsar' || catNorm === 'punjab') {
-          catPattern = 'amritsar|punjab';
-        } else if (catNorm === 'goa') {
-          catPattern = 'goa';
-        } else if (catNorm === 'orissa') {
-          catPattern = 'orissa';
-        } else if (catNorm === 'bhoutan') {
-          catPattern = 'bhoutan';
-        } else if (catNorm === 'himachal' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal') {
-          catPattern = 'himachal|dharamsala';
-        } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand') {
-          catPattern = 'rishikesh|uttarakhand|haridwar';
-        } else if (catNorm === 'madhya-pradesh' || catNorm === 'madhya') {
-          catPattern = 'madhya[\\s-]*pradesh|madhya|khajuraho|orchha|gwalior|bandhavgarh|kanha';
-        } else {
-          catPattern = targetCat.replace(/-/g, ' ');
+        const catInfo = buildCategoryRegex(targetCat);
+        if (catInfo) {
+          const catRegex = new RegExp(catInfo.pattern, 'i');
+          conditions.push({
+            $or: [
+              { category: catRegex },
+              { region: catRegex },
+              { location: catRegex },
+              { title: catRegex },
+              { 'cities.name': catRegex },
+              { 'cities.slug': new RegExp(catInfo.catNorm, 'i') }
+            ]
+          });
         }
-
-        const catRegex = new RegExp(catPattern, 'i');
-        conditions.push({
-          $or: [
-            { category: catRegex },
-            { region: catRegex },
-            { location: catRegex },
-            { title: catRegex },
-            { 'cities.name': catRegex },
-            { 'cities.slug': new RegExp(catNorm, 'i') }
-          ]
-        });
       }
 
       if (region && region !== 'all') {
@@ -354,15 +384,20 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     else if (status === 'draft') conditions.push({ published: false });
 
     if (category) {
-      const catRegex = new RegExp(category.replace(/-/g, ' '), 'i');
-      conditions.push({
-        $or: [
-          { category: catRegex },
-          { region: catRegex },
-          { 'cities.name': catRegex },
-          { 'cities.slug': new RegExp(category, 'i') }
-        ]
-      });
+      const catInfo = buildCategoryRegex(category);
+      if (catInfo) {
+        const catRegex = new RegExp(catInfo.pattern, 'i');
+        conditions.push({
+          $or: [
+            { category: catRegex },
+            { region: catRegex },
+            { location: catRegex },
+            { title: catRegex },
+            { 'cities.name': catRegex },
+            { 'cities.slug': new RegExp(catInfo.catNorm, 'i') }
+          ]
+        });
+      }
     }
 
     if (search) {
@@ -413,8 +448,14 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     if (status === 'published') list = list.filter(t => t.published !== false);
     else if (status === 'draft') list = list.filter(t => t.published === false);
     if (category) {
-      const c = category.toLowerCase().replace(/-/g, ' ');
-      list = list.filter(t => (t.category || '').toLowerCase().includes(c) || (t.region || '').toLowerCase().includes(c));
+      const catInfo = buildCategoryRegex(category);
+      const catRegex = catInfo ? new RegExp(catInfo.pattern, 'i') : new RegExp(category.replace(/-/g, ' '), 'i');
+      list = list.filter(t => 
+        catRegex.test(t.category || '') || 
+        catRegex.test(t.region || '') || 
+        catRegex.test(t.title || '') || 
+        catRegex.test(t.location || '')
+      );
     }
     if (search) {
       const s = search.toLowerCase();

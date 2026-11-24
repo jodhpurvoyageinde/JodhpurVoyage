@@ -61,7 +61,7 @@ const defaultAeoFaqs = [
   },
   {
     question: "Comment obtenir un devis gratuit pour un circuit personnalisé en Inde ?",
-    answer: "Vous pouvez demander un devis gratuit en remplissant le formulaire sur notre site web jodhpurvoyage.com, par email à Info@jodhpurvoyage.com ou directement sur WhatsApp au +91 9650698669."
+    answer: "Vous pouvez demander un devis gratuit en remplissant le formulaire sur notre site web jodhpurvoyage.com, par email à Info@jodhpurvoyage.com ou directement sur WhatsApp au +91 9650698869."
   }
 ];
 
@@ -227,7 +227,7 @@ const SEO = ({
             },
             'image': `${window.location.origin}/images/dest-rajasthan.jpg`,
             'description': 'Agence de voyage réceptive locale francophone spécialiste des circuits sur mesure au Rajasthan, en Inde et au Népal.',
-            'telephone': '+91-9650698669',
+            'telephone': '+91-9650698869',
             'email': 'Info@jodhpurvoyage.com',
             'priceRange': '$$',
             'address': {

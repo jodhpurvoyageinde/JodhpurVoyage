@@ -78,13 +78,13 @@ const AdminTours = () => {
     image: '/images/dest-rajasthan.jpg',
     gallery: [],
     overview: '',
-    highlights: ['Visit Taj Mahal', 'Jaipur Royal Palaces', 'Mehrangarh Fort of Jodhpur'],
+    highlights: ['Visite du Taj Mahal', 'Palais royaux de Jaipur', 'Fort de Mehrangarh à Jodhpur'],
     itinerary: [
-      { day: 1, title: 'Arrival in Delhi', description: 'Warm welcome by your private English/French speaking chauffeur at the airport and transfer to hotel.', meals: 'Free dinner', accommodation: '4* Boutique Hotel' },
-      { day: 2, title: 'Delhi - Jaipur', description: 'Drive to the Pink City of Rajasthan. Explore bustling colorful bazaars and the Hawa Mahal.', meals: 'Breakfast included', accommodation: 'Heritage Haveli' }
+      { day: 1, title: 'Arrivée à Delhi', description: 'Accueil chaleureux par votre chauffeur privé francophone à l\'aéroport et transfert à votre hôtel.', meals: 'Dîner libre', accommodation: 'Hôtel de charme 4*' },
+      { day: 2, title: 'Delhi - Jaipur', description: 'Route vers la Ville Rose du Rajasthan. Découverte des bazars colorés et du Palais des Vents (Hawa Mahal).', meals: 'Petit-déjeuner inclus', accommodation: 'Haveli de patrimoine' }
     ],
-    inclusions: ['Private air-conditioned vehicle with chauffeur', 'Charming heritage hotels with daily breakfast', '24/7 dedicated assistance'],
-    exclusions: ['International flights', 'Indian visa fees', 'Personal expenses and gratuities'],
+    inclusions: ['Véhicule privé climatisé & chauffeur', 'Hébergements de charme & petits-déjeuners', 'Assistance francophone 24h/24'],
+    exclusions: ['Vols internationaux', 'Frais de visa électronique pour l\'Inde', 'Pourboires et dépenses personnelles'],
     seoTitle: '',
     seoKeywords: '',
     seoDescription: '',

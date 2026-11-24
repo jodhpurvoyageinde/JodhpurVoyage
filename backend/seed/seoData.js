@@ -17,7 +17,7 @@ export const defaultSeoData = [
       'url': 'https://jodhpurvoyage.com',
       'logo': 'https://jodhpurvoyage.com/images/logo-transprent.png',
       'description': 'Agence de voyage spécialiste des circuits sur mesure en Inde et Népal',
-      'telephone': '+91-9650698669',
+      'telephone': '+91-9650698869',
       'email': 'Info@jodhpurvoyage.com',
       'address': {
         '@type': 'PostalAddress',

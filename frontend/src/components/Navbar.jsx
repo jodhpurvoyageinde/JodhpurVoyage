@@ -67,7 +67,7 @@ const DEFAULT_DESTINATION_GROUPS = [
 const DEFAULT_MEGA_CONFIG = {
   topBar: {
     email: 'Info@jodhpurvoyage.com',
-    phone: '+91-96 50 69 86 69',
+    phone: '+91-96 50 69 88 69',
     announcementPrefix: 'Voyager en confiance :',
     announcementText: 'devis gratuit & conseils sur mesure',
     announcementLink: '/voyage-sur-mesure',
@@ -601,7 +601,7 @@ const Navbar = () => {
               </div>
               <div className="top-bar-item">
                 <i className="fas fa-phone-alt"></i>
-                <a href={`tel:${(topBar.phone || '+919650698669').replace(/\s+/g, '')}`}>{topBar.phone || '+91-96 50 69 86 69'}</a>
+                <a href={`tel:${(topBar.phone || '+919650698869').replace(/\s+/g, '')}`}>{topBar.phone || '+91-96 50 69 88 69'}</a>
               </div>
             </div>
             <div className="top-bar-announcement">

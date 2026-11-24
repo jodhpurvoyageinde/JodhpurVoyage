@@ -957,7 +957,7 @@ const VoyageSurMesure = () => {
           FLOATING WIDGETS
           ========================================================================= */}
       <a
-        href="https://wa.me/919650698669"
+        href="https://wa.me/919650698869"
         target="_blank"
         rel="noreferrer"
         className="floating-whatsapp"

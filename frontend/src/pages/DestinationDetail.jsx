@@ -296,9 +296,21 @@ const slugAliases = {
   'punjab': 'amritsar-punjab',
   'dharamsala': 'dharamsala-himachal',
   'himachal': 'dharamsala-himachal',
+  'himachal-pradesh': 'dharamsala-himachal',
+  'spiti': 'dharamsala-himachal',
+  'kinnaur': 'dharamsala-himachal',
+  'shimla': 'dharamsala-himachal',
+  'manali': 'dharamsala-himachal',
   'rishikesh': 'rishikesh-uttarakhand',
   'uttarakhand': 'rishikesh-uttarakhand',
   'benares': 'varanasi',
+  'benaras': 'varanasi',
+  'bombay': 'mumbai',
+  'mumbai': 'bombay',
+  'darjeeling': 'darjeeling-sikkim',
+  'sikkim': 'darjeeling-sikkim',
+  'madhya': 'madhya-pradesh',
+  'madhya-pradesh': 'madhya-pradesh',
   'katmandou': 'nepal',
   'pokhara': 'nepal',
   'chitwan': 'nepal',
@@ -383,7 +395,7 @@ const DestinationDetail = ({ overrideSlug }) => {
       }
 
       if (clean === 'amritsar-punjab' || clean === 'amritsar' || clean === 'punjab') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
             !allText.includes('amritsar') && !allText.includes('punjab') && !allText.includes('golden temple')) {
           return false;
         }
@@ -395,7 +407,7 @@ const DestinationDetail = ({ overrideSlug }) => {
       }
 
       if (clean === 'delhi-agra' || clean === 'delhi' || clean === 'agra') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
             !allText.includes('delhi') && !allText.includes('agra') && !allText.includes('taj mahal')) {
           return false;
         }
@@ -406,16 +418,17 @@ const DestinationDetail = ({ overrideSlug }) => {
                cities.some(c => c.includes('delhi') || c.includes('agra') || c.includes('taj'));
       }
 
-      if (clean === 'dharamsala-himachal' || clean === 'dharamsala' || clean === 'himachal') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
-            !allText.includes('dharamsala') && !allText.includes('himachal') && !allText.includes('manali') && !allText.includes('shimla')) {
+      if (clean === 'dharamsala-himachal' || clean === 'dharamsala' || clean === 'himachal' || clean === 'himachal-pradesh' || clean === 'spiti' || clean === 'kinnaur' || clean === 'shimla' || clean === 'manali') {
+        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
+            !allText.includes('dharamsala') && !allText.includes('himachal') && !allText.includes('manali') && !allText.includes('shimla') && !allText.includes('spiti') && !allText.includes('kinnaur')) {
           return false;
         }
         return cat.includes('dharamsala') || cat.includes('himachal') ||
                title.includes('dharamsala') || title.includes('himachal') ||
                loc.includes('dharamsala') || loc.includes('himachal') ||
                reg.includes('dharamsala') || reg.includes('himachal') ||
-               cities.some(c => c.includes('dharamsala') || c.includes('himachal') || c.includes('manali') || c.includes('shimla'));
+               allText.includes('spiti') || allText.includes('kinnaur') || allText.includes('manali') || allText.includes('shimla') ||
+               cities.some(c => c.includes('dharamsala') || c.includes('himachal') || c.includes('manali') || c.includes('shimla') || c.includes('spiti') || c.includes('kinnaur'));
       }
 
       if (clean === 'rishikesh-uttarakhand' || clean === 'rishikesh' || clean === 'uttarakhand') {
@@ -843,7 +856,7 @@ const DestinationDetail = ({ overrideSlug }) => {
           FLOATING WIDGETS
           ========================================================================= */}
       <a
-        href="https://wa.me/919650698669"
+        href="https://wa.me/919650698869"
         target="_blank"
         rel="noreferrer"
         className="floating-whatsapp"
