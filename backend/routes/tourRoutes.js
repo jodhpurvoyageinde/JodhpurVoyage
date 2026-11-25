@@ -96,6 +96,63 @@ const buildCategoryRegex = (category) => {
   return { pattern, catNorm };
 };
 
+const buildAdminCategoryRegex = (category) => {
+  if (!category || category === 'all') return null;
+  const catNorm = category.trim().toLowerCase().replace(/_/g, '-');
+  let pattern;
+  if (catNorm === 'rajasthan') {
+    pattern = '^rajasthan|rajasthan';
+  } else if (catNorm === 'gujarat') {
+    pattern = '^gujarat|gujarat';
+  } else if (catNorm === 'ladakh') {
+    pattern = 'ladakh';
+  } else if (catNorm === 'nepal' || catNorm === 'npal') {
+    pattern = 'n[ée]pal';
+  } else if (catNorm === 'kerala') {
+    pattern = '^kerala|kerala';
+  } else if (catNorm === 'karnataka') {
+    pattern = 'karnataka';
+  } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil') {
+    pattern = 'tamil';
+  } else if (catNorm === 'chennai') {
+    pattern = '^chennai$|\\bchennai\\b';
+  } else if (catNorm === 'madras') {
+    pattern = '^madras$|\\bmadras\\b';
+  } else if (catNorm === 'delhi') {
+    pattern = '^delhi$|\\bdelhi\\b';
+  } else if (catNorm === 'agra' || catNorm === 'taj-mahal-agra') {
+    pattern = '^agra$|\\bagra\\b';
+  } else if (catNorm === 'delhi-agra') {
+    pattern = 'delhi|agra';
+  } else if (catNorm === 'varanasi' || catNorm === 'benares' || catNorm === 'bénarès') {
+    pattern = 'varanasi|b[ée]nar[èe]s';
+  } else if (catNorm === 'amritsar' || catNorm === 'amritsar-punjab') {
+    pattern = '^amritsar$|\\bamritsar\\b';
+  } else if (catNorm === 'punjab') {
+    pattern = 'punjab';
+  } else if (catNorm === 'goa') {
+    pattern = '^goa$|\\bgoa\\b';
+  } else if (catNorm === 'orissa') {
+    pattern = '^orissa$|\\borissa\\b';
+  } else if (catNorm === 'bhoutan') {
+    pattern = 'bhoutan';
+  } else if (catNorm === 'himachal' || catNorm === 'himachal-pradesh' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal') {
+    pattern = 'himachal|dharamsala|spiti|kinnaur';
+  } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand' || catNorm === 'uttarakhand') {
+    pattern = 'rishikesh|uttarakhand';
+  } else if (catNorm === 'madhya-pradesh' || catNorm === 'madhya') {
+    pattern = 'madhya';
+  } else if (catNorm === 'bombay' || catNorm === 'mumbai') {
+    pattern = 'bombay|mumbai';
+  } else if (catNorm === 'darjeeling-sikkim' || catNorm === 'darjeeling' || catNorm === 'darjeeling & sikkim' || catNorm === 'darjeeling-et-sikkim') {
+    pattern = 'darjeeling|sikkim';
+  } else {
+    const cleanCat = category.replace(/-/g, ' ');
+    pattern = `^${cleanCat}$|\\b${cleanCat}\\b`;
+  }
+  return { pattern, catNorm };
+};
+
 const normalizeTour = (tour) => {
   if (!tour) return null;
   const doc = tour && tour.toObject ? tour.toObject() : tour;
@@ -384,17 +441,13 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     else if (status === 'draft') conditions.push({ published: false });
 
     if (category) {
-      const catInfo = buildCategoryRegex(category);
+      const catInfo = buildAdminCategoryRegex(category);
       if (catInfo) {
         const catRegex = new RegExp(catInfo.pattern, 'i');
         conditions.push({
           $or: [
             { category: catRegex },
-            { region: catRegex },
-            { location: catRegex },
-            { title: catRegex },
-            { 'cities.name': catRegex },
-            { 'cities.slug': new RegExp(catInfo.catNorm, 'i') }
+            { categoryId: category }
           ]
         });
       }
@@ -448,13 +501,11 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     if (status === 'published') list = list.filter(t => t.published !== false);
     else if (status === 'draft') list = list.filter(t => t.published === false);
     if (category) {
-      const catInfo = buildCategoryRegex(category);
+      const catInfo = buildAdminCategoryRegex(category);
       const catRegex = catInfo ? new RegExp(catInfo.pattern, 'i') : new RegExp(category.replace(/-/g, ' '), 'i');
       list = list.filter(t => 
         catRegex.test(t.category || '') || 
-        catRegex.test(t.region || '') || 
-        catRegex.test(t.title || '') || 
-        catRegex.test(t.location || '')
+        String(t.categoryId || '') === String(category)
       );
     }
     if (search) {

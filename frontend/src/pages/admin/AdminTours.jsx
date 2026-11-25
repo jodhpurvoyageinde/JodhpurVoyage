@@ -14,28 +14,27 @@ import {
 } from '../../services/api';
 
 const DEFAULT_DESTINATIONS_PRESETS = [
-  { name: 'Rajasthan', region: 'rajasthan', slug: 'rajasthan' },
-  { name: 'Jodhpur', region: 'rajasthan', slug: 'jodhpur' },
-  { name: 'Jaipur', region: 'rajasthan', slug: 'jaipur' },
-  { name: 'Udaipur', region: 'rajasthan', slug: 'udaipur' },
-  { name: 'Jaisalmer', region: 'rajasthan', slug: 'jaisalmer' },
-  { name: 'Delhi', region: 'inde-du-nord', slug: 'delhi' },
-  { name: 'Agra (Taj Mahal)', region: 'inde-du-nord', slug: 'agra' },
-  { name: 'Varanasi (Bénarès)', region: 'inde-du-nord', slug: 'varanasi' },
+  { name: 'Agra', region: 'inde-du-nord', slug: 'agra' },
   { name: 'Amritsar', region: 'inde-du-nord', slug: 'amritsar' },
-  { name: 'Dharamsala', region: 'inde-du-nord', slug: 'dharamsala' },
-  { name: 'Rishikesh', region: 'inde-du-nord', slug: 'rishikesh' },
-  { name: 'Ladakh', region: 'ladakh', slug: 'ladakh' },
-  { name: 'Kerala', region: 'inde-du-sud', slug: 'kerala' },
-  { name: 'Tamil Nadu', region: 'inde-du-sud', slug: 'tamil-nadu' },
-  { name: 'Karnataka', region: 'inde-du-sud', slug: 'karnataka' },
-  { name: 'Gujarat', region: 'gujarat', slug: 'gujarat' },
+  { name: 'Bénarès', region: 'inde-du-nord', slug: 'varanasi' },
+  { name: 'Bhoutan', region: 'bhoutan', slug: 'bhoutan' },
+  { name: 'Bombay', region: 'inde-du-sud', slug: 'bombay' },
+  { name: 'Chennai', region: 'inde-du-sud', slug: 'chennai' },
+  { name: 'Darjeeling & Sikkim', region: 'inde-de-louest', slug: 'darjeeling-sikkim' },
+  { name: 'Delhi', region: 'inde-du-nord', slug: 'delhi' },
   { name: 'Goa', region: 'inde-du-sud', slug: 'goa' },
+  { name: 'Gujarat', region: 'gujarat', slug: 'gujarat' },
+  { name: 'Himachal Pradesh', region: 'inde-du-nord', slug: 'himachal-pradesh' },
+  { name: 'Karnataka', region: 'inde-du-sud', slug: 'karnataka' },
+  { name: 'Kerala', region: 'inde-du-sud', slug: 'kerala' },
+  { name: 'Ladakh', region: 'ladakh', slug: 'ladakh' },
+  { name: 'Madhya Pradesh', region: 'centre-est', slug: 'madhya-pradesh' },
+  { name: 'Madras', region: 'inde-du-sud', slug: 'madras' },
+  { name: 'Népal', region: 'nepal', slug: 'nepal' },
   { name: 'Orissa', region: 'inde-du-sud', slug: 'orissa' },
-  { name: 'Kathmandu (Nepal)', region: 'nepal', slug: 'kathmandu' },
-  { name: 'Pokhara (Nepal)', region: 'nepal', slug: 'pokhara' },
-  { name: 'Punakha (Bhutan)', region: 'bhoutan', slug: 'punakha' },
-  { name: 'Thimphu (Bhutan)', region: 'bhoutan', slug: 'thimphu' }
+  { name: 'Rajasthan', region: 'rajasthan', slug: 'rajasthan' },
+  { name: 'Rishikesh', region: 'inde-du-nord', slug: 'rishikesh' },
+  { name: 'Tamil Nadu', region: 'inde-du-sud', slug: 'tamil-nadu' }
 ];
 
 const slugify = (text) => {
@@ -193,21 +192,20 @@ const AdminTours = () => {
         });
       }
     });
-  } else {
-    // Fallback only if database destinations list has not loaded yet
-    DEFAULT_DESTINATIONS_PRESETS.forEach((preset) => {
-      const key = preset.name.toLowerCase();
-      if (!seenCatNames.has(key)) {
-        seenCatNames.add(key);
-        combinedCategories.push({
-          _id: preset.slug,
-          name: preset.name,
-          slug: preset.slug,
-          region: preset.region
-        });
-      }
-    });
   }
+  
+  DEFAULT_DESTINATIONS_PRESETS.forEach((preset) => {
+    const key = preset.name.toLowerCase();
+    if (!seenCatNames.has(key)) {
+      seenCatNames.add(key);
+      combinedCategories.push({
+        _id: preset.slug,
+        name: preset.name,
+        slug: preset.slug,
+        region: preset.region
+      });
+    }
+  });
 
   // Sort alphabetically so admin can easily find any destination
   combinedCategories.sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
@@ -461,40 +459,84 @@ const AdminTours = () => {
       subtitle="Manage published tour packages, linked destination categories, and connected city tags."
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', flex: '1 1 320px' }}>
-          <div style={{ position: 'relative', width: '260px' }}>
-            <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)' }}></i>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', flex: '1 1 520px' }}>
+          <div style={{ position: 'relative', minWidth: '220px', flex: '1 1 220px' }}>
+            <i className="fas fa-search" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--admin-text-muted)', pointerEvents: 'none' }}></i>
             <input 
               type="text" 
-              className="form-control" 
               placeholder="Search tour, city..." 
               value={searchTerm}
               onChange={handleSearchChange}
-              style={{ paddingLeft: '34px', fontSize: '0.88rem', height: '38px', borderRadius: '8px' }}
+              style={{
+                width: '100%',
+                paddingLeft: '34px',
+                paddingRight: '12px',
+                paddingTop: 0,
+                paddingBottom: 0,
+                fontSize: '0.88rem',
+                height: '38px',
+                lineHeight: '38px',
+                borderRadius: '8px',
+                border: '1.5px solid #cbd5e1',
+                backgroundColor: '#ffffff',
+                color: '#0f172a',
+                boxSizing: 'border-box',
+                outline: 'none'
+              }}
             />
           </div>
 
           <select
-            className="form-control"
             value={selectedFilterCategory}
             onChange={handleCategoryFilterChange}
-            style={{ width: '160px', height: '38px', fontSize: '0.85rem', borderRadius: '8px' }}
+            style={{
+              height: '38px',
+              padding: '0 32px 0 12px',
+              fontSize: '0.88rem',
+              fontWeight: '600',
+              color: '#0f172a',
+              backgroundColor: '#ffffff',
+              border: '1.5px solid #cbd5e1',
+              borderRadius: '8px',
+              outline: 'none',
+              cursor: 'pointer',
+              minWidth: '190px',
+              lineHeight: '38px',
+              appearance: 'auto',
+              WebkitAppearance: 'menulist',
+              boxSizing: 'border-box'
+            }}
           >
-            <option value="all">All Categories</option>
+            <option value="all">📁 All Categories</option>
             {combinedCategories.map(c => (
-              <option key={c.slug || c._id} value={c.slug}>{c.name}</option>
+              <option key={c._id || c.name} value={c.name}>{c.name}</option>
             ))}
           </select>
 
           <select
-            className="form-control"
             value={selectedFilterStatus}
             onChange={handleStatusFilterChange}
-            style={{ width: '130px', height: '38px', fontSize: '0.85rem', borderRadius: '8px' }}
+            style={{
+              height: '38px',
+              padding: '0 28px 0 12px',
+              fontSize: '0.88rem',
+              fontWeight: '600',
+              color: '#0f172a',
+              backgroundColor: '#ffffff',
+              border: '1.5px solid #cbd5e1',
+              borderRadius: '8px',
+              outline: 'none',
+              cursor: 'pointer',
+              minWidth: '130px',
+              lineHeight: '38px',
+              appearance: 'auto',
+              WebkitAppearance: 'menulist',
+              boxSizing: 'border-box'
+            }}
           >
-            <option value="all">All Status</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
+            <option value="all">🌐 All Status</option>
+            <option value="published">🟢 Published</option>
+            <option value="draft">⚪ Draft</option>
           </select>
         </div>
 
