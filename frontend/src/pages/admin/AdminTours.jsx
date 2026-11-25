@@ -105,6 +105,10 @@ const AdminTours = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('all');
   const [selectedFilterStatus, setSelectedFilterStatus] = useState('all');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [categorySearchQuery, setCategorySearchQuery] = useState('');
+  const categoryDropdownRef = useRef(null);
+  const categorySearchInputRef = useRef(null);
   const ITEMS_PER_PAGE = 10;
 
   const loadTours = (page = currentPage, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
@@ -173,6 +177,23 @@ const AdminTours = () => {
     loadTours();
     loadDestinations();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(e.target)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    if (isCategoryDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      setTimeout(() => {
+        if (categorySearchInputRef.current) {
+          categorySearchInputRef.current.focus();
+        }
+      }, 30);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCategoryDropdownOpen]);
 
   // Source destinations directly from the Destination Panel (/admin/destinations)
   const combinedCategories = [];
@@ -444,6 +465,18 @@ const AdminTours = () => {
     loadTours(1, searchTerm, val, selectedFilterStatus);
   };
 
+  const handleSelectCategory = (catName) => {
+    setSelectedFilterCategory(catName);
+    setIsCategoryDropdownOpen(false);
+    setCategorySearchQuery('');
+    setCurrentPage(1);
+    loadTours(1, searchTerm, catName, selectedFilterStatus);
+  };
+
+  const filteredCategoryList = combinedCategories.filter((c) =>
+    (c.name || '').toLowerCase().includes(categorySearchQuery.trim().toLowerCase())
+  );
+
   const handleStatusFilterChange = (e) => {
     const val = e.target.value;
     setSelectedFilterStatus(val);
@@ -486,32 +519,220 @@ const AdminTours = () => {
             />
           </div>
 
-          <select
-            value={selectedFilterCategory}
-            onChange={handleCategoryFilterChange}
-            style={{
-              height: '38px',
-              padding: '0 32px 0 12px',
-              fontSize: '0.88rem',
-              fontWeight: '600',
-              color: '#0f172a',
-              backgroundColor: '#ffffff',
-              border: '1.5px solid #cbd5e1',
-              borderRadius: '8px',
-              outline: 'none',
-              cursor: 'pointer',
-              minWidth: '190px',
-              lineHeight: '38px',
-              appearance: 'auto',
-              WebkitAppearance: 'menulist',
-              boxSizing: 'border-box'
-            }}
-          >
-            <option value="all">📁 All Categories</option>
-            {combinedCategories.map(c => (
-              <option key={c._id || c.name} value={c.name}>{c.name}</option>
-            ))}
-          </select>
+          {/* Searchable Category Dropdown */}
+          <div ref={categoryDropdownRef} style={{ position: 'relative', minWidth: '190px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsCategoryDropdownOpen(prev => !prev);
+                setCategorySearchQuery('');
+              }}
+              style={{
+                width: '100%',
+                height: '38px',
+                padding: '0 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                fontSize: '0.88rem',
+                fontWeight: '600',
+                color: selectedFilterCategory === 'all' ? '#0f172a' : '#047857',
+                backgroundColor: selectedFilterCategory === 'all' ? '#ffffff' : '#f0fdf4',
+                border: selectedFilterCategory === 'all' ? '1.5px solid #cbd5e1' : '1.5px solid #10b981',
+                borderRadius: '8px',
+                outline: 'none',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                transition: 'all 0.15s ease'
+              }}
+              title="Click to search and filter by Destination / Category"
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '7px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ color: '#f59e0b', fontSize: '0.95rem' }}>📁</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {selectedFilterCategory === 'all' ? 'All Categories' : selectedFilterCategory}
+                </span>
+              </span>
+
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {selectedFilterCategory !== 'all' && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectCategory('all');
+                    }}
+                    title="Reset to All Categories"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '50%',
+                      background: '#e2e8f0',
+                      color: '#475569',
+                      fontSize: '0.7rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#fecaca'; e.currentTarget.style.color = '#dc2626'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#e2e8f0'; e.currentTarget.style.color = '#475569'; }}
+                  >
+                    ✕
+                  </span>
+                )}
+                <i 
+                  className={`fas fa-chevron-${isCategoryDropdownOpen ? 'up' : 'down'}`} 
+                  style={{ fontSize: '0.72rem', color: '#64748b' }}
+                ></i>
+              </span>
+            </button>
+
+            {/* Dropdown Menu with Search Field */}
+            {isCategoryDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 4px)',
+                  left: 0,
+                  minWidth: '240px',
+                  width: 'max-content',
+                  maxWidth: '320px',
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '10px',
+                  boxShadow: '0 12px 28px -4px rgba(0, 0, 0, 0.15), 0 6px 12px -4px rgba(0, 0, 0, 0.08)',
+                  zIndex: 9999,
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Search input inside dropdown */}
+                <div style={{ padding: '8px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc' }}>
+                  <div style={{ position: 'relative' }}>
+                    <i 
+                      className="fas fa-search" 
+                      style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.78rem', color: '#94a3b8', pointerEvents: 'none' }}
+                    ></i>
+                    <input
+                      ref={categorySearchInputRef}
+                      type="text"
+                      placeholder="Search category (e.g. Rajasthan, Agra)..."
+                      value={categorySearchQuery}
+                      onChange={(e) => setCategorySearchQuery(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '6px 26px 6px 30px',
+                        fontSize: '0.82rem',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        background: '#ffffff',
+                        color: '#0f172a',
+                        boxSizing: 'border-box'
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') setIsCategoryDropdownOpen(false);
+                        if (e.key === 'Enter') {
+                          if (filteredCategoryList.length > 0) {
+                            handleSelectCategory(filteredCategoryList[0].name);
+                          }
+                        }
+                      }}
+                    />
+                    {categorySearchQuery && (
+                      <span
+                        onClick={() => setCategorySearchQuery('')}
+                        style={{
+                          position: 'absolute',
+                          right: '8px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          fontSize: '0.72rem',
+                          color: '#94a3b8',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ✕
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* List of categories */}
+                <div style={{ maxHeight: '250px', overflowY: 'auto', padding: '4px 0' }}>
+                  {/* Option: All Categories */}
+                  {!categorySearchQuery && (
+                    <div
+                      onClick={() => handleSelectCategory('all')}
+                      style={{
+                        padding: '8px 14px',
+                        fontSize: '0.85rem',
+                        fontWeight: selectedFilterCategory === 'all' ? '700' : '500',
+                        color: selectedFilterCategory === 'all' ? '#0f766e' : '#334155',
+                        background: selectedFilterCategory === 'all' ? '#f0fdfa' : 'transparent',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid #f1f5f9'
+                      }}
+                      onMouseEnter={(e) => { if (selectedFilterCategory !== 'all') e.currentTarget.style.background = '#f8fafc'; }}
+                      onMouseLeave={(e) => { if (selectedFilterCategory !== 'all') e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ color: '#f59e0b', fontSize: '0.9rem' }}>📁</span>
+                        <span>All Categories</span>
+                      </span>
+                      {selectedFilterCategory === 'all' && (
+                        <i className="fas fa-check" style={{ fontSize: '0.75rem', color: '#0f766e' }}></i>
+                      )}
+                    </div>
+                  )}
+
+                  {filteredCategoryList.length === 0 ? (
+                    <div style={{ padding: '16px 12px', textAlign: 'center', color: '#94a3b8', fontSize: '0.82rem' }}>
+                      <i className="fas fa-filter" style={{ marginRight: '6px' }}></i> No matching category found
+                    </div>
+                  ) : (
+                    filteredCategoryList.map((c) => {
+                      const isSelected = selectedFilterCategory.toLowerCase() === c.name.toLowerCase();
+                      return (
+                        <div
+                          key={c._id || c.name}
+                          onClick={() => handleSelectCategory(c.name)}
+                          style={{
+                            padding: '8px 14px',
+                            fontSize: '0.85rem',
+                            fontWeight: isSelected ? '700' : '500',
+                            color: isSelected ? '#047857' : '#1e293b',
+                            background: isSelected ? '#f0fdf4' : 'transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            transition: 'background 0.1s'
+                          }}
+                          onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = '#f8fafc'; }}
+                          onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                        >
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ color: '#f59e0b', fontSize: '0.9rem' }}>📁</span>
+                            <span>{c.name}</span>
+                          </span>
+                          {isSelected && (
+                            <i className="fas fa-check" style={{ fontSize: '0.75rem', color: '#047857' }}></i>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           <select
             value={selectedFilterStatus}
