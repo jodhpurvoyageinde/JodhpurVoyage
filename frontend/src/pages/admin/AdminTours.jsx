@@ -113,11 +113,21 @@ const AdminTours = () => {
 
   const loadTours = (page = currentPage, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
     setLoading(true);
+    const catObj = combinedCategories.find(c => 
+      (c.name || '').toLowerCase() === (category || '').toLowerCase() ||
+      (c.slug || '').toLowerCase() === (category || '').toLowerCase() ||
+      String(c._id || '') === String(category)
+    );
+    const categoryId = (category && category !== 'all' && catObj?._id) ? String(catObj._id) : undefined;
+    const categoryName = (category && category !== 'all') ? (catObj?.name || category) : undefined;
+
     fetchAdminTours({
       page,
       limit: ITEMS_PER_PAGE,
-      search: (search || '').trim(),
-      category: category !== 'all' ? category : undefined,
+      search: (search || '').trim() || undefined,
+      category: categoryName,
+      categoryId: categoryId,
+      destinationId: categoryId,
       status: status !== 'all' ? status : undefined
     })
       .then((res) => {
@@ -484,7 +494,54 @@ const AdminTours = () => {
     loadTours(1, searchTerm, selectedFilterCategory, val);
   };
 
-  const filteredTours = Array.isArray(tours) ? tours : [];
+  const filteredTours = (Array.isArray(tours) ? tours : []).filter(t => {
+    // 1. Strict Category / Destination Guard: Only show tours mapped to the active category
+    if (selectedFilterCategory && selectedFilterCategory !== 'all') {
+      const selectedObj = combinedCategories.find(c => 
+        (c.name || '').toLowerCase() === selectedFilterCategory.toLowerCase() ||
+        (c.slug || '').toLowerCase() === selectedFilterCategory.toLowerCase() ||
+        String(c._id || '') === String(selectedFilterCategory)
+      );
+      const selectedId = selectedObj?._id ? String(selectedObj._id) : '';
+      const tourCatId = t.categoryId ? String(t.categoryId) : '';
+      
+      const idMatch = Boolean(selectedId && tourCatId && selectedId === tourCatId);
+      const tourCatName = (t.category || t.destination || '').trim().toLowerCase();
+      const targetCatName = (selectedObj?.name || selectedFilterCategory).trim().toLowerCase();
+      
+      const nameMatch = tourCatName === targetCatName;
+      const aliasMatch = (targetCatName === 'ladakh' && tourCatName.includes('ladakh')) ||
+                         (targetCatName === 'nepal' && (tourCatName.includes('nepal') || tourCatName.includes('népal'))) ||
+                         (targetCatName === 'karnataka' && tourCatName.includes('karnataka')) ||
+                         (targetCatName === 'darjeeling & sikkim' && (tourCatName.includes('darjeeling') || tourCatName.includes('sikkim')));
+
+      if (!idMatch && !nameMatch && !aliasMatch) {
+        return false;
+      }
+    }
+
+    // 2. Status filter guard
+    if (selectedFilterStatus && selectedFilterStatus !== 'all') {
+      if (selectedFilterStatus === 'published' && t.published === false) return false;
+      if (selectedFilterStatus === 'draft' && t.published !== false) return false;
+    }
+
+    // 3. Search filter guard
+    if (searchTerm && searchTerm.trim()) {
+      const s = searchTerm.trim().toLowerCase();
+      const title = (t.title || '').toLowerCase();
+      const cat = (t.category || '').toLowerCase();
+      const loc = (t.location || '').toLowerCase();
+      const cities = Array.isArray(t.cities) 
+        ? t.cities.map(c => typeof c === 'string' ? c : c.name || '').join(' ').toLowerCase() 
+        : '';
+      if (!title.includes(s) && !cat.includes(s) && !loc.includes(s) && !cities.includes(s)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <AdminLayout 
@@ -896,7 +953,7 @@ const AdminTours = () => {
           {/* Pagination Footer */}
           <div className="admin-pagination-container">
             <div className="admin-pagination-info">
-              Showing <strong>{totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalRecords)}</strong> of <strong>{totalRecords}</strong> tour packages
+              Showing <strong>{filteredTours.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, filteredTours.length)}</strong> of <strong>{filteredTours.length}</strong> tour packages
             </div>
 
             {totalPages > 1 && (

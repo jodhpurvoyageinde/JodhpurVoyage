@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Tour from '../models/Tour.js';
 import { isMongoConnected, memoryStore } from '../store.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
@@ -118,12 +119,10 @@ const buildAdminCategoryRegex = (category) => {
     pattern = '^chennai$|\\bchennai\\b';
   } else if (catNorm === 'madras') {
     pattern = '^madras$|\\bmadras\\b';
-  } else if (catNorm === 'delhi') {
+  } else if (catNorm === 'delhi' || catNorm === 'delhi-agra') {
     pattern = '^delhi$|\\bdelhi\\b';
   } else if (catNorm === 'agra' || catNorm === 'taj-mahal-agra') {
     pattern = '^agra$|\\bagra\\b';
-  } else if (catNorm === 'delhi-agra') {
-    pattern = 'delhi|agra';
   } else if (catNorm === 'varanasi' || catNorm === 'benares' || catNorm === 'bénarès') {
     pattern = 'varanasi|b[ée]nar[èe]s';
   } else if (catNorm === 'amritsar' || catNorm === 'amritsar-punjab') {
@@ -432,6 +431,8 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     const limit = isAll ? 0 : Math.max(1, parseInt(req.query.limit) || 10);
     const search = req.query.search ? req.query.search.trim() : '';
     const category = req.query.category && req.query.category !== 'all' ? req.query.category.trim() : '';
+    const categoryId = (req.query.categoryId || req.query.destinationId || '').trim();
+    const destination = req.query.destination && req.query.destination !== 'all' ? req.query.destination.trim() : '';
     const status = req.query.status && req.query.status !== 'all' ? req.query.status : '';
     const sort = req.query.sort || 'newest';
 
@@ -440,16 +441,26 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     if (status === 'published') conditions.push({ published: true });
     else if (status === 'draft') conditions.push({ published: false });
 
-    if (category) {
-      const catInfo = buildAdminCategoryRegex(category);
-      if (catInfo) {
-        const catRegex = new RegExp(catInfo.pattern, 'i');
-        conditions.push({
-          $or: [
-            { category: catRegex },
-            { categoryId: category }
-          ]
-        });
+    const activeCatFilter = category || destination;
+    if (categoryId || activeCatFilter) {
+      const orConditions = [];
+      if (categoryId && categoryId !== 'all') {
+        orConditions.push({ categoryId: categoryId });
+        if (mongoose.Types.ObjectId.isValid(categoryId)) {
+          orConditions.push({ categoryId: new mongoose.Types.ObjectId(categoryId) });
+        }
+      }
+      if (activeCatFilter) {
+        const catInfo = buildAdminCategoryRegex(activeCatFilter);
+        if (catInfo) {
+          orConditions.push({ category: new RegExp(catInfo.pattern, 'i') });
+        } else {
+          const catClean = activeCatFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          orConditions.push({ category: new RegExp(`^${catClean}$`, 'i') });
+        }
+      }
+      if (orConditions.length > 0) {
+        conditions.push({ $or: orConditions });
       }
     }
 
