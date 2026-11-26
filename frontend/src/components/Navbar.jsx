@@ -9,14 +9,14 @@ const DEFAULT_DESTINATION_GROUPS = [
     title: 'Inde du Nord',
     icon: 'fas fa-gopuram',
     subcategories: [
-      { name: 'Agra', path: '/category/delhi-agra', searchKey: 'agra' },
-      { name: 'Amritsar', path: '/category/amritsar-punjab', searchKey: 'amritsar' },
-      { name: 'Bénarès', path: '/category/varanasi', searchKey: 'benares' },
-      { name: 'Delhi', path: '/category/delhi-agra', searchKey: 'delhi' },
-      { name: 'Himachal Pradesh', path: '/category/dharamsala-himachal', searchKey: 'himachal-pradesh' },
+      { name: 'Agra', path: '/category/agra', searchKey: 'agra' },
+      { name: 'Amritsar', path: '/category/amritsar', searchKey: 'amritsar' },
+      { name: 'Bénarès', path: '/category/benares', searchKey: 'benares' },
+      { name: 'Delhi', path: '/category/delhi', searchKey: 'delhi' },
+      { name: 'Himachal Pradesh', path: '/category/himachal-pradesh', searchKey: 'himachal-pradesh' },
       { name: 'Ladakh', path: '/category/ladakh', searchKey: 'ladakh' },
       { name: 'Rajasthan', path: '/category/rajasthan', searchKey: 'rajasthan' },
-      { name: 'Rishikesh', path: '/category/rishikesh-uttarakhand', searchKey: 'rishikesh' }
+      { name: 'Rishikesh', path: '/category/rishikesh', searchKey: 'rishikesh' }
     ]
   },
   {

@@ -93,8 +93,8 @@ const buildAdminCategoryRegex = (category) => {
     pattern = '^goa$|\\bgoa\\b';
   } else if (catNorm === 'orissa') {
     pattern = '^orissa$|\\borissa\\b';
-  } else if (catNorm === 'bhoutan') {
-    pattern = 'bhoutan';
+  } else if (catNorm === 'bhoutan' || catNorm === 'punakha' || catNorm === 'paro' || catNorm === 'thimphu') {
+    pattern = 'bhoutan|punakha|paro|thimphu';
   } else if (catNorm === 'himachal' || catNorm === 'himachal-pradesh' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal') {
     pattern = 'himachal|dharamsala|spiti|kinnaur';
   } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand' || catNorm === 'uttarakhand') {

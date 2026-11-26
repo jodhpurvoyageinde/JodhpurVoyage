@@ -320,8 +320,81 @@ const defaultDestinationsMap = {
       { icon: 'fa-mask', title: 'Festivals Tshechu & Masques Sacrés', desc: 'Danses mystiques costumées exécutées par les moines dans les cours des Dzongs.' }
     ],
     region: 'bhoutan'
+  },
+  bombay: {
+    name: 'Bombay (Mumbai)',
+    slug: 'bombay',
+    heroTitle: 'Voyage à Bombay',
+    h1Title: 'Bombay (Mumbai) : Métropole Vibrante & Cité du Cinéma Bollywood',
+    tagline: 'Gateway of India, Marine Drive, marchés colorés et grottes d\'Elephanta',
+    image: '/images/dest-rajasthan.jpg',
+    satisfaction: '98% de satisfaction (70 avis)',
+    shortDescription: "Capitale économique et financière de l'Inde, Bombay (Mumbai) est une mégapole effervescente face à la mer d'Oman. Découvrez l'architecture victorienne classée UNESCO, le célèbre Gateway of India et l'énergie débordante de cette cité cosmopolite.",
+    highlights: [
+      { icon: 'fa-landmark', title: 'Gateway of India', desc: 'Monument emblématique érigé face au port de Bombay.' },
+      { icon: 'fa-umbrella-beach', title: 'Marine Drive', desc: 'Le collier de la reine illuminé au coucher du soleil.' },
+      { icon: 'fa-film', title: 'Bollywood & Culture', desc: 'Immersion dans les coulisses des studios de cinéma les plus prolifiques du monde.' },
+      { icon: 'fa-place-of-worship', title: 'Île d\'Elephanta (UNESCO)', desc: 'Grottes sculptées millénaires dédiées à Shiva au milieu de la baie.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  madras: {
+    name: 'Madras (Chennai)',
+    slug: 'madras',
+    heroTitle: 'Voyage à Madras',
+    h1Title: 'Madras : Cité Historique & Patrimoine Dravidien du Sud',
+    tagline: 'Temples séculaires, plage de Marina et carrefour culturel du Tamil Nadu',
+    image: '/images/dest-karnataka.jpg',
+    satisfaction: '98% de satisfaction (64 avis)',
+    shortDescription: "Ancienne Madras, Chennai est le cœur culturel et artistique du Tamil Nadu, berceau de la musique carnatique et de la danse Bharatanatyam.",
+    highlights: [
+      { icon: 'fa-gopuram', title: 'Temple de Kapaleeshwarar', desc: 'Gopurams sculptés polychromes dédiés à Shiva.' },
+      { icon: 'fa-umbrella-beach', title: 'Marina Beach', desc: 'Immense plage urbaine animée au crépuscule.' },
+      { icon: 'fa-church', title: 'Basilique Saint-Thomas', desc: 'Patrimoine historique chrétien séculaire.' },
+      { icon: 'fa-landmark', title: 'Fort St. George', desc: 'Témoin majeur de l\'histoire coloniale britannique.' }
+    ],
+    region: 'inde-du-sud'
+  },
+  'madhya-pradesh': {
+    name: 'Madhya Pradesh',
+    slug: 'madhya-pradesh',
+    heroTitle: 'Voyage au Madhya Pradesh',
+    h1Title: 'Madhya Pradesh : Le Cœur de l\'Inde, Temples de Khajuraho & Tigres',
+    tagline: 'Temples érotiques de Khajuraho, forteresses d\'Orchha et parcs nationaux',
+    image: '/images/image-6.jpg',
+    satisfaction: '97% de satisfaction (55 avis)',
+    shortDescription: "Le Madhya Pradesh est le cœur sauvage et patrimonial de l'Inde : temples sculptés de Khajuraho, palais d'Orchha, forteresse colossale de Gwalior et safaris aux tigres dans les parcs de Kanha et Bandhavgarh.",
+    highlights: [
+      { icon: 'fa-gem', title: 'Temples de Khajuraho (UNESCO)', desc: 'Sculptures érotiques et spirituelles de grès d\'une finesse incomparable.' },
+      { icon: 'fa-fort-awesome', title: 'Orchha Médiévale', desc: 'Palais et cénotaphes paisibles au bord de la rivière Betwa.' },
+      { icon: 'fa-cat', title: 'Safaris aux Tigres', desc: 'Observation des tigres du Bengale dans les forêts du Livre de la Jungle.' },
+      { icon: 'fa-monument', title: 'Fort de Gwalior', desc: 'Forteresse imprenable dominant la ville historique.' }
+    ],
+    region: 'inde-de-louest'
+  },
+  'darjeeling-sikkim': {
+    name: 'Darjeeling & Sikkim',
+    slug: 'darjeeling-sikkim',
+    heroTitle: 'Voyage à Darjeeling & Sikkim',
+    h1Title: 'Darjeeling & Sikkim : Plantations de Thé & Vue sur le Kangchenjunga',
+    tagline: 'Train à vapeur Toy Train, monastères tibétains et sommets himalayens',
+    image: '/images/dest-himachal.jpg',
+    satisfaction: '99% de satisfaction (60 avis)',
+    shortDescription: "Face au géant Kangchenjunga (8 586 m), Darjeeling et l'ancien royaume du Sikkim dévoilent un univers de brumes mystiques, de plantations de thé d'altitude et de monastères bouddhistes séculaires.",
+    highlights: [
+      { icon: 'fa-mountain', title: 'Mont Kangchenjunga', desc: 'Lever de soleil inoubliable sur le 3e plus haut sommet de la planète depuis Tiger Hill.' },
+      { icon: 'fa-leaf', title: 'Jardins de Thé de Darjeeling', desc: 'Dégustation des plus grands crus de thé au monde parmi les collines émeraude.' },
+      { icon: 'fa-place-of-worship', title: 'Monastère de Rumtek', desc: 'Haut lieu du bouddhisme tibétain au Sikkim.' },
+      { icon: 'fa-train', title: 'Toy Train (UNESCO)', desc: 'Ligne ferroviaire historique à vapeur serpentant à flanc de montagne.' }
+    ],
+    region: 'inde-de-louest'
   }
 };
+
+defaultDestinationsMap['amritsar'] = defaultDestinationsMap['amritsar-punjab'];
+defaultDestinationsMap['himachal-pradesh'] = defaultDestinationsMap['dharamsala-himachal'];
+defaultDestinationsMap['rishikesh'] = defaultDestinationsMap['rishikesh-uttarakhand'];
+defaultDestinationsMap['benares'] = defaultDestinationsMap['varanasi'];
 
 const defaultPackages = [];
 
@@ -343,19 +416,35 @@ const slugAliases = {
   'uttarakhand': 'rishikesh-uttarakhand',
   'benares': 'varanasi',
   'benaras': 'varanasi',
-  'bombay': 'mumbai',
+  'bénarès': 'varanasi',
+  'bombay': 'bombay',
   'mumbai': 'bombay',
   'darjeeling': 'darjeeling-sikkim',
   'sikkim': 'darjeeling-sikkim',
+  'darjeeling-sikkim': 'darjeeling-sikkim',
   'madhya': 'madhya-pradesh',
   'madhya-pradesh': 'madhya-pradesh',
+  'nepal': 'nepal',
+  'népal': 'nepal',
   'katmandou': 'nepal',
   'pokhara': 'nepal',
   'chitwan': 'nepal',
+  'bhoutan': 'bhoutan',
   'paro': 'bhoutan',
   'punakha': 'bhoutan',
   'thimphu': 'bhoutan',
-  'madras': 'chennai'
+  'chennai': 'chennai',
+  'madras': 'madras',
+  'goa': 'goa',
+  'karnataka': 'karnataka',
+  'kerala': 'kerala',
+  'tamil-nadu': 'tamil-nadu',
+  'tamil': 'tamil-nadu',
+  'orissa': 'orissa',
+  'odisha': 'orissa',
+  'gujarat': 'gujarat',
+  'rajasthan': 'rajasthan',
+  'ladakh': 'ladakh'
 };
 
 const DestinationDetail = ({ overrideSlug }) => {
@@ -372,173 +461,93 @@ const DestinationDetail = ({ overrideSlug }) => {
   const [selectedTour, setSelectedTour] = useState({ title: 'Voyage sur mesure', duration: '' });
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // 100% PURE CATEGORY BASED MATCHING (No transit city, route or title bleed)
   const filterToursForDestination = (tourList, targetSlug) => {
     if (!Array.isArray(tourList) || tourList.length === 0) return [];
     const clean = (targetSlug || '').toLowerCase().trim();
-    const cleanWithSpaces = clean.replace(/-/g, ' ');
 
     return tourList.filter(t => {
-      const cat = (t.category || '').toLowerCase();
-      const reg = (t.region || '').toLowerCase();
-      const title = (t.title || '').toLowerCase();
-      const loc = (t.location || '').toLowerCase();
-      const cities = Array.isArray(t.cities) 
-        ? t.cities.map(c => (typeof c === 'string' ? c : c.name || c.slug || '').toLowerCase())
-        : [];
-      const allText = `${cat} ${reg} ${title} ${loc} ${cities.join(' ')}`;
+      const cat = (t.category || '').toLowerCase().trim();
+      const catId = String(t.categoryId || '').toLowerCase().trim();
 
-      if (clean === 'rajasthan') {
-        if ((cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal') || cat.includes('népal') || cat.includes('karnataka') || cat.includes('kerala')) && !title.includes('rajasthan')) {
-          return false;
-        }
-        return cat.includes('rajasthan') || title.includes('rajasthan') || loc.includes('rajasthan') || cities.some(c => c.includes('rajasthan') || c.includes('jaipur') || c.includes('jodhpur') || c.includes('udaipur') || c.includes('jaisalmer') || c.includes('bikaner'));
-      }
-
-      if (clean === 'madhya-pradesh' || clean === 'madhya') {
-        // Exclude tours belonging to other distinct regions unless they genuinely visit MP
-        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bhoutan')) &&
-            !allText.includes('madhya') && !allText.includes('khajuraho') && !allText.includes('orchha') && !allText.includes('gwalior') && !allText.includes('bandhavgarh') && !allText.includes('kanha')) {
-          return false;
-        }
-        return cat.includes('madhya') || title.includes('madhya') || loc.includes('madhya') || reg.includes('madhya') ||
-          allText.includes('khajuraho') || allText.includes('orchha') || allText.includes('gwalior') || allText.includes('bandhavgarh') || allText.includes('kanha') || allText.includes('bhopal') || allText.includes('ujjain') || allText.includes('sanchi') || allText.includes('jabalpur');
-      }
-
-      if (clean === 'ladakh') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('rajasthan') || cat.includes('karnataka')) && !allText.includes('ladakh') && !allText.includes('leh')) {
-          return false;
-        }
-        return cat.includes('ladakh') || title.includes('ladakh') || loc.includes('ladakh') || reg.includes('ladakh') || cities.some(c => c.includes('ladakh') || c.includes('leh'));
-      }
-
-      if (clean === 'gujarat') {
-        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal')) && !allText.includes('gujarat')) {
-          return false;
-        }
-        return cat.includes('gujarat') || title.includes('gujarat') || loc.includes('gujarat') || reg.includes('gujarat') || cities.some(c => c.includes('gujarat') || c.includes('ahmedabad') || c.includes('kutch') || c.includes('palitana') || c.includes('gir'));
-      }
-
-      if (clean === 'kerala') {
-        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && !allText.includes('kerala')) {
-          return false;
-        }
-        return cat.includes('kerala') || title.includes('kerala') || loc.includes('kerala') || reg.includes('kerala') || cities.some(c => c.includes('kerala') || c.includes('cochin') || c.includes('munnar') || c.includes('alleppey'));
-      }
-
-      if (clean === 'nepal') {
-        if ((cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat')) && !allText.includes('nepal') && !allText.includes('népal')) {
-          return false;
-        }
-        return cat.includes('nepal') || cat.includes('népal') || title.includes('nepal') || title.includes('népal') || loc.includes('nepal') || reg.includes('nepal') || cities.some(c => c.includes('nepal') || c.includes('kathmandu') || c.includes('pokhara'));
-      }
-
-      if (clean === 'amritsar-punjab' || clean === 'amritsar' || clean === 'punjab') {
-        if (cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal') || cat.includes('népal') || cat.includes('rajasthan')) {
-          return false;
-        }
-        return cat.includes('amritsar') || cat.includes('punjab') ||
-               title.includes('amritsar') || title.includes('punjab');
-      }
-
+      // 1. Inde du Nord
       if (clean === 'agra') {
-        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bombay') || cat.includes('chennai') || cat.includes('karnataka') || cat.includes('amritsar')) {
-          return false;
-        }
-        return cat === 'agra' || cat.includes('agra') || (title.includes('agra') && !title.includes('rajasthan'));
+        return cat === 'agra' || catId === 'agra';
       }
-
+      if (clean === 'amritsar-punjab' || clean === 'amritsar' || clean === 'punjab') {
+        return cat === 'amritsar' || cat === 'punjab' || cat.includes('amritsar');
+      }
+      if (clean === 'varanasi' || clean === 'benares' || clean === 'bénarès') {
+        return cat === 'varanasi' || cat === 'benares' || cat === 'bénarès' || cat.includes('varanasi') || cat.includes('bénarès') || cat.includes('benares');
+      }
       if (clean === 'delhi') {
-        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bombay') || cat.includes('amritsar')) {
-          return false;
-        }
-        return cat === 'delhi' || cat.includes('delhi');
+        return (cat === 'delhi' || catId === 'delhi') && !cat.includes('rajasthan');
       }
-
       if (clean === 'delhi-agra') {
-        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('bombay') || cat.includes('amritsar')) {
-          return false;
-        }
-        return cat.includes('delhi') || cat.includes('agra');
+        return cat === 'delhi' || cat === 'agra' || catId === 'delhi' || catId === 'agra';
       }
-
-      if (clean === 'dharamsala-himachal' || clean === 'dharamsala' || clean === 'himachal' || clean === 'himachal-pradesh' || clean === 'spiti' || clean === 'kinnaur' || clean === 'shimla' || clean === 'manali') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
-            !allText.includes('dharamsala') && !allText.includes('himachal') && !allText.includes('manali') && !allText.includes('shimla') && !allText.includes('spiti') && !allText.includes('kinnaur')) {
-          return false;
-        }
-        return cat.includes('dharamsala') || cat.includes('himachal') ||
-               title.includes('dharamsala') || title.includes('himachal') ||
-               loc.includes('dharamsala') || loc.includes('himachal') ||
-               reg.includes('dharamsala') || reg.includes('himachal') ||
-               allText.includes('spiti') || allText.includes('kinnaur') || allText.includes('manali') || allText.includes('shimla') ||
-               cities.some(c => c.includes('dharamsala') || c.includes('himachal') || c.includes('manali') || c.includes('shimla') || c.includes('spiti') || c.includes('kinnaur'));
+      if (clean === 'dharamsala-himachal' || clean === 'himachal-pradesh' || clean === 'himachal' || clean === 'dharamsala' || clean === 'spiti' || clean === 'kinnaur') {
+        return cat === 'himachal pradesh' || cat === 'himachal' || cat.includes('himachal') || cat.includes('dharamsala') || cat.includes('spiti') || cat.includes('kinnaur');
       }
-
+      if (clean === 'ladakh') {
+        return cat === 'ladakh' || cat.includes('ladakh');
+      }
+      if (clean === 'rajasthan') {
+        return cat === 'rajasthan' || (cat.includes('rajasthan') && !cat.includes('gujarat'));
+      }
       if (clean === 'rishikesh-uttarakhand' || clean === 'rishikesh' || clean === 'uttarakhand') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('nepal')) && 
-            !allText.includes('rishikesh') && !allText.includes('uttarakhand') && !allText.includes('haridwar')) {
-          return false;
-        }
-        return cat.includes('rishikesh') || cat.includes('uttarakhand') ||
-               title.includes('rishikesh') || title.includes('uttarakhand') ||
-               loc.includes('rishikesh') || loc.includes('uttarakhand') ||
-               reg.includes('rishikesh') || reg.includes('uttarakhand') ||
-               cities.some(c => c.includes('rishikesh') || c.includes('uttarakhand') || c.includes('haridwar'));
+        return cat === 'rishikesh' || cat.includes('rishikesh') || cat === 'uttarakhand' || cat.includes('uttarakhand');
       }
 
-      if (clean === 'varanasi' || clean === 'benares') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('ladakh')) && 
-            !allText.includes('varanasi') && !allText.includes('benares') && !allText.includes('bénarès') && !allText.includes('gange')) {
-          return false;
-        }
-        return cat.includes('varanasi') || cat.includes('benares') || cat.includes('bénarès') ||
-               title.includes('varanasi') || title.includes('benares') || title.includes('bénarès') ||
-               loc.includes('varanasi') || loc.includes('benares') || loc.includes('bénarès') ||
-               reg.includes('varanasi') || reg.includes('benares') ||
-               cities.some(c => c.includes('varanasi') || c.includes('benares') || c.includes('bénarès'));
+      // 2. Inde du Sud
+      if (clean === 'chennai') {
+        return cat === 'chennai' || catId === 'chennai';
       }
-
-      if (clean === 'tamil-nadu' || clean === 'tamil' || clean === 'chennai') {
-        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && 
-            !allText.includes('tamil') && !allText.includes('chennai') && !allText.includes('madras')) {
-          return false;
-        }
-        return cat.includes('tamil') || cat.includes('chennai') || cat.includes('madras') ||
-               title.includes('tamil') || title.includes('chennai') || title.includes('madras') ||
-               loc.includes('tamil') || loc.includes('chennai') || loc.includes('madras') ||
-               reg.includes('tamil') || reg.includes('chennai') ||
-               cities.some(c => c.includes('tamil') || c.includes('chennai') || c.includes('madras'));
+      if (clean === 'goa') {
+        return cat === 'goa' || catId === 'goa';
       }
-
       if (clean === 'karnataka') {
-        if ((cat.includes('ladakh') || cat.includes('gujarat') || cat.includes('nepal')) && 
-            !allText.includes('karnataka') && !allText.includes('hampi') && !allText.includes('mysore')) {
-          return false;
-        }
-        return cat.includes('karnataka') || title.includes('karnataka') || loc.includes('karnataka') || reg.includes('karnataka') ||
-               cities.some(c => c.includes('karnataka') || c.includes('hampi') || c.includes('mysore'));
+        return cat === 'karnataka' || cat.includes('karnataka');
+      }
+      if (clean === 'kerala') {
+        return cat === 'kerala' || cat.includes('kerala');
+      }
+      if (clean === 'tamil-nadu' || clean === 'tamil') {
+        return cat === 'tamil nadu' || cat === 'tamil' || cat.includes('tamil');
+      }
+      if (clean === 'bombay' || clean === 'mumbai') {
+        return cat === 'bombay' || cat === 'mumbai';
+      }
+      if (clean === 'madras') {
+        return cat === 'madras';
+      }
+      if (clean === 'orissa' || clean === 'odisha') {
+        return cat === 'orissa' || cat === 'odisha';
       }
 
-      // Default matching for other destinations
-      const isMismatched = (cat.includes('ladakh') && !allText.includes(clean) && !allText.includes(cleanWithSpaces)) ||
-                           (cat.includes('kerala') && !allText.includes(clean) && !allText.includes(cleanWithSpaces));
-      if (isMismatched) return false;
-
-      const matchesDirect = cat.includes(clean) || cat.includes(cleanWithSpaces) ||
-                            title.includes(clean) || title.includes(cleanWithSpaces) ||
-                            loc.includes(clean) || loc.includes(cleanWithSpaces) ||
-                            reg.includes(clean) || reg.includes(cleanWithSpaces) ||
-                            cities.some(c => c.includes(clean) || c.includes(cleanWithSpaces));
-
-      if (matchesDirect) return true;
-
-      // Check individual words for hyphenated slugs (e.g. "amritsar-punjab" -> "amritsar", "punjab")
-      const words = clean.split('-').filter(w => w.length >= 4);
-      if (words.length > 1) {
-        return words.some(w => cat.includes(w) || title.includes(w) || loc.includes(w) || reg.includes(w) || cities.some(c => c.includes(w)));
+      // 3. Inde de l'Est & de l'Ouest
+      if (clean === 'gujarat') {
+        return cat === 'gujarat' || cat.includes('gujarat');
+      }
+      if (clean === 'madhya-pradesh' || clean === 'madhya') {
+        return cat === 'madhya pradesh' || cat === 'madhya' || cat.includes('madhya');
+      }
+      if (clean === 'darjeeling-sikkim' || clean === 'darjeeling' || clean === 'sikkim') {
+        return cat.includes('darjeeling') || cat.includes('sikkim');
       }
 
-      return false;
+      // 4. Népal
+      if (clean === 'nepal' || clean === 'népal') {
+        return cat === 'nepal' || cat === 'népal';
+      }
+
+      // 5. Bhoutan
+      if (clean === 'bhoutan' || clean === 'punakha' || clean === 'paro' || clean === 'thimphu') {
+        return cat === 'bhoutan' || cat === clean || cat.includes('bhoutan');
+      }
+
+      // Fallback exact match on category or categoryId
+      return cat === clean || cat.replace(/\s+/g, '-') === clean || catId === clean;
     });
   };
 
