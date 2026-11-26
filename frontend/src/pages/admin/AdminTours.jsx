@@ -116,7 +116,7 @@ const AdminTours = () => {
     return hasFilter ? 9 : 10;
   };
 
-  const loadTours = (page = currentPage, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
+  const loadTours = (page = 1, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
     setLoading(true);
     const limit = getItemsPerPage(category, status, search);
     const catObj = combinedCategories.find(c => 
@@ -160,23 +160,25 @@ const AdminTours = () => {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
+    if (newPage >= 1 && newPage !== currentPage) {
       setCurrentPage(newPage);
       loadTours(newPage, searchTerm, selectedFilterCategory, selectedFilterStatus);
     }
   };
 
-  const getPageNumbers = () => {
+  const getPageNumbers = (totPages, curPage) => {
     const pages = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    const totalP = Math.max(1, totPages || 1);
+    const activeP = Math.min(Math.max(1, curPage || 1), totalP);
+    if (totalP <= 7) {
+      for (let i = 1; i <= totalP; i++) pages.push(i);
     } else {
-      if (currentPage <= 4) {
-        pages.push(1, 2, 3, 4, 5, '...', totalPages);
-      } else if (currentPage >= totalPages - 3) {
-        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      if (activeP <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalP);
+      } else if (activeP >= totalP - 3) {
+        pages.push(1, '...', totalP - 4, totalP - 3, totalP - 2, totalP - 1, totalP);
       } else {
-        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        pages.push(1, '...', activeP - 1, activeP, activeP + 1, '...', totalP);
       }
     }
     return pages;
@@ -606,9 +608,15 @@ const AdminTours = () => {
   });
 
   const itemsPerPage = getItemsPerPage(selectedFilterCategory, selectedFilterStatus, searchTerm);
-  const effectiveTotal = selectedFilterCategory !== 'all' ? filteredTours.length : totalRecords;
-  const startRecord = filteredTours.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endRecord = filteredTours.length === 0 ? 0 : Math.min((currentPage - 1) * itemsPerPage + filteredTours.length, Math.max(filteredTours.length, effectiveTotal));
+  const effectiveTotal = (selectedFilterCategory !== 'all' || selectedFilterStatus !== 'all' || Boolean(searchTerm && searchTerm.trim()))
+    ? (totalRecords > 0 && totalRecords === displayTours.length ? filteredTours.length : (filteredTours.length === 0 ? 0 : (totalRecords || filteredTours.length)))
+    : (totalRecords || filteredTours.length);
+
+  const maxPages = Math.max(1, Math.ceil(effectiveTotal / itemsPerPage));
+  const activePage = Math.min(Math.max(1, currentPage), maxPages);
+
+  const startRecord = effectiveTotal === 0 ? 0 : (activePage - 1) * itemsPerPage + 1;
+  const endRecord = effectiveTotal === 0 ? 0 : Math.min(startRecord + filteredTours.length - 1, effectiveTotal);
 
   return (
     <AdminLayout 
@@ -1023,19 +1031,19 @@ const AdminTours = () => {
               Showing <strong>{startRecord}</strong> to <strong>{endRecord}</strong> of <strong>{effectiveTotal}</strong> tour packages
             </div>
 
-            {totalPages > 1 && (
+            {maxPages > 1 && (
               <div className="admin-pagination-controls">
                 <button
                   type="button"
                   className="admin-page-btn admin-page-nav"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(activePage - 1)}
+                  disabled={activePage === 1}
                   title="Previous Page"
                 >
                   <i className="fas fa-chevron-left"></i> Previous
                 </button>
 
-                {getPageNumbers().map((p, idx) => {
+                {getPageNumbers(maxPages, activePage).map((p, idx) => {
                   if (p === '...') {
                     return <span key={`ellipsis-${idx}`} className="admin-page-ellipsis">•••</span>;
                   }
@@ -1043,7 +1051,7 @@ const AdminTours = () => {
                     <button
                       key={`page-${p}`}
                       type="button"
-                      className={`admin-page-btn ${currentPage === p ? 'active' : ''}`}
+                      className={`admin-page-btn ${activePage === p ? 'active' : ''}`}
                       onClick={() => handlePageChange(p)}
                     >
                       {p}
@@ -1054,8 +1062,8 @@ const AdminTours = () => {
                 <button
                   type="button"
                   className="admin-page-btn admin-page-nav"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(activePage + 1)}
+                  disabled={activePage === maxPages}
                   title="Next Page"
                 >
                   Next <i className="fas fa-chevron-right"></i>
