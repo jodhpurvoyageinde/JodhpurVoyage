@@ -490,12 +490,15 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     let list = [...(memoryStore.tours || [])];
     if (status === 'published') list = list.filter(t => t.published !== false);
     else if (status === 'draft') list = list.filter(t => t.published === false);
-    if (category) {
-      const catInfo = buildAdminCategoryRegex(category);
-      const catRegex = catInfo ? new RegExp(catInfo.pattern, 'i') : new RegExp(category.replace(/-/g, ' '), 'i');
+    const activeCatMem = category || destination;
+    if (categoryId && categoryId !== 'all') {
+      list = list.filter(t => String(t.categoryId || '') === String(categoryId));
+    } else if (activeCatMem && activeCatMem !== 'all') {
+      const catInfo = buildAdminCategoryRegex(activeCatMem);
+      const catRegex = catInfo ? new RegExp(catInfo.pattern, 'i') : new RegExp(activeCatMem.replace(/-/g, ' '), 'i');
       list = list.filter(t => 
         catRegex.test(t.category || '') || 
-        String(t.categoryId || '') === String(category)
+        String(t.categoryId || '') === String(activeCatMem)
       );
     }
     if (search) {

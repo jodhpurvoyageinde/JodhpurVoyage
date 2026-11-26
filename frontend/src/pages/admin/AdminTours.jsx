@@ -494,54 +494,10 @@ const AdminTours = () => {
     loadTours(1, searchTerm, selectedFilterCategory, val);
   };
 
-  const filteredTours = (Array.isArray(tours) ? tours : []).filter(t => {
-    // 1. Strict Category / Destination Guard: Only show tours mapped to the active category
-    if (selectedFilterCategory && selectedFilterCategory !== 'all') {
-      const selectedObj = combinedCategories.find(c => 
-        (c.name || '').toLowerCase() === selectedFilterCategory.toLowerCase() ||
-        (c.slug || '').toLowerCase() === selectedFilterCategory.toLowerCase() ||
-        String(c._id || '') === String(selectedFilterCategory)
-      );
-      const selectedId = selectedObj?._id ? String(selectedObj._id) : '';
-      const tourCatId = t.categoryId ? String(t.categoryId) : '';
-      
-      const idMatch = Boolean(selectedId && tourCatId && selectedId === tourCatId);
-      const tourCatName = (t.category || t.destination || '').trim().toLowerCase();
-      const targetCatName = (selectedObj?.name || selectedFilterCategory).trim().toLowerCase();
-      
-      const nameMatch = tourCatName === targetCatName;
-      const aliasMatch = (targetCatName === 'ladakh' && tourCatName.includes('ladakh')) ||
-                         (targetCatName === 'nepal' && (tourCatName.includes('nepal') || tourCatName.includes('népal'))) ||
-                         (targetCatName === 'karnataka' && tourCatName.includes('karnataka')) ||
-                         (targetCatName === 'darjeeling & sikkim' && (tourCatName.includes('darjeeling') || tourCatName.includes('sikkim')));
-
-      if (!idMatch && !nameMatch && !aliasMatch) {
-        return false;
-      }
-    }
-
-    // 2. Status filter guard
-    if (selectedFilterStatus && selectedFilterStatus !== 'all') {
-      if (selectedFilterStatus === 'published' && t.published === false) return false;
-      if (selectedFilterStatus === 'draft' && t.published !== false) return false;
-    }
-
-    // 3. Search filter guard
-    if (searchTerm && searchTerm.trim()) {
-      const s = searchTerm.trim().toLowerCase();
-      const title = (t.title || '').toLowerCase();
-      const cat = (t.category || '').toLowerCase();
-      const loc = (t.location || '').toLowerCase();
-      const cities = Array.isArray(t.cities) 
-        ? t.cities.map(c => typeof c === 'string' ? c : c.name || '').join(' ').toLowerCase() 
-        : '';
-      if (!title.includes(s) && !cat.includes(s) && !loc.includes(s) && !cities.includes(s)) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  const displayTours = Array.isArray(tours) ? tours : [];
+  const filteredTours = displayTours;
+  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endRecord = totalRecords === 0 ? 0 : Math.min((currentPage - 1) * ITEMS_PER_PAGE + displayTours.length, totalRecords);
 
   return (
     <AdminLayout 
@@ -953,7 +909,7 @@ const AdminTours = () => {
           {/* Pagination Footer */}
           <div className="admin-pagination-container">
             <div className="admin-pagination-info">
-              Showing <strong>{filteredTours.length === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, filteredTours.length)}</strong> of <strong>{filteredTours.length}</strong> tour packages
+              Showing <strong>{startRecord}</strong> to <strong>{endRecord}</strong> of <strong>{totalRecords}</strong> tour packages
             </div>
 
             {totalPages > 1 && (
