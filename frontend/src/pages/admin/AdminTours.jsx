@@ -109,10 +109,16 @@ const AdminTours = () => {
   const [categorySearchQuery, setCategorySearchQuery] = useState('');
   const categoryDropdownRef = useRef(null);
   const categorySearchInputRef = useRef(null);
-  const ITEMS_PER_PAGE = 10;
+
+  // Dynamic pagination: 10 items without filter, 9 items with active filter
+  const getItemsPerPage = (cat = selectedFilterCategory, stat = selectedFilterStatus, srch = searchTerm) => {
+    const hasFilter = (cat && cat !== 'all') || (stat && stat !== 'all') || Boolean(srch && srch.trim());
+    return hasFilter ? 9 : 10;
+  };
 
   const loadTours = (page = currentPage, search = searchTerm, category = selectedFilterCategory, status = selectedFilterStatus) => {
     setLoading(true);
+    const limit = getItemsPerPage(category, status, search);
     const catObj = combinedCategories.find(c => 
       (c.name || '').toLowerCase() === (category || '').toLowerCase() ||
       (c.slug || '').toLowerCase() === (category || '').toLowerCase() ||
@@ -123,7 +129,7 @@ const AdminTours = () => {
 
     fetchAdminTours({
       page,
-      limit: ITEMS_PER_PAGE,
+      limit: limit,
       search: (search || '').trim() || undefined,
       category: categoryName,
       categoryId: categoryId,
@@ -140,7 +146,7 @@ const AdminTours = () => {
           const list = Array.isArray(res.data) ? res.data : [];
           setTours(list);
           setTotalRecords(list.length);
-          setTotalPages(Math.ceil(list.length / ITEMS_PER_PAGE) || 1);
+          setTotalPages(Math.ceil(list.length / limit) || 1);
         }
         setLoading(false);
       })
@@ -496,8 +502,9 @@ const AdminTours = () => {
 
   const displayTours = Array.isArray(tours) ? tours : [];
   const filteredTours = displayTours;
-  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
-  const endRecord = totalRecords === 0 ? 0 : Math.min((currentPage - 1) * ITEMS_PER_PAGE + displayTours.length, totalRecords);
+  const itemsPerPage = getItemsPerPage(selectedFilterCategory, selectedFilterStatus, searchTerm);
+  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endRecord = totalRecords === 0 ? 0 : Math.min((currentPage - 1) * itemsPerPage + displayTours.length, totalRecords);
 
   return (
     <AdminLayout 
