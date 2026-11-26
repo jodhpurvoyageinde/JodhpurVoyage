@@ -1025,13 +1025,9 @@ const AdminTours = () => {
             </table>
           </div>
 
-          {/* Pagination Footer */}
-          <div className="admin-pagination-container">
-            <div className="admin-pagination-info">
-              Showing <strong>{startRecord}</strong> to <strong>{endRecord}</strong> of <strong>{effectiveTotal}</strong> tour packages
-            </div>
-
-            {maxPages > 1 && (
+          {/* Pagination Footer - only shown when more than 1 page exists */}
+          {maxPages > 1 && (
+            <div className="admin-pagination-container" style={{ justifyContent: 'flex-end' }}>
               <div className="admin-pagination-controls">
                 <button
                   type="button"
@@ -1069,8 +1065,8 @@ const AdminTours = () => {
                   Next <i className="fas fa-chevron-right"></i>
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
