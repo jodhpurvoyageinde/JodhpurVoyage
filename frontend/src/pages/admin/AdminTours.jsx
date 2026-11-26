@@ -124,7 +124,8 @@ const AdminTours = () => {
       (c.slug || '').toLowerCase() === (category || '').toLowerCase() ||
       String(c._id || '') === String(category)
     );
-    const categoryId = (category && category !== 'all' && catObj?._id) ? String(catObj._id) : undefined;
+    const isObjectId = catObj?._id && /^[0-9a-fA-F]{24}$/.test(String(catObj._id));
+    const categoryId = (category && category !== 'all' && isObjectId) ? String(catObj._id) : undefined;
     const categoryName = (category && category !== 'all') ? (catObj?.name || category) : undefined;
 
     fetchAdminTours({
@@ -133,7 +134,6 @@ const AdminTours = () => {
       search: (search || '').trim() || undefined,
       category: categoryName,
       categoryId: categoryId,
-      destinationId: categoryId,
       status: status !== 'all' ? status : undefined
     })
       .then((res) => {
@@ -152,6 +152,9 @@ const AdminTours = () => {
       })
       .catch((err) => {
         console.error(err);
+        setTours([]);
+        setTotalRecords(0);
+        setTotalPages(1);
         setLoading(false);
       });
   };
@@ -500,11 +503,112 @@ const AdminTours = () => {
     loadTours(1, searchTerm, selectedFilterCategory, val);
   };
 
+  const isTourInCategory = (tour, targetCat) => {
+    if (!targetCat || targetCat === 'all') return true;
+    const catClean = targetCat.trim().toLowerCase();
+    const tourCat = (tour.category || tour.destination || '').trim().toLowerCase();
+    const tourCatId = String(tour.categoryId || '').trim().toLowerCase();
+
+    if (catClean === 'rajasthan') {
+      return tourCat === 'rajasthan' || (tourCat.includes('rajasthan') && !tourCat.includes('gujarat'));
+    }
+    if (catClean === 'delhi') {
+      return tourCat === 'delhi' && !tourCat.includes('rajasthan');
+    }
+    if (catClean === 'agra') {
+      return tourCat === 'agra' || tourCatId === 'agra';
+    }
+    if (catClean === 'amritsar') {
+      return tourCat === 'amritsar' || tourCat === 'punjab' || tourCat.includes('amritsar');
+    }
+    if (catClean === 'varanasi' || catClean === 'benares' || catClean === 'bénarès') {
+      return tourCat === 'varanasi' || tourCat === 'benares' || tourCat === 'bénarès' || tourCat.includes('varanasi') || tourCat.includes('bénarès') || tourCat.includes('benares');
+    }
+    if (catClean === 'himachal-pradesh' || catClean === 'himachal pradesh' || catClean === 'himachal') {
+      return tourCat === 'himachal pradesh' || tourCat === 'himachal' || tourCat.includes('himachal') || tourCat.includes('dharamsala') || tourCat.includes('spiti') || tourCat.includes('kinnaur');
+    }
+    if (catClean === 'ladakh') {
+      return tourCat === 'ladakh' || tourCat.includes('ladakh');
+    }
+    if (catClean === 'rishikesh' || catClean === 'uttarakhand') {
+      return tourCat === 'rishikesh' || tourCat.includes('rishikesh') || tourCat === 'uttarakhand' || tourCat.includes('uttarakhand');
+    }
+    if (catClean === 'chennai') {
+      return tourCat === 'chennai' || tourCatId === 'chennai';
+    }
+    if (catClean === 'madras') {
+      return tourCat === 'madras';
+    }
+    if (catClean === 'bombay' || catClean === 'mumbai') {
+      return tourCat === 'bombay' || tourCat === 'mumbai';
+    }
+    if (catClean === 'goa') {
+      return tourCat === 'goa' || tourCatId === 'goa';
+    }
+    if (catClean === 'karnataka') {
+      return tourCat === 'karnataka' || tourCat.includes('karnataka');
+    }
+    if (catClean === 'kerala') {
+      return tourCat === 'kerala' || tourCat.includes('kerala');
+    }
+    if (catClean === 'tamil-nadu' || catClean === 'tamil nadu' || catClean === 'tamil') {
+      return tourCat === 'tamil nadu' || tourCat === 'tamil' || tourCat.includes('tamil');
+    }
+    if (catClean === 'orissa' || catClean === 'odisha') {
+      return tourCat === 'orissa' || tourCat === 'odisha';
+    }
+    if (catClean === 'gujarat') {
+      return tourCat === 'gujarat' || tourCat.includes('gujarat');
+    }
+    if (catClean === 'madhya-pradesh' || catClean === 'madhya pradesh' || catClean === 'madhya') {
+      return tourCat === 'madhya pradesh' || tourCat === 'madhya' || tourCat.includes('madhya');
+    }
+    if (catClean === 'darjeeling & sikkim' || catClean === 'darjeeling-sikkim' || catClean === 'darjeeling' || catClean === 'sikkim') {
+      return tourCat.includes('darjeeling') || tourCat.includes('sikkim');
+    }
+    if (catClean === 'nepal' || catClean === 'népal') {
+      return tourCat === 'nepal' || tourCat === 'népal';
+    }
+    if (catClean === 'bhoutan' || catClean === 'punakha' || catClean === 'paro' || catClean === 'thimphu') {
+      return tourCat === 'bhoutan' || tourCat.includes('bhoutan') || tourCat === catClean;
+    }
+
+    return tourCat === catClean || tourCatId === catClean;
+  };
+
   const displayTours = Array.isArray(tours) ? tours : [];
-  const filteredTours = displayTours;
+  const filteredTours = displayTours.filter(t => {
+    // 1. Strict Category Guard: Must match the category column, NOT transit tags or cities
+    if (selectedFilterCategory && selectedFilterCategory !== 'all') {
+      if (!isTourInCategory(t, selectedFilterCategory)) {
+        return false;
+      }
+    }
+    // 2. Status filter guard
+    if (selectedFilterStatus && selectedFilterStatus !== 'all') {
+      if (selectedFilterStatus === 'published' && t.published === false) return false;
+      if (selectedFilterStatus === 'draft' && t.published !== false) return false;
+    }
+    // 3. Search filter guard
+    if (searchTerm && searchTerm.trim()) {
+      const s = searchTerm.trim().toLowerCase();
+      const title = (t.title || '').toLowerCase();
+      const cat = (t.category || '').toLowerCase();
+      const loc = (t.location || '').toLowerCase();
+      const cities = Array.isArray(t.cities) 
+        ? t.cities.map(c => typeof c === 'string' ? c : c.name || '').join(' ').toLowerCase() 
+        : '';
+      if (!title.includes(s) && !cat.includes(s) && !loc.includes(s) && !cities.includes(s)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
   const itemsPerPage = getItemsPerPage(selectedFilterCategory, selectedFilterStatus, searchTerm);
-  const startRecord = totalRecords === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const endRecord = totalRecords === 0 ? 0 : Math.min((currentPage - 1) * itemsPerPage + displayTours.length, totalRecords);
+  const effectiveTotal = selectedFilterCategory !== 'all' ? filteredTours.length : totalRecords;
+  const startRecord = filteredTours.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endRecord = filteredTours.length === 0 ? 0 : Math.min((currentPage - 1) * itemsPerPage + filteredTours.length, Math.max(filteredTours.length, effectiveTotal));
 
   return (
     <AdminLayout 
@@ -916,7 +1020,7 @@ const AdminTours = () => {
           {/* Pagination Footer */}
           <div className="admin-pagination-container">
             <div className="admin-pagination-info">
-              Showing <strong>{startRecord}</strong> to <strong>{endRecord}</strong> of <strong>{totalRecords}</strong> tour packages
+              Showing <strong>{startRecord}</strong> to <strong>{endRecord}</strong> of <strong>{effectiveTotal}</strong> tour packages
             </div>
 
             {totalPages > 1 && (
