@@ -55,48 +55,6 @@ const translateExclusion = (str) => {
   return s;
 };
 
-const buildCategoryRegex = (category) => {
-  if (!category || category === 'all') return null;
-  const catNorm = category.trim().toLowerCase().replace(/_/g, '-');
-  let pattern;
-  if (catNorm === 'rajasthan') {
-    pattern = '^rajasthan|rajasthan';
-  } else if (catNorm === 'gujarat') {
-    pattern = 'gujarat';
-  } else if (catNorm === 'ladakh') {
-    pattern = 'ladakh';
-  } else if (catNorm === 'nepal') {
-    pattern = 'n[ée]pal|katmandou|kathmandu';
-  } else if (catNorm === 'kerala') {
-    pattern = 'kerala';
-  } else if (catNorm === 'karnataka') {
-    pattern = 'karnataka';
-  } else if (catNorm === 'tamil-nadu' || catNorm === 'tamil' || catNorm === 'chennai' || catNorm === 'madras') {
-    pattern = 'tamil|chennai|madras';
-  } else if (catNorm === 'delhi-agra' || catNorm === 'delhi' || catNorm === 'agra') {
-    pattern = 'delhi|agra';
-  } else if (catNorm === 'varanasi' || catNorm === 'benares') {
-    pattern = 'varanasi|b[ée]nar[èe]s';
-  } else if (catNorm === 'amritsar-punjab' || catNorm === 'amritsar' || catNorm === 'punjab') {
-    pattern = 'amritsar|punjab';
-  } else if (catNorm === 'goa') {
-    pattern = 'goa';
-  } else if (catNorm === 'orissa') {
-    pattern = 'orissa';
-  } else if (catNorm === 'bhoutan') {
-    pattern = 'bhoutan';
-  } else if (catNorm === 'himachal' || catNorm === 'himachal-pradesh' || catNorm === 'dharamsala' || catNorm === 'dharamsala-himachal' || catNorm === 'spiti' || catNorm === 'kinnaur' || catNorm === 'shimla' || catNorm === 'manali') {
-    pattern = 'himachal[\\s-]*pradesh|himachal|dharamsala|spiti|kinnaur|shimla|manali';
-  } else if (catNorm === 'rishikesh' || catNorm === 'rishikesh-uttarakhand' || catNorm === 'uttarakhand') {
-    pattern = 'rishikesh|uttarakhand|haridwar';
-  } else if (catNorm === 'madhya-pradesh' || catNorm === 'madhya') {
-    pattern = 'madhya[\\s-]*pradesh|madhya|khajuraho|orchha|gwalior|bandhavgarh|kanha';
-  } else {
-    pattern = category.replace(/-/g, ' ');
-  }
-  return { pattern, catNorm };
-};
-
 const buildAdminCategoryRegex = (category) => {
   if (!category || category === 'all') return null;
   const catNorm = category.trim().toLowerCase().replace(/_/g, '-');
@@ -119,10 +77,12 @@ const buildAdminCategoryRegex = (category) => {
     pattern = '^chennai$|\\bchennai\\b';
   } else if (catNorm === 'madras') {
     pattern = '^madras$|\\bmadras\\b';
-  } else if (catNorm === 'delhi' || catNorm === 'delhi-agra') {
+  } else if (catNorm === 'delhi') {
     pattern = '^delhi$|\\bdelhi\\b';
   } else if (catNorm === 'agra' || catNorm === 'taj-mahal-agra') {
     pattern = '^agra$|\\bagra\\b';
+  } else if (catNorm === 'delhi-agra') {
+    pattern = 'delhi|agra';
   } else if (catNorm === 'varanasi' || catNorm === 'benares' || catNorm === 'bénarès') {
     pattern = 'varanasi|b[ée]nar[èe]s';
   } else if (catNorm === 'amritsar' || catNorm === 'amritsar-punjab') {
@@ -150,6 +110,10 @@ const buildAdminCategoryRegex = (category) => {
     pattern = `^${cleanCat}$|\\b${cleanCat}\\b`;
   }
   return { pattern, catNorm };
+};
+
+const buildCategoryRegex = (category) => {
+  return buildAdminCategoryRegex(category);
 };
 
 const normalizeTour = (tour) => {
@@ -258,7 +222,7 @@ const normalizeTour = (tour) => {
 // GET /api/tours (fetches from Tour database / Tour model)
 router.get('/', async (req, res) => {
   try {
-    const { region, city, category, destination, search, limit, featured, cultureSafari } = req.query;
+    const { region, city, category, destination, search, limit, featured, cultureSafari, categoryId, destinationId } = req.query;
 
     if (isMongoConnected()) {
       const conditions = [{ published: { $ne: false } }];
@@ -271,19 +235,26 @@ router.get('/', async (req, res) => {
         conditions.push({ cultureSafari: cultureSafari === 'true' || cultureSafari === true });
       }
 
+      // 1. Strict Category & CategoryId filtering (exact same logic as in Admin Panel)
+      const targetCatId = categoryId || destinationId;
       const targetCat = category || destination;
-      if (targetCat && targetCat !== 'all') {
-        const catInfo = buildCategoryRegex(targetCat);
+
+      if (targetCatId && targetCatId !== 'all') {
+        conditions.push({
+          $or: [
+            { categoryId: targetCatId },
+            { categoryId: new RegExp(`^${targetCatId}$`, 'i') }
+          ]
+        });
+      } else if (targetCat && targetCat !== 'all') {
+        const catInfo = buildAdminCategoryRegex(targetCat);
         if (catInfo) {
           const catRegex = new RegExp(catInfo.pattern, 'i');
           conditions.push({
             $or: [
               { category: catRegex },
-              { region: catRegex },
-              { location: catRegex },
-              { title: catRegex },
-              { 'cities.name': catRegex },
-              { 'cities.slug': new RegExp(catInfo.catNorm, 'i') }
+              { categoryId: targetCat },
+              { categoryId: catInfo.catNorm }
             ]
           });
         }
@@ -379,13 +350,21 @@ router.get('/', async (req, res) => {
     if (featured !== undefined) {
       list = list.filter((t) => t.featured === (featured === 'true' || featured === true));
     }
+    const targetCatIdMem = categoryId || destinationId;
     const targetCatMem = category || destination;
-    if (targetCatMem && targetCatMem !== 'all') {
-      const cat = targetCatMem.toLowerCase().replace(/-/g, ' ');
-      list = list.filter((t) =>
-        t.category?.toLowerCase().includes(cat) ||
-        t.cities?.some((ct) => (typeof ct === 'string' ? ct : ct.name)?.toLowerCase().includes(cat) || ct.slug?.toLowerCase().includes(cat))
-      );
+
+    if (targetCatIdMem && targetCatIdMem !== 'all') {
+      list = list.filter((t) => String(t.categoryId) === String(targetCatIdMem));
+    } else if (targetCatMem && targetCatMem !== 'all') {
+      const catInfo = buildAdminCategoryRegex(targetCatMem);
+      if (catInfo) {
+        const catRegex = new RegExp(catInfo.pattern, 'i');
+        list = list.filter((t) =>
+          catRegex.test(t.category || '') ||
+          String(t.categoryId) === targetCatMem ||
+          String(t.categoryId) === catInfo.catNorm
+        );
+      }
     }
     if (region && region !== 'all') {
       const reg = region.toLowerCase().replace(/-/g, ' ');

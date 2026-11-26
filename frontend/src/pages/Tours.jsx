@@ -136,7 +136,7 @@ const Tours = () => {
     // Region category check
     if (activeRegion && activeRegion !== 'all') {
       const regNorm = activeRegion.toLowerCase();
-      const tourReg = (tour.region || tour.category || tour.location || '').toLowerCase();
+      const tourReg = (tour.region || tour.category || '').toLowerCase();
       const tourTitle = (tour.title || '').toLowerCase();
       const tourExcerpt = (tour.subtitle || tour.excerpt || tour.overview || '').toLowerCase();
 
@@ -144,11 +144,15 @@ const Tours = () => {
       if (regNorm === 'inde-du-nord' || regNorm === 'nord') {
         matchRegion = tourReg.includes('nord') || tourReg.includes('rajasthan') || tourReg.includes('delhi') || tourReg.includes('varanasi') || tourReg.includes('amritsar') || tourReg.includes('dharamsala') || tourReg.includes('rishikesh') || tourReg.includes('ladakh') || tourReg.includes('himachal') || tourReg.includes('punjab') || tourTitle.includes('nord') || tourTitle.includes('rajasthan');
       } else if (regNorm === 'inde-du-sud' || regNorm === 'sud') {
-        matchRegion = tourReg.includes('sud') || tourReg.includes('kerala') || tourReg.includes('tamil') || tourReg.includes('karnataka') || tourReg.includes('gujarat') || tourReg.includes('goa') || tourReg.includes('orissa') || tourTitle.includes('sud') || tourTitle.includes('kerala');
+        matchRegion = tourReg.includes('sud') || tourReg.includes('kerala') || tourReg.includes('tamil') || tourReg.includes('karnataka') || tourReg.includes('goa') || tourReg.includes('orissa') || tourTitle.includes('sud') || tourTitle.includes('kerala');
       } else if (regNorm === 'rajasthan') {
-        matchRegion = tourReg.includes('rajasthan') || tourTitle.includes('rajasthan') || tourExcerpt.includes('rajasthan');
+        matchRegion = (tourReg.includes('rajasthan') || tourTitle.includes('rajasthan')) && !tourReg.includes('gujarat') && !tourReg.includes('ladakh');
       } else if (regNorm === 'ladakh' || regNorm === 'himalaya') {
-        matchRegion = tourReg.includes('ladakh') || tourReg.includes('himalaya') || tourReg.includes('spiti') || tourTitle.includes('ladakh') || tourTitle.includes('himalaya');
+        matchRegion = (tourReg.includes('ladakh') || tourReg.includes('himalaya') || tourReg.includes('spiti') || tourTitle.includes('ladakh') || tourTitle.includes('himalaya')) && !tourReg.includes('amritsar');
+      } else if (regNorm === 'agra') {
+        matchRegion = (tourReg === 'agra' || tourReg.includes('agra')) && !tourReg.includes('rajasthan');
+      } else if (regNorm === 'amritsar' || regNorm === 'amritsar-punjab') {
+        matchRegion = (tourReg === 'amritsar' || tourReg.includes('amritsar') || tourReg.includes('punjab')) && !tourReg.includes('ladakh');
       } else if (regNorm === 'gujarat') {
         matchRegion = tourReg.includes('gujarat') || tourTitle.includes('gujarat');
       } else if (regNorm === 'nepal') {

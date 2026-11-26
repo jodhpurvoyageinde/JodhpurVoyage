@@ -80,6 +80,42 @@ const defaultDestinationsMap = {
     ],
     region: 'nepal'
   },
+  agra: {
+    name: 'Agra',
+    slug: 'agra',
+    heroTitle: 'Voyage à Agra & Taj Mahal',
+    h1Title: 'Agra : La Cité Impériale Moghole & Le Majestueux Taj Mahal',
+    tagline: 'Merveille du Monde, Fort d\'Agra et splendeurs mogholes',
+    image: '/images/dest-tajmahal.jpg',
+    satisfaction: '99% de satisfaction (180 avis)',
+    shortDescription: "Visitez le majestueux Taj Mahal en marbre blanc au lever du soleil et l'historique Fort d'Agra. Joyau de l'Empire moghol, Agra est une étape incontournable offrant une richesse patrimoniale et architecturale incomparable.",
+    fullDescription: "Découvrez l'ancienne capitale des empereurs moghouls. Du marbre blanc immaculé du Taj Mahal aux remparts de grès rouge du Fort d'Agra et aux ruines préservées de Fatehpur Sikri, plongez au cœur de l'histoire et du raffinement moghol.",
+    highlights: [
+      { icon: 'fa-heart', title: 'Taj Mahal au Lever du Soleil', desc: 'Merveille du Monde baignée par les douces lumières de l\'aube.' },
+      { icon: 'fa-landmark', title: 'Fort Rouge d\'Agra', desc: 'Résidence impériale moghole et forteresse classée au patrimoine de l\'UNESCO.' },
+      { icon: 'fa-archway', title: 'Fatehpur Sikri', desc: 'Cité impériale magnifiquement conservée aux portes d\'Agra.' },
+      { icon: 'fa-paint-brush', title: 'Artisans du Marbre', desc: 'Savoir-faire séculaire de marqueterie de marbre incrusté de pierres semi-précieuses.' }
+    ],
+    region: 'inde-du-nord'
+  },
+  delhi: {
+    name: 'Delhi',
+    slug: 'delhi',
+    heroTitle: 'Voyage à Delhi',
+    h1Title: 'Delhi : Capitale Millénaire entre Histoire et Modernité',
+    tagline: 'Des ruelles vibrantes d\'Old Delhi aux avenues majestueuses de New Delhi',
+    image: '/images/dest-tajmahal.jpg',
+    satisfaction: '98% de satisfaction (145 avis)',
+    shortDescription: "Capitale vibrante et carrefour millénaire, Delhi dévoile les contrastes saisissants de l'Inde : du labyrinthe historique de Chandni Chowk aux monuments majestueux de la dynastie moghole.",
+    fullDescription: "Explorez les trésors de Delhi avec chauffeur privé : la Grande Mosquée Jama Masjid, le Tombeau d'Humayun, le Qutb Minar et les boulevards verdoyants de New Delhi conçus par Lutyens.",
+    highlights: [
+      { icon: 'fa-mosque', title: 'Jama Masjid & Chandni Chowk', desc: 'La plus grande mosquée d\'Inde et balade immersive en rickshaw.' },
+      { icon: 'fa-monument', title: 'Tombeau d\'Humayun (UNESCO)', desc: 'Précurseur architectural du Taj Mahal au milieu de jardins persans.' },
+      { icon: 'fa-place-of-worship', title: 'Qutb Minar', desc: 'Plus haut minaret de briques au monde datant du XIIe siècle.' },
+      { icon: 'fa-sun', title: 'Temple du Lotus & India Gate', desc: 'Monuments emblématiques mêlant modernité, recueillement et mémoire.' }
+    ],
+    region: 'inde-du-nord'
+  },
   'delhi-agra': {
     name: 'Delhi & Taj Mahal d\'Agra',
     slug: 'delhi-agra',
@@ -290,8 +326,10 @@ const defaultDestinationsMap = {
 const defaultPackages = [];
 
 const slugAliases = {
-  'delhi': 'delhi-agra',
-  'agra': 'delhi-agra',
+  'delhi': 'delhi',
+  'agra': 'agra',
+  'taj-mahal-agra': 'agra',
+  'delhi-agra': 'delhi-agra',
   'amritsar': 'amritsar-punjab',
   'punjab': 'amritsar-punjab',
   'dharamsala': 'dharamsala-himachal',
@@ -395,27 +433,32 @@ const DestinationDetail = ({ overrideSlug }) => {
       }
 
       if (clean === 'amritsar-punjab' || clean === 'amritsar' || clean === 'punjab') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
-            !allText.includes('amritsar') && !allText.includes('punjab') && !allText.includes('golden temple')) {
+        if (cat.includes('ladakh') || cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal') || cat.includes('népal') || cat.includes('rajasthan')) {
           return false;
         }
         return cat.includes('amritsar') || cat.includes('punjab') ||
-               title.includes('amritsar') || title.includes('punjab') ||
-               loc.includes('amritsar') || loc.includes('punjab') ||
-               reg.includes('amritsar') || reg.includes('punjab') ||
-               cities.some(c => c.includes('amritsar') || c.includes('punjab'));
+               title.includes('amritsar') || title.includes('punjab');
       }
 
-      if (clean === 'delhi-agra' || clean === 'delhi' || clean === 'agra') {
-        if ((cat.includes('kerala') || cat.includes('gujarat') || cat.includes('nepal')) && 
-            !allText.includes('delhi') && !allText.includes('agra') && !allText.includes('taj mahal')) {
+      if (clean === 'agra') {
+        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bombay') || cat.includes('chennai') || cat.includes('karnataka') || cat.includes('amritsar')) {
           return false;
         }
-        return cat.includes('delhi') || cat.includes('agra') ||
-               title.includes('delhi') || title.includes('agra') ||
-               loc.includes('delhi') || loc.includes('agra') ||
-               reg.includes('delhi') || reg.includes('agra') ||
-               cities.some(c => c.includes('delhi') || c.includes('agra') || c.includes('taj'));
+        return cat === 'agra' || cat.includes('agra') || (title.includes('agra') && !title.includes('rajasthan'));
+      }
+
+      if (clean === 'delhi') {
+        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('népal') || cat.includes('bombay') || cat.includes('amritsar')) {
+          return false;
+        }
+        return cat === 'delhi' || cat.includes('delhi');
+      }
+
+      if (clean === 'delhi-agra') {
+        if (cat.includes('rajasthan') || cat.includes('gujarat') || cat.includes('ladakh') || cat.includes('kerala') || cat.includes('nepal') || cat.includes('bombay') || cat.includes('amritsar')) {
+          return false;
+        }
+        return cat.includes('delhi') || cat.includes('agra');
       }
 
       if (clean === 'dharamsala-himachal' || clean === 'dharamsala' || clean === 'himachal' || clean === 'himachal-pradesh' || clean === 'spiti' || clean === 'kinnaur' || clean === 'shimla' || clean === 'manali') {
@@ -522,31 +565,12 @@ const DestinationDetail = ({ overrideSlug }) => {
         setLoading(false);
       });
 
-    // 2. Fetch tours matching this category / destination
+    // 2. Fetch tours matching this category / destination strictly
     fetchTours({ category: currentSlug })
       .then((res) => {
         const tourList = Array.isArray(res.data) ? res.data : [];
         const filtered = filterToursForDestination(tourList, currentSlug);
-
-        if (filtered.length > 0) {
-          setPackages(filtered);
-        } else {
-          fetchTours({ region: currentSlug })
-            .then((r2) => {
-              const r2List = Array.isArray(r2.data) ? r2.data : [];
-              const filteredR2 = filterToursForDestination(r2List, currentSlug);
-              if (filteredR2.length > 0) {
-                setPackages(filteredR2);
-              } else {
-                const fallbackFiltered = defaultPackages.filter(p => 
-                  p.location?.toLowerCase().includes(currentSlug.toLowerCase()) || 
-                  p.title?.toLowerCase().includes(currentSlug.toLowerCase())
-                );
-                setPackages(fallbackFiltered);
-              }
-            })
-            .catch(() => setPackages([]));
-        }
+        setPackages(filtered);
       })
       .catch(() => {
         setPackages([]);
@@ -785,7 +809,7 @@ const DestinationDetail = ({ overrideSlug }) => {
       {/* =========================================================================
           TOUR PACKAGES GRID
           ========================================================================= */}
-      {packages && packages.length > 0 && (
+      {packages && packages.length > 0 ? (
         <section id="circuits-section" className="section-padding bg-cream">
           <div className="container">
             <div className="section-header">
@@ -831,6 +855,23 @@ const DestinationDetail = ({ overrideSlug }) => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section id="circuits-section" className="section-padding bg-cream">
+          <div className="container" style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ maxWidth: '650px', margin: '0 auto', background: '#ffffff', padding: '48px 32px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+              <i className="fas fa-map-marked-alt" style={{ fontSize: '3rem', color: 'var(--primary-color, #C58B39)', marginBottom: '18px', display: 'inline-block' }}></i>
+              <h3 style={{ fontSize: '1.45rem', fontWeight: '800', color: '#1E293B', marginBottom: '14px' }}>
+                Itinéraires sur mesure pour {activeDest.name}
+              </h3>
+              <p style={{ color: '#64748B', lineHeight: '1.75', marginBottom: '28px', fontSize: '1.02rem' }}>
+                Cette destination est entièrement personnalisable dans le cadre d'un circuit privé en Inde avec chauffeur dédié. Contactez notre équipe pour concevoir un itinéraire exclusif incluant {activeDest.name}.
+              </p>
+              <Link to="/voyage-sur-mesure" className="btn btn-primary btn-lg" style={{ borderRadius: '30px', padding: '14px 32px' }}>
+                <i className="fas fa-sliders-h" style={{ marginRight: '8px' }}></i> Concevoir Mon Voyage à {activeDest.name}
+              </Link>
             </div>
           </div>
         </section>
