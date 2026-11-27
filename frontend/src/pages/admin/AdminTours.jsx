@@ -615,9 +615,6 @@ const AdminTours = () => {
   const maxPages = Math.max(1, Math.ceil(effectiveTotal / itemsPerPage));
   const activePage = Math.min(Math.max(1, currentPage), maxPages);
 
-  const startRecord = effectiveTotal === 0 ? 0 : (activePage - 1) * itemsPerPage + 1;
-  const endRecord = effectiveTotal === 0 ? 0 : Math.min(startRecord + filteredTours.length - 1, effectiveTotal);
-
   return (
     <AdminLayout 
       title="Tours & Travel Itineraries" 
