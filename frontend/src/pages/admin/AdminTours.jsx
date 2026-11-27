@@ -6,6 +6,7 @@ import RichTextEditor from '../../components/RichTextEditor';
 import { 
   fetchAdminTours, 
   fetchAdminDestinations, 
+  fetchDestinationCategories,
   createTour, 
   updateTour, 
   deleteTour, 
@@ -185,13 +186,22 @@ const AdminTours = () => {
   };
 
   const loadDestinations = () => {
-    fetchAdminDestinations()
+    fetchDestinationCategories()
       .then((res) => {
-        if (Array.isArray(res.data)) {
+        if (Array.isArray(res.data) && res.data.length > 0) {
           setDestinationsList(res.data);
+        } else {
+          return fetchAdminDestinations().then((r) => {
+            if (Array.isArray(r.data)) setDestinationsList(r.data);
+          });
         }
       })
-      .catch((err) => console.error('Erreur chargement destinations admin:', err));
+      .catch((err) => {
+        console.error('Erreur chargement destinations admin:', err);
+        fetchAdminDestinations().then((r) => {
+          if (Array.isArray(r.data)) setDestinationsList(r.data);
+        }).catch(() => {});
+      });
   };
 
   useEffect(() => {
@@ -512,10 +522,10 @@ const AdminTours = () => {
     const tourCatId = String(tour.categoryId || '').trim().toLowerCase();
 
     if (catClean === 'rajasthan') {
-      return tourCat === 'rajasthan' || (tourCat.includes('rajasthan') && !tourCat.includes('gujarat'));
+      return (tourCat === 'rajasthan' || (tourCat.includes('rajasthan') && !tourCat.includes('gujarat')) || tourCatId === 'rajasthan' || tourCatId === '6ab2196edf6a34f9195b10c5' || tourCatId === '6ac60d86fc92c5d1638294b6') && !tourCat.includes('gujarat') && !tourCat.includes('delhi');
     }
     if (catClean === 'delhi') {
-      return tourCat === 'delhi' && !tourCat.includes('rajasthan');
+      return (tourCat === 'delhi' || tourCatId === 'delhi' || tourCatId === '6ac60d86fc92c5d1638294ba' || tourCatId === '6ab21b8f4a1fe5af024d95ff') && !tourCat.includes('rajasthan') && !tourCat.includes('himachal');
     }
     if (catClean === 'agra') {
       return tourCat === 'agra' || tourCatId === 'agra';

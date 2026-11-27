@@ -481,7 +481,7 @@ const DestinationDetail = ({ overrideSlug }) => {
         return cat === 'varanasi' || cat === 'benares' || cat === 'bénarès' || cat.includes('varanasi') || cat.includes('bénarès') || cat.includes('benares');
       }
       if (clean === 'delhi') {
-        return (cat === 'delhi' || catId === 'delhi') && !cat.includes('rajasthan');
+        return (cat === 'delhi' || catId === 'delhi' || catId === '6ac60d86fc92c5d1638294ba' || catId === '6ab21b8f4a1fe5af024d95ff') && !cat.includes('rajasthan') && !cat.includes('himachal');
       }
       if (clean === 'delhi-agra') {
         return cat === 'delhi' || cat === 'agra' || catId === 'delhi' || catId === 'agra';
@@ -493,7 +493,7 @@ const DestinationDetail = ({ overrideSlug }) => {
         return cat === 'ladakh' || cat.includes('ladakh');
       }
       if (clean === 'rajasthan') {
-        return cat === 'rajasthan' || (cat.includes('rajasthan') && !cat.includes('gujarat'));
+        return (cat === 'rajasthan' || (cat.includes('rajasthan') && !cat.includes('gujarat')) || catId === 'rajasthan' || catId === '6ab2196edf6a34f9195b10c5' || catId === '6ac60d86fc92c5d1638294b6') && !cat.includes('gujarat') && !cat.includes('delhi');
       }
       if (clean === 'rishikesh-uttarakhand' || clean === 'rishikesh' || clean === 'uttarakhand') {
         return cat === 'rishikesh' || cat.includes('rishikesh') || cat === 'uttarakhand' || cat.includes('uttarakhand');

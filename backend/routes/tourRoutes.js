@@ -112,6 +112,182 @@ const buildAdminCategoryRegex = (category) => {
   return { pattern, catNorm };
 };
 
+const CATEGORY_ID_MAP = {
+  'delhi': ['6ac60d86fc92c5d1638294ba', '6ab21b8f4a1fe5af024d95ff'],
+  'rajasthan': ['6ab2196edf6a34f9195b10c5', '6ac60d86fc92c5d1638294b6'],
+  'agra': ['6ab21b904a1fe5af024d9608'],
+  'amritsar': ['6ab21b914a1fe5af024d9612', '6ac60d86fc92c5d1638294bc'],
+  'varanasi': ['6ab21ac3bfa94bea89a588ce', '6ac60d86fc92c5d1638294bb'],
+  'benares': ['6ab21ac3bfa94bea89a588ce', '6ac60d86fc92c5d1638294bb'],
+  'bénarès': ['6ab21ac3bfa94bea89a588ce', '6ac60d86fc92c5d1638294bb'],
+  'ladakh': ['6ab21ac3bfa94bea89a588c6', '6ac60d86fc92c5d1638294bf'],
+  'gujarat': ['6ab21ac2bfa94bea89a5889d'],
+  'kerala': ['6ab21ac3bfa94bea89a588d6'],
+  'karnataka': ['6ab21ac2bfa94bea89a588a8'],
+  'tamil-nadu': ['6ab21ac4bfa94bea89a588de'],
+  'chennai': ['6ac67c791f9d93a213437c00'],
+  'bombay': ['6ac68d2f1f9d93a2134382d2', '6ac68d2f70cbb5b7201099be'],
+  'mumbai': ['6ac68d2f1f9d93a2134382d2', '6ac68d2f70cbb5b7201099be'],
+  'goa': ['6ac790e71f9d93a21344ec90'],
+  'orissa': ['6ab21ac2bfa94bea89a588bd'],
+  'nepal': ['6ab21ac2bfa94bea89a588b2', '6aabba4f458ffa5c40e97f02', '6ac60d86fc92c5d1638294c8'],
+  'népal': ['6ab21ac2bfa94bea89a588b2', '6aabba4f458ffa5c40e97f02', '6ac60d86fc92c5d1638294c8'],
+  'bhoutan': ['6ab21ac4bfa94bea89a588f6', '6ab21ac5bfa94bea89a58906', '6ab21ac5bfa94bea89a588fe'],
+  'himachal': ['6ac6aa111f9d93a21343886c', '6ac60d86fc92c5d1638294bd'],
+  'himachal-pradesh': ['6ac6aa111f9d93a21343886c', '6ac60d86fc92c5d1638294bd'],
+  'rishikesh': ['6ab21b914a1fe5af024d961e'],
+  'madhya-pradesh': ['6ac6aa831f9d93a21343886e'],
+  'darjeeling-sikkim': ['6ac6ab4f1f9d93a213438874']
+};
+
+const buildUnifiedCategoryCondition = (category, categoryId, destination) => {
+  const activeCat = (category || destination || '').trim();
+  const activeId = (categoryId || '').trim();
+
+  if ((!activeCat || activeCat === 'all') && (!activeId || activeId === 'all')) {
+    return null;
+  }
+
+  const norm = (activeCat || activeId).toLowerCase().replace(/_/g, '-');
+  const orConditions = [];
+
+  if (norm === 'delhi') {
+    orConditions.push({ category: /^delhi$|\bdelhi\b/i });
+  } else if (norm === 'rajasthan') {
+    orConditions.push({ category: /^rajasthan|rajasthan/i });
+  } else if (norm === 'agra' || norm === 'taj-mahal-agra') {
+    orConditions.push({ category: /^agra$|\bagra\b/i });
+  } else if (norm === 'delhi-agra') {
+    orConditions.push({ category: /delhi|agra/i });
+  } else if (norm === 'varanasi' || norm === 'benares' || norm === 'bénarès') {
+    orConditions.push({ category: /varanasi|b[ée]nar[èe]s/i });
+  } else if (norm === 'amritsar' || norm === 'amritsar-punjab' || norm === 'punjab') {
+    orConditions.push({ category: /^amritsar$|\bamritsar\b|^punjab$/i });
+  } else if (norm === 'gujarat') {
+    orConditions.push({ category: /^gujarat|gujarat/i });
+  } else if (norm === 'ladakh') {
+    orConditions.push({ category: /ladakh/i });
+  } else if (norm === 'nepal' || norm === 'npal' || norm === 'népal') {
+    orConditions.push({ category: /n[ée]pal/i });
+  } else if (norm === 'kerala') {
+    orConditions.push({ category: /^kerala|kerala/i });
+  } else if (norm === 'karnataka') {
+    orConditions.push({ category: /karnataka/i });
+  } else if (norm === 'tamil-nadu' || norm === 'tamil') {
+    orConditions.push({ category: /tamil/i });
+  } else if (norm === 'chennai') {
+    orConditions.push({ category: /^chennai$|\bchennai\b/i });
+  } else if (norm === 'madras') {
+    orConditions.push({ category: /^madras$|\bmadras\b/i });
+  } else if (norm === 'bombay' || norm === 'mumbai') {
+    orConditions.push({ category: /bombay|mumbai/i });
+  } else if (norm === 'goa') {
+    orConditions.push({ category: /^goa$|\bgoa\b/i });
+  } else if (norm === 'orissa') {
+    orConditions.push({ category: /^orissa$|\borissa\b/i });
+  } else if (norm === 'himachal' || norm === 'himachal-pradesh' || norm === 'dharamsala') {
+    orConditions.push({ category: /himachal|dharamsala|spiti|kinnaur/i });
+  } else if (norm === 'rishikesh' || norm === 'uttarakhand') {
+    orConditions.push({ category: /rishikesh|uttarakhand/i });
+  } else if (norm === 'madhya-pradesh' || norm === 'madhya') {
+    orConditions.push({ category: /madhya/i });
+  } else if (norm === 'darjeeling-sikkim' || norm === 'darjeeling' || norm === 'sikkim') {
+    orConditions.push({ category: /darjeeling|sikkim/i });
+  } else if (norm === 'bhoutan' || norm === 'punakha' || norm === 'paro' || norm === 'thimphu') {
+    orConditions.push({ category: /bhoutan|punakha|paro|thimphu/i });
+  } else if (activeCat) {
+    const catClean = activeCat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    orConditions.push({ category: new RegExp(`^${catClean}$`, 'i') });
+  }
+
+  const ids = new Set();
+  if (activeId && activeId !== 'all') {
+    ids.add(activeId);
+  }
+  if (CATEGORY_ID_MAP[norm]) {
+    CATEGORY_ID_MAP[norm].forEach(id => ids.add(id));
+  }
+  const idArray = Array.from(ids);
+  if (idArray.length > 0) {
+    orConditions.push({ categoryId: { $in: idArray } });
+    const objIds = idArray.filter(id => mongoose.Types.ObjectId.isValid(id)).map(id => new mongoose.Types.ObjectId(id));
+    if (objIds.length > 0) {
+      orConditions.push({ categoryId: { $in: objIds } });
+    }
+  }
+  orConditions.push({ categoryId: norm });
+  if (activeCat) {
+    orConditions.push({ categoryId: activeCat.toLowerCase() });
+  }
+
+  const result = { $or: orConditions };
+
+  if (norm === 'delhi') {
+    return {
+      $and: [
+        result,
+        { category: { $nin: ['Himachal Pradesh', 'Rajasthan', 'Gujarat'] } }
+      ]
+    };
+  }
+  if (norm === 'rajasthan') {
+    return {
+      $and: [
+        result,
+        { category: { $nin: ['Gujarat', 'Delhi', 'Himachal Pradesh'] } }
+      ]
+    };
+  }
+
+  return result;
+};
+
+const matchesUnifiedCategory = (t, category, categoryId, destination) => {
+  const activeCat = (category || destination || '').trim();
+  const activeId = (categoryId || '').trim();
+  if ((!activeCat || activeCat === 'all') && (!activeId || activeId === 'all')) return true;
+
+  const norm = (activeCat || activeId).toLowerCase().replace(/_/g, '-');
+  const cat = (t.category || '').toLowerCase().trim();
+  const catId = String(t.categoryId || '').toLowerCase().trim();
+
+  if (norm === 'delhi') {
+    return (cat === 'delhi' || catId === 'delhi' || catId === '6ac60d86fc92c5d1638294ba' || catId === '6ab21b8f4a1fe5af024d95ff') && !cat.includes('himachal') && !cat.includes('rajasthan');
+  }
+  if (norm === 'rajasthan') {
+    return (cat === 'rajasthan' || (cat.includes('rajasthan') && !cat.includes('gujarat')) || catId === 'rajasthan' || catId === '6ab2196edf6a34f9195b10c5' || catId === '6ac60d86fc92c5d1638294b6') && !cat.includes('gujarat') && !cat.includes('delhi');
+  }
+  if (norm === 'agra' || norm === 'taj-mahal-agra') {
+    return cat === 'agra' || catId === 'agra' || catId === '6ab21b904a1fe5af024d9608';
+  }
+  if (norm === 'delhi-agra') {
+    return cat === 'delhi' || cat === 'agra' || catId === 'delhi' || catId === 'agra';
+  }
+  if (norm === 'amritsar' || norm === 'amritsar-punjab' || norm === 'punjab') {
+    return cat === 'amritsar' || cat === 'punjab' || cat.includes('amritsar');
+  }
+  if (norm === 'varanasi' || norm === 'benares' || norm === 'bénarès') {
+    return cat.includes('varanasi') || cat.includes('benares') || cat.includes('bénarès');
+  }
+  if (norm === 'gujarat') return cat.includes('gujarat');
+  if (norm === 'ladakh') return cat.includes('ladakh');
+  if (norm === 'nepal' || norm === 'npal' || norm === 'népal') return cat.includes('nepal') || cat.includes('népal');
+  if (norm === 'kerala') return cat.includes('kerala');
+  if (norm === 'karnataka') return cat.includes('karnataka');
+  if (norm === 'tamil-nadu' || norm === 'tamil') return cat.includes('tamil');
+  if (norm === 'chennai') return cat === 'chennai' || catId === 'chennai';
+  if (norm === 'bombay' || norm === 'mumbai') return cat === 'bombay' || cat === 'mumbai';
+  if (norm === 'goa') return cat === 'goa' || catId === 'goa';
+  if (norm === 'orissa') return cat === 'orissa';
+  if (norm === 'himachal' || norm === 'himachal-pradesh') return cat.includes('himachal') || cat.includes('dharamsala');
+  if (norm === 'rishikesh') return cat.includes('rishikesh') || cat.includes('uttarakhand');
+  if (norm === 'madhya-pradesh') return cat.includes('madhya');
+  if (norm === 'darjeeling-sikkim') return cat.includes('darjeeling') || cat.includes('sikkim');
+  if (norm === 'bhoutan') return cat.includes('bhoutan');
+
+  return cat === norm || catId === norm;
+};
+
 const buildCategoryRegex = (category) => {
   return buildAdminCategoryRegex(category);
 };
@@ -235,29 +411,10 @@ router.get('/', async (req, res) => {
         conditions.push({ cultureSafari: cultureSafari === 'true' || cultureSafari === true });
       }
 
-      // 1. Strict Category & CategoryId filtering (exact same logic as in Admin Panel)
-      const targetCatId = categoryId || destinationId;
-      const targetCat = category || destination;
-
-      if (targetCatId && targetCatId !== 'all') {
-        conditions.push({
-          $or: [
-            { categoryId: targetCatId },
-            { categoryId: new RegExp(`^${targetCatId}$`, 'i') }
-          ]
-        });
-      } else if (targetCat && targetCat !== 'all') {
-        const catInfo = buildAdminCategoryRegex(targetCat);
-        if (catInfo) {
-          const catRegex = new RegExp(catInfo.pattern, 'i');
-          conditions.push({
-            $or: [
-              { category: catRegex },
-              { categoryId: targetCat },
-              { categoryId: catInfo.catNorm }
-            ]
-          });
-        }
+      // 1. Strict Category & CategoryId filtering (exact same unified logic across Website & Admin)
+      const unifiedCatCond = buildUnifiedCategoryCondition(category, categoryId || destinationId, destination);
+      if (unifiedCatCond) {
+        conditions.push(unifiedCatCond);
       }
 
       if (region && region !== 'all') {
@@ -350,21 +507,8 @@ router.get('/', async (req, res) => {
     if (featured !== undefined) {
       list = list.filter((t) => t.featured === (featured === 'true' || featured === true));
     }
-    const targetCatIdMem = categoryId || destinationId;
-    const targetCatMem = category || destination;
-
-    if (targetCatIdMem && targetCatIdMem !== 'all') {
-      list = list.filter((t) => String(t.categoryId) === String(targetCatIdMem));
-    } else if (targetCatMem && targetCatMem !== 'all') {
-      const catInfo = buildAdminCategoryRegex(targetCatMem);
-      if (catInfo) {
-        const catRegex = new RegExp(catInfo.pattern, 'i');
-        list = list.filter((t) =>
-          catRegex.test(t.category || '') ||
-          String(t.categoryId) === targetCatMem ||
-          String(t.categoryId) === catInfo.catNorm
-        );
-      }
+    if ((category && category !== 'all') || (destination && destination !== 'all') || (categoryId && categoryId !== 'all') || (destinationId && destinationId !== 'all')) {
+      list = list.filter((t) => matchesUnifiedCategory(t, category, categoryId || destinationId, destination));
     }
     if (region && region !== 'all') {
       const reg = region.toLowerCase().replace(/-/g, ' ');
@@ -420,27 +564,9 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     if (status === 'published') conditions.push({ published: true });
     else if (status === 'draft') conditions.push({ published: false });
 
-    const activeCatFilter = category || destination;
-    if (categoryId || activeCatFilter) {
-      const orConditions = [];
-      if (categoryId && categoryId !== 'all') {
-        orConditions.push({ categoryId: categoryId });
-        if (mongoose.Types.ObjectId.isValid(categoryId)) {
-          orConditions.push({ categoryId: new mongoose.Types.ObjectId(categoryId) });
-        }
-      }
-      if (activeCatFilter) {
-        const catInfo = buildAdminCategoryRegex(activeCatFilter);
-        if (catInfo) {
-          orConditions.push({ category: new RegExp(catInfo.pattern, 'i') });
-        } else {
-          const catClean = activeCatFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          orConditions.push({ category: new RegExp(`^${catClean}$`, 'i') });
-        }
-      }
-      if (orConditions.length > 0) {
-        conditions.push({ $or: orConditions });
-      }
+    const unifiedCatCond = buildUnifiedCategoryCondition(category, categoryId, destination);
+    if (unifiedCatCond) {
+      conditions.push(unifiedCatCond);
     }
 
     if (search) {
@@ -490,16 +616,8 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     let list = [...(memoryStore.tours || [])];
     if (status === 'published') list = list.filter(t => t.published !== false);
     else if (status === 'draft') list = list.filter(t => t.published === false);
-    const activeCatMem = category || destination;
-    if (categoryId && categoryId !== 'all') {
-      list = list.filter(t => String(t.categoryId || '') === String(categoryId));
-    } else if (activeCatMem && activeCatMem !== 'all') {
-      const catInfo = buildAdminCategoryRegex(activeCatMem);
-      const catRegex = catInfo ? new RegExp(catInfo.pattern, 'i') : new RegExp(activeCatMem.replace(/-/g, ' '), 'i');
-      list = list.filter(t => 
-        catRegex.test(t.category || '') || 
-        String(t.categoryId || '') === String(activeCatMem)
-      );
+    if ((category && category !== 'all') || (destination && destination !== 'all') || (categoryId && categoryId !== 'all')) {
+      list = list.filter(t => matchesUnifiedCategory(t, category, categoryId, destination));
     }
     if (search) {
       const s = search.toLowerCase();
