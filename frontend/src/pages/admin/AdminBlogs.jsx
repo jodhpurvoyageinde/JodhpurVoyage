@@ -280,12 +280,8 @@ const AdminBlogs = () => {
           </div>
 
           {/* Pagination Footer */}
-          <div className="admin-pagination-container">
-            <div className="admin-pagination-info">
-              Showing <strong>{totalRecords === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to <strong>{Math.min(currentPage * ITEMS_PER_PAGE, totalRecords)}</strong> of <strong>{totalRecords}</strong> articles
-            </div>
-
-            {totalPages > 1 && (
+          {totalPages > 1 && (
+            <div className="admin-pagination-container" style={{ justifyContent: 'flex-end' }}>
               <div className="admin-pagination-controls">
                 <button
                   type="button"
@@ -323,8 +319,8 @@ const AdminBlogs = () => {
                   Next <i className="fas fa-chevron-right"></i>
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

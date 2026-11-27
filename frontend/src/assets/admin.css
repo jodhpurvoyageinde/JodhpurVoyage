@@ -749,7 +749,7 @@
 /* Admin Pagination */
 .admin-pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
@@ -760,14 +760,7 @@
 }
 
 .admin-pagination-info {
-  font-size: 0.88rem;
-  color: #64748B;
-  font-weight: 500;
-}
-
-.admin-pagination-info strong {
-  color: #1E293B;
-  font-weight: 600;
+  display: none !important;
 }
 
 .admin-pagination-controls {
